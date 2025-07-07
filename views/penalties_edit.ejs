@@ -1,4 +1,5 @@
-<h2>Strafe bearbeiten</h2>
+
+<h2>Neue Strafe vergeben</h2>
 <% if (error) { %>
   <div class="error"><%= error %></div>
 <% } %>
@@ -6,22 +7,22 @@
   <label>Nutzer:</label>
   <select name="user_id" required>
     <% users.forEach(u => { %>
-      <option value="<%= u.id %>" <%= penalty.user_id === u.id ? 'selected' : '' %>><%= u.username %></option>
+      <option value="<%= u.id %>"><%= u.username %></option>
     <% }) %>
   </select>
   
   <label>Art der Strafe:</label>
-  <input type="text" name="type" value="<%= penalty.type %>" required>
+  <input type="text" name="type" required>
 
   <label>Veranstaltung:</label>
-  <input type="text" name="event" value="<%= penalty.event %>" required>
+  <input type="text" name="event" required>
 
   <label>Grund / Beschreibung:</label>
-  <input type="text" name="reason" value="<%= penalty.reason %>" required>
+  <input type="text" name="reason" required>
 
   <label>Datum:</label>
-  <input type="date" name="date" value="<%= penalty.date ? penalty.date.toISOString ? penalty.date.toISOString().slice(0,10) : penalty.date : '' %>" required>
+  <input type="date" name="date" required>
 
-  <button type="submit" class="btn">💾 Speichern</button>
-  <a href="/penalties" class="btn btn-cancel">Abbrechen</a>
+  <button type="submit" class="btn">➕ Eintragen</button>
+  <a href="/penalties" class="btn btn-delete">Abbrechen</a>
 </form>
