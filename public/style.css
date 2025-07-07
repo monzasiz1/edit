@@ -20,16 +20,18 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--main-bg);
   color: var(--text-color);
+  line-height: 1.6;
 }
 
 /* Container */
 .container {
   max-width: var(--max-width);
   margin: calc(var(--nav-height) + 2rem) auto 2rem;
-  padding: 1.5rem 2rem;
+  padding: 2rem 3rem;
   background: var(--white);
   border-radius: var(--border-radius);
-  box-shadow: 0 4px 12px rgb(98 118 74 / 0.15);
+  box-shadow: 0 6px 18px rgba(98, 118, 74, 0.12);
+  transition: padding 0.3s ease;
 }
 
 /* Navigation */
@@ -41,29 +43,33 @@ nav.main-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 3rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 1000;
+  transition: padding 0.3s ease;
 }
 nav.main-nav .logo {
   display: flex;
   align-items: center;
   color: var(--white);
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   text-decoration: none;
+  user-select: none;
+  transition: font-size 0.3s ease;
 }
 nav.main-nav .logo img {
-  height: 36px; /* Angemessene Logo-Höhe */
-  margin-right: 10px;
+  height: 28px; /* kleineres Logo */
+  margin-right: 8px;
   border-radius: 0.3rem;
   object-fit: contain;
+  transition: height 0.3s ease;
 }
 
 /* Menü */
 nav.main-nav ul {
   display: flex;
-  gap: 1.6rem;
+  gap: 1.8rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -72,12 +78,15 @@ nav.main-nav ul li a {
   color: var(--white);
   text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.1rem;
   transition: color var(--transition-speed);
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
 }
 nav.main-nav ul li a:hover,
 nav.main-nav ul li a:focus {
   color: var(--accent-color);
+  background: rgba(156, 180, 114, 0.15);
   outline: none;
 }
 
@@ -103,6 +112,15 @@ nav.main-nav ul li a:focus {
 
 /* Mobile Navigation */
 @media (max-width: 768px) {
+  nav.main-nav {
+    padding: 0 1.5rem;
+  }
+  nav.main-nav .logo {
+    font-size: 1.4rem;
+  }
+  nav.main-nav .logo img {
+    height: 36px;
+  }
   nav.main-nav ul {
     position: fixed;
     top: var(--nav-height);
