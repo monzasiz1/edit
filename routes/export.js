@@ -17,12 +17,15 @@ function requireLogin(req, res, next) {
 }
 
 // Eigenes Strafregister exportieren (Mitglied/Admin)
-router.get('/me', requireLogin, async (req, res) => {
-  try {
-    const penalties = (await db.query(
-      'SELECT * FROM penalties WHERE user_id = $1 ORDER BY date DESC',
-      [req.session.user.id]
-    )).rows;
+router.get('/', requireLogin, async (req, res) => {
+  let users = [];
+  if (req.session.user.is_admin) {
+    const result = await db.query('SELECT id, username FROM users ORDER BY username');
+    users = result.rows;
+  }
+  res.render('export', { user: req.session.user, users });
+});
+
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
