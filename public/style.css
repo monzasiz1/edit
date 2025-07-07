@@ -1,37 +1,45 @@
-/* Grundfarben & Variablen */
+/* Variablen & Farbpalette */
 :root {
-  --main-bg: #f5f7f3;
-  --primary-color: #62764a;
-  --accent-color: #9cb472;
-  --text-color: #2f2f2f;
-  --white: #fff;
-  --nav-height: 60px;
-  --border-radius: 8px;
-  --max-width: 960px;
-  --transition-speed: 0.3s;
+  --bg-light: #f4f6f8;
+  --bg-white: #fff;
+  --color-primary: #345f24;    /* dunkles Grün */
+  --color-accent: #6fa447;     /* helleres Grün */
+  --color-text: #2e2e2e;
+  --color-muted: #6e6e6e;
+  --border-radius: 12px;
+  --nav-height: 64px;
+  --max-width: 1024px;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --transition: 0.3s ease;
+  --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Reset & Basis */
-* {
+/* Grundreset */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--main-bg);
-  color: var(--text-color);
-  line-height: 1.6;
+  font-family: var(--font-sans);
+  background: var(--bg-light);
+  color: var(--color-text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Container */
+/* Container zentriert mit max Breite und weichem Schatten */
 .container {
   max-width: var(--max-width);
-  margin: calc(var(--nav-height) + 2rem) auto 2rem;
-  padding: 2rem 3rem;
-  background: var(--white);
+  margin: calc(var(--nav-height) + 3rem) auto 3rem auto;
+  padding: 2.5rem 3rem;
+  background: var(--bg-white);
   border-radius: var(--border-radius);
-  box-shadow: 0 6px 18px rgba(98, 118, 74, 0.12);
-  transition: padding 0.3s ease;
+  box-shadow: 0 4px 16px var(--shadow-medium);
+  transition: padding var(--transition);
 }
 
 /* Navigation */
@@ -39,63 +47,66 @@ nav.main-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--nav-height);
-  background: var(--primary-color);
+  background: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 3rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 12px var(--shadow-medium);
   z-index: 1000;
-  transition: padding 0.3s ease;
+  user-select: none;
+  transition: background-color var(--transition);
 }
 nav.main-nav .logo {
   display: flex;
   align-items: center;
-  color: var(--white);
+  color: var(--bg-white);
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   text-decoration: none;
-  user-select: none;
-  transition: font-size 0.3s ease;
+  letter-spacing: 0.03em;
+  font-variant: small-caps;
 }
 nav.main-nav .logo img {
-  height: 28px; /* kleineres Logo */
-  margin-right: 8px;
-  border-radius: 0.3rem;
+  height: 28px;
+  margin-right: 12px;
+  border-radius: 6px;
   object-fit: contain;
-  transition: height 0.3s ease;
+  filter: drop-shadow(0 0 0.3rem rgba(0,0,0,0.15));
+  transition: height var(--transition);
 }
 
-/* Menü */
+/* Menü: Flex, sauberer Abstand, elegante Links */
 nav.main-nav ul {
   display: flex;
-  gap: 1.8rem;
+  gap: 2rem;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 nav.main-nav ul li a {
-  color: var(--white);
+  color: var(--bg-white);
   text-decoration: none;
   font-weight: 600;
   font-size: 1.1rem;
-  transition: color var(--transition-speed);
-  padding: 0.25rem 0.5rem;
-  border-radius: 5px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  transition: background-color var(--transition), color var(--transition);
 }
 nav.main-nav ul li a:hover,
 nav.main-nav ul li a:focus {
-  color: var(--accent-color);
-  background: rgba(156, 180, 114, 0.15);
-  outline: none;
+  background-color: var(--color-accent);
+  color: var(--bg-white);
+  outline-offset: 2px;
+  outline: 2px solid var(--bg-white);
 }
 
-/* Hamburger Menü (mobil) */
+/* Hamburger Menü für Mobil */
 .menu-toggle {
   display: none;
   flex-direction: column;
   justify-content: space-around;
-  width: 28px;
+  width: 30px;
   height: 22px;
   background: transparent;
   border: none;
@@ -105,9 +116,9 @@ nav.main-nav ul li a:focus {
 .menu-toggle span {
   width: 100%;
   height: 3px;
-  background: var(--white);
+  background: var(--bg-white);
   border-radius: 3px;
-  transition: all var(--transition-speed);
+  transition: all var(--transition);
 }
 
 /* Mobile Navigation */
@@ -116,68 +127,72 @@ nav.main-nav ul li a:focus {
     padding: 0 1.5rem;
   }
   nav.main-nav .logo {
-    font-size: 1.4rem;
-  }
-  nav.main-nav .logo img {
-    height: 36px;
+    font-size: 1.3rem;
   }
   nav.main-nav ul {
     position: fixed;
     top: var(--nav-height);
     right: 0;
-    background: var(--primary-color);
+    background: var(--color-primary);
     flex-direction: column;
-    width: 220px;
+    width: 240px;
     height: calc(100vh - var(--nav-height));
-    padding: 2rem 1.5rem;
-    box-shadow: -4px 0 16px rgba(0,0,0,0.3);
+    padding: 2rem 2rem 2rem 1.5rem;
+    box-shadow: -6px 0 20px var(--shadow-medium);
     transform: translateX(100%);
-    transition: transform var(--transition-speed);
-    border-radius: 0 0 0 10px;
+    transition: transform var(--transition);
+    border-radius: 0 0 0 14px;
     overflow-y: auto;
   }
   nav.main-nav ul.active {
     transform: translateX(0);
   }
   nav.main-nav ul li {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
   }
   nav.main-nav ul li:last-child {
     margin-bottom: 0;
   }
   nav.main-nav ul li a {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
   }
   .menu-toggle {
     display: flex;
   }
 }
 
-/* Buttons */
+/* Buttons: weich, modern, Hover mit Schatten */
 button, a.btn {
-  background-color: var(--primary-color);
-  color: var(--white);
+  background-color: var(--color-primary);
+  color: var(--bg-white);
   border: none;
-  border-radius: 9999px;
-  padding: 0.5rem 1.5rem;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: 50px;
+  padding: 0.6rem 1.75rem;
+  font-weight: 700;
+  font-size: 1.1rem;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color var(--transition-speed);
+  transition: background-color var(--transition), box-shadow var(--transition);
   user-select: none;
-  display: inline-block;
-  text-align: center;
+  box-shadow: 0 2px 10px var(--shadow-light);
 }
 button:hover, a.btn:hover,
 button:focus, a.btn:focus {
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
+  box-shadow: 0 4px 20px var(--shadow-medium);
   outline: none;
 }
 
-/* Formulare */
+/* Formulare mit viel Luft & größerem Font */
 form {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+  max-width: 500px;
+}
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
 }
 input[type="text"],
 input[type="password"],
@@ -185,12 +200,12 @@ input[type="date"],
 select,
 textarea {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  margin-top: 0.3rem;
-  border: 1.5px solid #c4c9b5;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.2rem;
+  border: 2px solid #c4c9b5;
   border-radius: var(--border-radius);
-  font-size: 1rem;
-  transition: border-color var(--transition-speed);
+  font-size: 1.1rem;
+  transition: border-color var(--transition);
   font-family: inherit;
   box-sizing: border-box;
 }
@@ -199,66 +214,73 @@ input[type="password"]:focus,
 input[type="date"]:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   outline: none;
+  box-shadow: 0 0 5px var(--color-accent);
 }
 
-/* Tabellen */
+/* Tabellen mit Card-Look */
 table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 14px;
-  margin-top: 2rem;
-  font-size: 1rem;
+  border-spacing: 0 20px;
+  margin-top: 2.5rem;
+  font-size: 1.1rem;
 }
 th, td {
-  padding: 0.85rem 1rem;
+  padding: 1rem 1.25rem;
   text-align: left;
   vertical-align: middle;
 }
 th {
-  background-color: var(--primary-color);
-  color: var(--white);
+  background-color: var(--color-primary);
+  color: var(--bg-white);
   font-weight: 700;
-  border-radius: 8px 8px 0 0;
+  border-radius: 12px 12px 0 0;
+  letter-spacing: 0.02em;
+  user-select: none;
 }
 tr {
-  background-color: var(--white);
-  box-shadow: 0 4px 12px rgba(98,118,74,0.12);
+  background-color: var(--bg-white);
+  box-shadow: 0 6px 20px var(--shadow-light);
   transition: box-shadow 0.3s ease;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 12px 12px;
+  cursor: default;
 }
 tr:hover {
-  box-shadow: 0 6px 18px rgba(98,118,74,0.25);
+  box-shadow: 0 10px 36px var(--shadow-medium);
+  background-color: #f9fcf7;
 }
 td:first-child {
-  border-bottom-left-radius: 8px;
+  border-bottom-left-radius: 12px;
 }
 td:last-child {
-  border-bottom-right-radius: 8px;
+  border-bottom-right-radius: 12px;
 }
 
-/* Fehler & Erfolg */
+/* Fehlermeldungen */
 .error {
-  background: #ffeaea;
-  color: #a70000;
-  padding: 1rem 1.2rem;
+  background: #ffebe9;
+  color: #b32323;
+  padding: 1.25rem 1.5rem;
   border-radius: var(--border-radius);
-  margin: 1rem 0;
-  font-weight: 600;
-  box-shadow: 0 0 6px rgba(167, 0, 0, 0.3);
+  margin: 1.5rem 0;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(179,35,35,0.25);
+  user-select: none;
 }
 .success {
-  background: #e6f6e9;
-  color: #1a6d24;
-  padding: 1rem 1.2rem;
+  background: #e7f4e8;
+  color: #1f7a2e;
+  padding: 1.25rem 1.5rem;
   border-radius: var(--border-radius);
-  margin: 1rem 0;
-  font-weight: 600;
-  box-shadow: 0 0 6px rgba(26, 109, 36, 0.3);
+  margin: 1.5rem 0;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(31,122,46,0.25);
+  user-select: none;
 }
 
-/* Utility */
+/* Utility-Klassen */
 .hidden {
   display: none !important;
 }
