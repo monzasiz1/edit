@@ -449,3 +449,21 @@ a.btn-delete:hover, .btn.btn-delete:hover {
 .btn-delete:hover, .btn-cancel:hover {
   background: #cfd8e3;
 }
+.btn-small {
+  font-size: 0.93rem;
+  padding: 0.34rem 1rem;
+  border-radius: 18px;
+  margin-right: 0.3rem;
+}
+.btn-cancel {
+  background: #e9ecf4;
+  color: #2b3445;
+}
+.btn-cancel:hover {
+  background: #d3d6dd;
+}
+nav.main-nav .logo img {
+  height: 60px;
+  
+  /* ...wie bisher */
+}
