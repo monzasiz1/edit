@@ -7,24 +7,26 @@ async function init() {
   await pool.query('DROP TABLE IF EXISTS users CASCADE;');
   // -------------------------------------------------------
 
-  // Tabelle für Benutzer
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      username VARCHAR(50) UNIQUE NOT NULL,
-      password VARCHAR(200) NOT NULL,
-      is_admin BOOLEAN DEFAULT FALSE
-    );
-  `);
+  CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(200) NOT NULL,
+    is_admin BOOLEAN DEFAULT FALSE
+  );
+`);
 
-  // Tabelle für Strafen
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS penalties (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      reason TEXT NOT NULL,
-      date DATE DEFAULT CURRENT_DATE
-    );
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS penalties (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    date DATE DEFAULT CURRENT_DATE,
+    type VARCHAR(100),                -- Art der Strafe
+    event VARCHAR(100),               -- Veranstaltung
+    created_at TIMESTAMP DEFAULT NOW() -- Zeitpunkt der Eintragung
+  );
+    
   `);
 
   // Optional: Standard-Admin einfügen (wenn nicht vorhanden)

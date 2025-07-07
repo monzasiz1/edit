@@ -7,37 +7,35 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/style.css">
   <script src="/register-sw.js" defer></script>
+  <script src="/menu.js" defer></script>
+
   <meta name="theme-color" content="#88896c">
 </head>
 <body>
   <header>
 
     <nav class="main-nav">
-      <a href="/" class="logo"><img src="/logo.png" alt="Logo" style="height:2em;vertical-align:middle;"> Spießbuch</a>
-      <% if (user) { %>
-        <span class="nav-user">👤 <%= user.username %> <% if (user.is_admin) { %> (Admin) <% } %></span>
-        <a href="/dashboard">Dashboard</a>
-        <% if (user.is_admin) { %>
-          <a href="/users">Benutzer</a>
-          <a href="/penalties">Strafen</a>
-          <a href="/export/all">PDF (Alle Strafen)</a>
-        <% } else { %>
-          <a href="/export/me">PDF-Export</a>
-        <% } %>
-        <form action="/logout" method="post" style="display:inline">
-          <button>Logout</button>
-        </form>
-      <% } else { %>
-        <a href="/login">Login</a>
-        <a href="/register">Registrieren</a>
-      <% } %>
-    </nav>
+  <a href="/" class="logo"><img src="/logo.png" alt="Logo">Spießbuch</a>
+  <div class="menu-toggle" id="menu-toggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <ul id="menu">
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/penalties">Strafen</a></li>
+    <li><a href="/users">Benutzer</a></li>
+    <li><a href="/export">Export</a></li>
+    <li><a href="/logout">Logout</a></li>
+  </ul>
+</nav>
+
   </header>
   <main class="container">
     <%- body %>
   </main>
   <footer>
-    <small>© <%= new Date().getFullYear() %> Spießstrafen-Tool – by dein Verein</small>
+    <small>© <%= new Date().getFullYear() %> Speißbuch-App 1.0 - by RS</small>
   </footer>
 </body>
 </html>
