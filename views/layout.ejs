@@ -11,8 +11,9 @@
 </head>
 <body>
   <header>
+
     <nav class="main-nav">
-      <a href="/" class="logo">🥨 Spießbuch</a>
+      <a href="/" class="logo"><img src="/logo.png" alt="Logo" style="height:2em;vertical-align:middle;"> Spießbuch</a>
       <% if (user) { %>
         <span class="nav-user">👤 <%= user.username %> <% if (user.is_admin) { %> (Admin) <% } %></span>
         <a href="/dashboard">Dashboard</a>

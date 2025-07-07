@@ -1,20 +1,20 @@
 
 
-<h2>PDF-Export</h2>
+<h2>📄 PDF-Export</h2>
 
 <% if (user.is_admin) { %>
   <section>
-    <h3>Alle Strafen als PDF</h3>
-    <a href="/export/all" class="button" target="_blank">Alle Strafen herunterladen</a>
+    <h3>📚 Alle Strafen als PDF</h3>
+    <a href="/export/all" class="btn btn-add" target="_blank">⬇️ Alle Strafen herunterladen</a>
   </section>
   <section style="margin-top:2em">
-    <h3>PDF für einzelne Nutzer</h3>
+    <h3>👥 PDF für einzelne Nutzer</h3>
     <% if (users && users.length) { %>
-      <ul>
+      <ul style="list-style:none; padding-left:0;">
         <% users.forEach(u => { %>
-          <li>
-            <strong><%= u.username %></strong>
-            <a href="/export/user/<%= u.id %>" target="_blank" class="button small">PDF</a>
+          <li style="margin-bottom:0.7em;">
+            <span style="display:inline-block; min-width:120px;"><strong>👤 <%= u.username %></strong></span>
+            <a href="/export/user/<%= u.id %>" target="_blank" class="btn btn-small">📥 PDF</a>
           </li>
         <% }) %>
       </ul>
@@ -26,7 +26,7 @@
 
 <% if (!user.is_admin) { %>
   <section>
-    <h3>Mein Strafenkonto als PDF</h3>
-    <a href="/export/me" class="button" target="_blank">PDF herunterladen</a>
+    <h3>🧾 Mein Strafenkonto als PDF</h3>
+    <a href="/export/me" class="btn" target="_blank">📥 PDF herunterladen</a>
   </section>
 <% } %>

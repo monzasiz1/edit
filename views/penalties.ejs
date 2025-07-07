@@ -1,16 +1,26 @@
+<h2>🥨 Alle Strafen</h2>
+<a href="/penalties/add" class="btn btn-add">➕ Neue Strafe vergeben</a>
 
-<h2>Alle Strafen</h2>
-<a href="/penalties/add">+ Neue Strafe vergeben</a>
 <table>
-  <tr><th>Nutzer</th><th>Datum</th><th>Grund</th><th>Aktion</th></tr>
+  <tr>
+    <th>👤 Nutzer</th>
+    <th>📆 Datum</th>
+    <th>🎯 Art</th>
+    <th>🎉 Veranstaltung</th>
+    <th>📝 Grund</th>
+    <th>⚙️ Aktion</th>
+  </tr>
   <% penalties.forEach(p => { %>
     <tr>
       <td><%= p.username %></td>
-      <td><%= p.date %></td>
+      <td><%= p.date ? p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date : '' %></td>
+      <td><%= p.type %></td>
+      <td><%= p.event %></td>
       <td><%= p.reason %></td>
       <td>
+        <a href="/penalties/edit/<%= p.id %>" class="btn">✏️ Bearbeiten</a>
         <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
-          <button onclick="return confirm('Wirklich löschen?')">Löschen</button>
+          <button class="btn btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
         </form>
       </td>
     </tr>

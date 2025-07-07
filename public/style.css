@@ -5,11 +5,22 @@
   --border: #b6b69e;
 }
 body {
-  margin: 0;
-  font-family: system-ui, Arial, sans-serif;
-  background: var(--main-bg);
+    font-family: 'Segoe UI', sans-serif;
+  background: #f5faf7;
   color: #222;
 }
+
+header, .main-nav {
+  background: #B4B9A6; /* Schilfgrün */
+  color: #222;
+  padding: 1em 2em;
+  border-radius: 0 0 2em 2em;
+}
+.logo img {
+  margin-right: 8px;
+  border-radius: 0.5em;
+}
+
 header {
   background: var(--main-green);
   color: #fff;
@@ -73,14 +84,23 @@ button:hover {
   margin-bottom: 1em;
 }
 table {
-  width: 100%;
+   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2em;
+  background: white;
+  border-radius: 1em;
+  overflow: hidden;
+  box-shadow: 0 4px 24px #bccab5aa;
 }
 th, td {
-  padding: 0.5em 0.7em;
-  border: 1px solid var(--border);
-  text-align: left;
+  padding: 1em;
+  border-bottom: 1px solid #eee;
+}
+th {
+  background: #DDE0D0;
+}
+tr:last-child td {
+  border-bottom: none;
 }
 footer {
   text-align: center;
@@ -90,4 +110,60 @@ footer {
 @media (max-width: 700px) {
   .container { padding: 1rem; }
   .main-nav { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+}
+
+.btn {
+  display: inline-block;
+  background: #7E876C;
+  color: #fff;
+  padding: 0.4em 1.2em;
+  border-radius: 1em;
+  border: none;
+  text-decoration: none;
+  font-size: 1em;
+  cursor: pointer;
+  margin: 0.2em 0;
+  transition: background 0.15s;
+}
+.btn:hover {
+  background: #a5b595;
+}
+.btn-add {
+  background: #55b452;
+}
+.btn-add:hover {
+  background: #3e9445;
+}
+.btn-small {
+  padding: 0.3em 0.7em;
+  font-size: 0.95em;
+}
+
+button, input[type="submit"] {
+  background: #7E876C;
+  color: white;
+  border: none;
+  border-radius: 1em;
+  padding: 0.5em 1.5em;
+  cursor: pointer;
+  margin: 0.2em;
+  transition: background 0.2s;
+}
+button:hover, input[type="submit"]:hover {
+  background: #a5b595;
+}
+.error {
+  color: #B42323;
+  background: #ffecec;
+  border-radius: 0.7em;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+.success {
+  color: #257A32;
+  background: #e9ffe9;
+  border-radius: 0.7em;
+  padding: 1em;
+  margin-bottom: 1em;
 }

@@ -1,14 +1,28 @@
 
 <h2>Neue Strafe vergeben</h2>
-<% if (error) { %><div class="error"><%= error %></div><% } %>
-<form method="POST" action="/penalties/add">
+<% if (error) { %>
+  <div class="error"><%= error %></div>
+<% } %>
+<form method="POST">
+  <label>Nutzer:</label>
   <select name="user_id" required>
-    <option value="">Nutzer wählen</option>
     <% users.forEach(u => { %>
       <option value="<%= u.id %>"><%= u.username %></option>
     <% }) %>
   </select>
-  <input type="text" name="reason" placeholder="Grund" required />
-  <button type="submit">Vergeben</button>
+  
+  <label>Art der Strafe:</label>
+  <input type="text" name="type" required>
+
+  <label>Veranstaltung:</label>
+  <input type="text" name="event" required>
+
+  <label>Grund / Beschreibung:</label>
+  <input type="text" name="reason" required>
+
+  <label>Datum:</label>
+  <input type="date" name="date" required>
+
+  <button type="submit" class="btn">➕ Eintragen</button>
+  <a href="/penalties" class="btn btn-delete">Abbrechen</a>
 </form>
-<a href="/penalties">Zurück</a>
