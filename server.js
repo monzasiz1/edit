@@ -26,12 +26,21 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Bei HTTPS auf true setzen
+  cookie: { secure: false }
 }));
+
+// --- Hier einfügen (macht user überall im Template verfügbar) ---
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+});
+// ---------------------------------------------------------------
 
 // Routen
 app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
+// usw.
+
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users', require('./routes/users'));
 app.use('/export', require('./routes/export'));
