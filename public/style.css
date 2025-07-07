@@ -124,24 +124,15 @@ nav.main-nav ul li a:focus {
 
 /* Mobile nav */
 @media (max-width: 768px) {
-  nav.main-nav {
-    padding: 0 1.5rem;
-  }
   nav.main-nav ul {
-    position: fixed;
-    top: var(--nav-height);
-    right: 0;
-    background: var(--color-white);
-    flex-direction: column;
-    width: 240px;
-    height: calc(100vh - var(--nav-height));
-    padding: 2.5rem 2rem;
-    box-shadow: -6px 0 22px rgba(43, 52, 69, 0.1);
+    /* ... */
     transform: translateX(100%);
-    transition: transform var(--transition-speed);
-    border-radius: 0 0 0 12px;
-    overflow-y: auto;
+    transition: transform 0.3s;
   }
+  nav.main-nav ul.active {
+    transform: translateX(0);
+  }
+}
   nav.main-nav ul.active {
     transform: translateX(0);
   }
@@ -158,7 +149,7 @@ nav.main-nav ul li a:focus {
   .menu-toggle {
     display: flex;
   }
-}
+
 
 /* Buttons */
 button, a.btn {
