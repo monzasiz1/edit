@@ -1,48 +1,37 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Spießstrafen-Tool</title>
-  <link rel="manifest" href="/manifest.json">
-  <link rel="stylesheet" href="/style.css">
-  <script src="/register-sw.js" defer></script>
-  <script src="/menu.js" defer></script>
-
-  
-  <meta name="theme-color" content="#88896c">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || 'Spießbuch' %></title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <header>
+  <nav class="main-nav">
+    <a href="/" class="logo">
+      <img src="/logo.png" alt="Logo" />
+      Spießbuch
+    </a>
 
-   <nav class="main-nav">
-  <a href="/" class="logo">
-    <img src="/logo.png" alt="Logo" />
-    Spießbuch
-  </a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menü öffnen" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-  <button id="menu-toggle" aria-label="Menü öffnen" aria-expanded="false">
-    ☰
-  </button>
+    <ul id="menu" class="menu-list">
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/penalties">Strafen</a></li>
+      <li><a href="/users">Benutzer</a></li>
+      <li><a href="/export">Export</a></li>
+      <li><a href="/logout">Logout</a></li>
+    </ul>
+  </nav>
 
-  <ul id="menu" class="menu-hidden">
-    <li><a href="/dashboard">Dashboard</a></li>
-    <li><a href="/penalties">Strafen</a></li>
-    <li><a href="/users">Benutzer</a></li>
-    <li><a href="/export">Export</a></li>
-    <li><a href="/logout">Logout</a></li>
-  </ul>
-</nav>
-
-
-  </header>
   <main class="container">
     <%- body %>
   </main>
-  <footer>
-    <small>© <%= new Date().getFullYear() %> Speißbuch-App 1.0 - by RS</small>
-  </footer>
-  <script src="/menu.js" defer></script>
 
+  <script src="/menu.js" defer></script>
 </body>
 </html>
