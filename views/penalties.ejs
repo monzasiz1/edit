@@ -19,7 +19,8 @@
         <td data-label="Datum"><%= p.date ? p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date : '' %></td>
         <td data-label="Art"><%= p.type %></td>
         <td data-label="Veranstaltung"><%= p.event %></td>
-        <td data-label="Betrag"><%= p.amount ? p.amount.toFixed(2) : "0.00" %> €</td>
+        <td data-label="Betrag"><%= Number(p.amount).toFixed(2) %> €</td>
+
         <td data-label="Aktion">
           <a href="/penalties/edit/<%= p.id %>" class="btn">✏️ Bearbeiten</a>
           <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">

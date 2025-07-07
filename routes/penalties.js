@@ -16,8 +16,15 @@ router.get('/', requireAdmin, async (req, res) => {
      JOIN users u ON p.user_id = u.id
      ORDER BY p.date DESC`
   )).rows;
+
+  // Optional: Im Controller direkt als Zahl wandeln (dann muss das Template das nicht machen!)
+  penalties.forEach(p => {
+    p.amount = Number(p.amount); // Wandelt String in Zahl um, falls nötig
+  });
+
   res.render('penalties', { user: req.session.user, penalties });
 });
+
 
 // Strafe anlegen (Form)
 router.get('/add', requireAdmin, async (req, res) => {
