@@ -125,14 +125,32 @@ nav.main-nav ul li a:focus {
 /* Mobile nav */
 @media (max-width: 768px) {
   nav.main-nav ul {
-    /* ... */
+    position: fixed;
+    top: var(--nav-height);
+    right: 0;
+    background: var(--color-white);
+    flex-direction: column;
+    width: 240px;
+    height: calc(100vh - var(--nav-height));
+    padding: 2.5rem 2rem;
+    box-shadow: -6px 0 22px rgba(43, 52, 69, 0.1);
     transform: translateX(100%);
     transition: transform 0.3s;
+    border-radius: 0 0 0 12px;
+    overflow-y: auto;
+    z-index: 1200; /* Damit drüber! */
   }
   nav.main-nav ul.active {
     transform: translateX(0);
   }
+  .menu-toggle {
+    display: flex;
+  }
 }
+.menu-toggle {
+  display: none; /* nur mobil sichtbar */
+}
+
   nav.main-nav ul.active {
     transform: translateX(0);
   }
@@ -146,9 +164,7 @@ nav.main-nav ul li a:focus {
     font-size: 1.2rem;
     color: var(--color-primary);
   }
-  .menu-toggle {
-    display: flex;
-  }
+ 
 
 
 /* Buttons */
