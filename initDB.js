@@ -1,10 +1,5 @@
 require('dotenv').config();
-const { Pool } = require('./db');
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
+const pool = require('./db');
 
 async function init() {
   // Tabelle für Benutzer
