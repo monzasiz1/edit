@@ -7,29 +7,25 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <nav class="main-nav" role="navigation" aria-label="Hauptnavigation">
-    <a href="/" class="logo" aria-label="Startseite">
-      <img src="/logo.png" alt="Logo Spießbuch" />
+  <nav class="main-nav">
+    <a href="/" class="logo">
+      <img src="/logo.png" alt="Logo" />
       Spießbuch
     </a>
 
-    <button class="menu-toggle" aria-expanded="false" aria-controls="main-menu" aria-label="Menü öffnen">
+    <button class="menu-toggle" aria-label="Menü öffnen" aria-expanded="false">
       <span></span>
       <span></span>
       <span></span>
     </button>
 
-    <ul id="main-menu" class="menu-list">
+    <ul id="menu" class="menu-list">
       <% if (user) { %>
         <li><a href="/dashboard">Dashboard</a></li>
         <li><a href="/penalties">Strafen</a></li>
         <li><a href="/users">Benutzer</a></li>
         <li><a href="/export">Export</a></li>
-        <li>
-          <form action="/logout" method="POST" style="display:inline;">
-            <button type="submit" class="btn btn-small">Logout</button>
-          </form>
-        </li>
+        <li><a href="/logout">Logout</a></li>
       <% } else { %>
         <li><a href="/login">Login</a></li>
         <li><a href="/register">Registrieren</a></li>
