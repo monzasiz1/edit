@@ -1,0 +1,17 @@
+<% layout('layout') %>
+<h2>Benutzerübersicht</h2>
+<table>
+  <tr><th>Benutzername</th><th>Rolle</th><th>Aktion</th></tr>
+  <% users.forEach(u => { %>
+    <tr>
+      <td><%= u.username %></td>
+      <td><%= u.is_admin ? 'Admin' : 'Mitglied' %></td>
+      <td>
+        <a href="/users/edit/<%= u.id %>">Bearbeiten</a>
+        <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
+          <button onclick="return confirm('Wirklich löschen?')">Löschen</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>

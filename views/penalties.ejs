@@ -1,0 +1,18 @@
+<% layout('layout') %>
+<h2>Alle Strafen</h2>
+<a href="/penalties/add">+ Neue Strafe vergeben</a>
+<table>
+  <tr><th>Nutzer</th><th>Datum</th><th>Grund</th><th>Aktion</th></tr>
+  <% penalties.forEach(p => { %>
+    <tr>
+      <td><%= p.username %></td>
+      <td><%= p.date %></td>
+      <td><%= p.reason %></td>
+      <td>
+        <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
+          <button onclick="return confirm('Wirklich löschen?')">Löschen</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>

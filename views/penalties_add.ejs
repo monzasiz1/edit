@@ -1,0 +1,14 @@
+<% layout('layout') %>
+<h2>Neue Strafe vergeben</h2>
+<% if (error) { %><div class="error"><%= error %></div><% } %>
+<form method="POST" action="/penalties/add">
+  <select name="user_id" required>
+    <option value="">Nutzer wählen</option>
+    <% users.forEach(u => { %>
+      <option value="<%= u.id %>"><%= u.username %></option>
+    <% }) %>
+  </select>
+  <input type="text" name="reason" placeholder="Grund" required />
+  <button type="submit">Vergeben</button>
+</form>
+<a href="/penalties">Zurück</a>

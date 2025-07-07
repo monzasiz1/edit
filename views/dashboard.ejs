@@ -1,0 +1,26 @@
+<% layout('layout') %>
+<h2>Dashboard</h2>
+<% if (user.is_admin && users) { %>
+  <h3>Alle Nutzer</h3>
+  <ul>
+    <% users.forEach(u => { %>
+      <li>
+        <%= u.username %> <% if (u.is_admin) { %> (Admin) <% } %>
+        | <a href="/users/edit/<%= u.id %>">Bearbeiten</a>
+        | <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline"><button onclick="return confirm('Wirklich löschen?')">Löschen</button></form>
+        | <a href="/export/user/<%= u.id %>">PDF</a>
+      </li>
+    <% }) %>
+  </ul>
+<% } else if (penalties) { %>
+  <h3>Meine Strafen</h3>
+  <% if (penalties.length === 0) { %>
+    <p>Keine Strafen vorhanden! 🎉</p>
+  <% } else { %>
+    <ul>
+      <% penalties.forEach(p => { %>
+        <li><%= p.date %>: <%= p.reason %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+<% } %>

@@ -1,0 +1,9 @@
+<% layout('layout') %>
+<h2>Login</h2>
+<% if (error) { %><div class="error"><%= error %></div><% } %>
+<form method="POST" action="/login">
+  <input type="text" name="username" placeholder="Benutzername" required />
+  <input type="password" name="password" placeholder="Passwort" required />
+  <button type="submit">Login</button>
+</form>
+<a href="/register">Noch keinen Account? Jetzt registrieren!</a>

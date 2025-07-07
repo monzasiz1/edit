@@ -1,0 +1,23 @@
+{
+  "name": "spiessbuch",
+  "version": "1.0.0",
+  "description": "Spießstrafen-Webanwendung",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.0.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "method-override": "^3.0.0",
+    "pdfkit": "^0.17.1",
+    "pg": "^8.11.3"
+  }
+}

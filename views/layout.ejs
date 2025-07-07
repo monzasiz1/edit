@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Spießstrafen-Tool</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/register-sw.js" defer></script>
+  <meta name="theme-color" content="#88896c">
+</head>
+<body>
+  <header>
+    <nav class="main-nav">
+      <a href="/" class="logo">🥨 Spießbuch</a>
+      <% if (user) { %>
+        <span class="nav-user">👤 <%= user.username %> <% if (user.is_admin) { %> (Admin) <% } %></span>
+        <a href="/dashboard">Dashboard</a>
+        <% if (user.is_admin) { %>
+          <a href="/users">Benutzer</a>
+          <a href="/penalties">Strafen</a>
+          <a href="/export/all">PDF (Alle Strafen)</a>
+        <% } else { %>
+          <a href="/export/me">PDF-Export</a>
+        <% } %>
+        <form action="/logout" method="post" style="display:inline">
+          <button>Logout</button>
+        </form>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/register">Registrieren</a>
+      <% } %>
+    </nav>
+  </header>
+  <main class="container">
+    <%- body %>
+  </main>
+  <footer>
+    <small>© <%= new Date().getFullYear() %> Spießstrafen-Tool – by dein Verein</small>
+  </footer>
+</body>
+</html>
