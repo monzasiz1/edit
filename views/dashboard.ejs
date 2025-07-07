@@ -3,18 +3,30 @@
 <% if (user.is_admin && users) { %>
   <section>
     <h3>Alle Nutzer</h3>
-    <ul>
-      <% users.forEach(u => { %>
-        <li>
-          <strong><%= u.username %></strong> <% if (u.is_admin) { %> (Admin) <% } %>
-          | <a href="/users/edit/<%= u.id %>">Bearbeiten</a>
-          | <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-              <button class="btn btn-small btn-danger" onclick="return confirm('Wirklich löschen?')">Löschen</button>
-            </form>
-          | <a href="/export/user/<%= u.id %>">PDF</a>
-        </li>
-      <% }) %>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Benutzername</th>
+          <th>Rolle</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td data-label="Benutzername"><strong><%= u.username %></strong></td>
+            <td data-label="Rolle"><%= u.is_admin ? "Admin" : "Mitglied" %></td>
+            <td data-label="Aktionen">
+              <a href="/users/edit/<%= u.id %>" class="btn btn-small">Bearbeiten</a>
+              <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
+                <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">Löschen</button>
+              </form>
+              <a href="/export/user/<%= u.id %>" class="btn btn-small">PDF</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
   </section>
 <% } else if (penalties) { %>
   <section>
@@ -22,11 +34,22 @@
     <% if (penalties.length === 0) { %>
       <p>Keine Strafen vorhanden! 🎉</p>
     <% } else { %>
-      <ul>
-        <% penalties.forEach(p => { %>
-          <li><%= new Date(p.date).toLocaleDateString('de-DE') %>: <%= p.reason %></li>
-        <% }) %>
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Grund</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% penalties.forEach(p => { %>
+            <tr>
+              <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
+              <td data-label="Grund"><%= p.reason %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
     <% } %>
   </section>
 <% } %>
