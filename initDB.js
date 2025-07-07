@@ -2,6 +2,11 @@ require('dotenv').config();
 const pool = require('./db');
 
 async function init() {
+  // --- ALTE Tabellen löschen (NUR beim ersten sauberen Setup nötig) ---
+  await pool.query('DROP TABLE IF EXISTS penalties CASCADE;');
+  await pool.query('DROP TABLE IF EXISTS users CASCADE;');
+  // -------------------------------------------------------
+
   // Tabelle für Benutzer
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
