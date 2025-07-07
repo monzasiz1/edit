@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.querySelector('.menu-toggle');
-  const menu = document.querySelector('nav.main-nav ul');
+  const menu = document.querySelector('.main-nav ul');
 
   toggle.addEventListener('click', () => {
-    menu.classList.toggle('active');
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    const expanded = toggle.getAttribute('aria-expanded') === 'true' || false;
     toggle.setAttribute('aria-expanded', !expanded);
+    menu.classList.toggle('active');
   });
 });
