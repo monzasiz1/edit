@@ -1,1 +1,32 @@
-<h1>Export</h1>
+<% layout('layout') %>
+
+<h2>PDF-Export</h2>
+
+<% if (user.is_admin) { %>
+  <section>
+    <h3>Alle Strafen als PDF</h3>
+    <a href="/export/all" class="button" target="_blank">Alle Strafen herunterladen</a>
+  </section>
+  <section style="margin-top:2em">
+    <h3>PDF für einzelne Nutzer</h3>
+    <% if (users && users.length) { %>
+      <ul>
+        <% users.forEach(u => { %>
+          <li>
+            <strong><%= u.username %></strong>
+            <a href="/export/user/<%= u.id %>" target="_blank" class="button small">PDF</a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>Keine Nutzer gefunden.</p>
+    <% } %>
+  </section>
+<% } %>
+
+<% if (!user.is_admin) { %>
+  <section>
+    <h3>Mein Strafenkonto als PDF</h3>
+    <a href="/export/me" class="button" target="_blank">PDF herunterladen</a>
+  </section>
+<% } %>
