@@ -289,3 +289,10 @@ td:last-child {
 .hidden {
   display: none !important;
 }
+.logo1 img {
+  height: 100px;    /* Beispiel: auf 36 px verkleinern */
+  width: auto;     /* Verhältnis bleibt erhalten */
+  margin-right: 12px;
+  vertical-align: middle;
+  border-radius: 6px;
+}
