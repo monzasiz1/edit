@@ -1,62 +1,47 @@
-
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
 const session = require('express-session');
-const expressLayouts = require('express-ejs-layouts');
 const methodOverride = require('method-override');
-
+const path = require('path');
+const ejsLayouts = require('express-ejs-layouts');
 
 const app = express();
 
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(methodOverride('_method'));
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'defaultsecret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production'
-  }
-}));
+const PORT = process.env.PORT || 3000;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
 
-
-// Benutzer verfügbar machen in Views
-app.use((req, res, next) => {
-  res.locals.user = req.session.user || null;
-  next();
-});
-
-// View-Engine
+// EJS & Layouts
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(expressLayouts);
+app.use(ejsLayouts);
 app.set('layout', 'layout');
 
+// Middlewares
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Bei HTTPS auf true setzen
+}));
+
 // Routen
-const authRoutes = require('./routes/auth');
-const dashboardRoutes = require('./routes/dashboard');
-const penaltyRoutes = require('./routes/penalties');
-const usersRoutes = require('./routes/users');
-const exportRoutes = require('./routes/export');
+app.use('/', require('./routes/auth'));
+app.use('/dashboard', require('./routes/dashboard'));
+app.use('/penalties', require('./routes/penalties'));
+app.use('/users', require('./routes/users'));
+app.use('/export', require('./routes/export'));
 
-app.use('/', authRoutes);
-app.use('/dashboard', dashboardRoutes);
-app.use('/penalties', penaltyRoutes);
-app.use('/users', usersRoutes);
-app.use('/export', exportRoutes);
-
-// Service Worker
-app.get('/register-sw.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'register-sw.js'));
+// 404-Fehlerseite
+app.use((req, res) => {
+  res.status(404).render('404', { layout: 'layout', user: req.session.user });
 });
 
-// Start Server
-const PORT = process.env.PORT || 3000;
+// Server starten
 app.listen(PORT, () => {
-  console.log(`🚀 Server läuft auf Port ${PORT}`);
+  console.log(`Server läuft auf http://localhost:${PORT}`);
 });
-
-
