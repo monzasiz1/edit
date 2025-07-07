@@ -22,11 +22,6 @@ app.use(session({
   }
 }));
 
-// DB-Initialisierung
-const initDB = require('./initDB');
-initDB().catch(err => {
-  console.error('Fehler beim Initialisieren der DB:', err);
-});
 
 // Benutzer verfügbar machen in Views
 app.use((req, res, next) => {
