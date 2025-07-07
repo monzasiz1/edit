@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const menu = document.getElementById('menu');
 
   toggle.addEventListener('click', () => {
-    menu.classList.toggle('active');
+    menu.classList.toggle('menu-visible');
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', !expanded);
   });
 });
