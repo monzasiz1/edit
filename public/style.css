@@ -3,7 +3,7 @@
   --color-bg: #f9fafb;
   --color-primary: #2b3445; /* sehr dunkles Blau-Schwarz */
   --color-secondary: #556677; /* dezentes Grau-Blau */
-  --color-accent: #bada55; /* ein freundliches Grün (kann anpassen) */
+  --color-accent: #bada55; /* freundliches Grün */
   --color-white: #ffffff;
   --color-text: #2b3445;
   --color-muted: #8899aa;
@@ -13,7 +13,7 @@
   --font-weight-semibold: 600;
 
   --radius-base: 8px;
-  --nav-height: 64px;
+  --nav-height: 60px;
 
   --max-width: 1080px;
 
@@ -21,11 +21,10 @@
 }
 
 /* Reset & Basics */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   font-family: var(--font-base);
@@ -67,18 +66,19 @@ nav.main-nav .logo {
   display: flex;
   align-items: center;
   color: var(--color-primary);
-  font-weight: var(--font-weight-semibold);
-  font-size: 1.5rem;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  font-size: 1.4rem;
   text-decoration: none;
 }
 nav.main-nav .logo img {
-  height: 28px;
+  height: 28px; /* kleineres Logo */
+  width: auto;
   margin-right: 12px;
+  border-radius: 0.3rem;
   object-fit: contain;
 }
 
-/* Menu links: hell, minimal, mit Hover-Underline */
+/* Menü */
 nav.main-nav ul {
   display: flex;
   gap: 2.2rem;
