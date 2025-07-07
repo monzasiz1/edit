@@ -1,14 +1,21 @@
-<h1>Registrierung</h1>
-<% if (error) { %>
-  <div class="error"><%= error %></div>
-<% } %>
-<form method="POST" action="/register">
-  <label for="username">Benutzername</label>
-  <input type="text" id="username" name="username" required autofocus />
-  
-  <label for="password">Passwort</label>
-  <input type="password" id="password" name="password" required />
-  
-  <button type="submit">Registrieren</button>
-</form>
-<p>Bereits registriert? <a href="/login">Login</a></p>
+<div class="auth-container">
+  <a href="/" class="logo1">
+    <img src="/logo.png" alt="Logo" /> Spießbuch
+  </a>
+  <h1>Registrierung</h1>
+  <% if (error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+  <form method="POST" action="/register" class="auth-form">
+    <label for="username">Benutzername</label>
+    <input type="text" id="username" name="username" required autofocus />
+
+    <label for="password">Passwort</label>
+    <input type="password" id="password" name="password" required />
+
+    <button type="submit" class="btn btn-primary">Registrieren</button>
+  </form>
+  <p class="switch-auth">
+    Bereits registriert? <a href="/login">Login</a>
+  </p>
+</div>
