@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= title || 'Spießbuch' %></title>
+  <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
@@ -13,18 +13,23 @@
       Spießbuch
     </a>
 
-    <button class="menu-toggle" id="menu-toggle" aria-label="Menü öffnen" aria-expanded="false">
+    <button class="menu-toggle" aria-label="Menü öffnen" aria-expanded="false">
       <span></span>
       <span></span>
       <span></span>
     </button>
 
     <ul id="menu" class="menu-list">
-      <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="/penalties">Strafen</a></li>
-      <li><a href="/users">Benutzer</a></li>
-      <li><a href="/export">Export</a></li>
-      <li><a href="/logout">Logout</a></li>
+      <% if (user) { %>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/penalties">Strafen</a></li>
+        <li><a href="/users">Benutzer</a></li>
+        <li><a href="/export">Export</a></li>
+        <li><a href="/logout">Logout</a></li>
+      <% } else { %>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Registrieren</a></li>
+      <% } %>
     </ul>
   </nav>
 

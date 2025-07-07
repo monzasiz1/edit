@@ -13,7 +13,12 @@ router.get('/', requireLogin, async (req, res) => {
   if (req.session.user.is_admin) {
     // Admin sieht alle Nutzer (und kann z.B. Adminfunktionen nutzen)
     const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
-    res.render('dashboard', { user: req.session.user, users });
+    res.render('dashboard', {
+  layout: 'layout',
+  user: req.session.user,
+  title: 'Dashboard'
+});
+
   } else {
     // Normale Nutzer sehen ihre Strafen
     const penalties = (await db.query(
