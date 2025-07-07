@@ -14,9 +14,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(ejsLayouts);
-
-// Kein globales Default-Layout, Routen setzen explizit
-app.set('layout', false);
+app.set('layout', 'layout'); // globales Layout aktivieren
 
 // Middlewares
 app.use(express.urlencoded({ extended: false }));
@@ -28,17 +26,25 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Für HTTPS auf true setzen
+  cookie: { secure: false } // bei HTTPS auf true setzen
 }));
 
-// User überall in Views verfügbar machen
+// User in allen Views verfügbar machen
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
 
 // Routen
-app.use('/', require('./routes/auth'));
+const authRouter = require('./routes/auth');
+app.use('/', (req, res, next) => {
+  // Login und Register ohne Layout (kein Menü)
+  if (req.path === '/login' || req.path === '/register') {
+    res.locals.layout = false;
+  }
+  next();
+});
+app.use('/', authRouter);
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users', require('./routes/users'));
@@ -47,7 +53,7 @@ app.use('/logout', require('./routes/logout'));
 
 // 404-Seite
 app.use((req, res) => {
-  res.status(404).render('404', { layout: 'layout', user: req.session.user });
+  res.status(404).render('404', { title: 'Seite nicht gefunden' });
 });
 
 // Server starten
