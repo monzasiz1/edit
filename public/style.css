@@ -3,7 +3,7 @@
   --color-bg: #f9fafb;
   --color-primary: #2b3445; /* sehr dunkles Blau-Schwarz */
   --color-secondary: #556677; /* dezentes Grau-Blau */
-  --color-accent: #bada55; /* freundliches Grün */
+  --color-accent: #016d1c; /* freundliches Grün */
   --color-white: #ffffff;
   --color-text: #2b3445;
   --color-muted: #8899aa;
@@ -71,7 +71,7 @@ nav.main-nav .logo {
   text-decoration: none;
 }
 nav.main-nav .logo img {
-  height: 28px; /* kleineres Logo */
+  height: 50px; /* kleineres Logo */
   width: auto;
   margin-right: 12px;
   border-radius: 0.3rem;
