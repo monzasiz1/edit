@@ -44,6 +44,7 @@ app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users', require('./routes/users'));
 app.use('/export', require('./routes/export'));
+app.use('/logout', require('./routes/logout'));
 
 // 404-Fehlerseite
 app.use((req, res) => {
