@@ -20,8 +20,13 @@ function requireLogin(req, res, next) {
 router.get('/', requireLogin, async (req, res) => {
   let users = [];
   if (req.session.user.is_admin) {
-    const result = await db.query('SELECT id, username FROM users ORDER BY username');
-    users = result.rows;
+    try {
+      const result = await db.query('SELECT id, username FROM users ORDER BY username');
+      users = result.rows;
+    } catch (err) {
+      console.error('Datenbankfehler beim Laden der Benutzer:', err);
+      return res.status(500).send('Fehler beim Laden der Benutzer');
+    }
   }
   res.render('export', { user: req.session.user, users });
 });
@@ -33,6 +38,10 @@ router.get('/me', requireLogin, async (req, res) => {
       'SELECT * FROM penalties WHERE user_id = $1 ORDER BY date DESC',
       [req.session.user.id]
     )).rows;
+
+    if (!penalties.length) {
+      return res.status(404).send('Keine Strafen gefunden');
+    }
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
@@ -58,7 +67,7 @@ router.get('/me', requireLogin, async (req, res) => {
 
     doc.end();
   } catch (err) {
-    console.error(err);
+    console.error('Fehler beim Exportieren der Strafen:', err);
     res.status(500).send('Fehler beim Exportieren');
   }
 });
@@ -75,6 +84,10 @@ router.get('/user/:id', requireLogin, async (req, res) => {
       'SELECT * FROM penalties WHERE user_id = $1 ORDER BY date DESC',
       [req.params.id]
     )).rows;
+
+    if (!penalties.length) {
+      return res.status(404).send('Keine Strafen für diesen Benutzer gefunden');
+    }
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
@@ -99,9 +112,10 @@ router.get('/user/:id', requireLogin, async (req, res) => {
     });
 
     doc.end();
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Fehler beim Exportieren');
+    console.error('Fehler beim Exportieren der Strafen für Benutzer:', err);
+    res.status(500).send(`Fehler beim Exportieren: ${err.message}`);
   }
 });
 
@@ -113,6 +127,10 @@ router.get('/all', requireLogin, async (req, res) => {
     const penalties = (await db.query(
       'SELECT p.date, p.reason, p.type, p.event, u.username FROM penalties p JOIN users u ON p.user_id = u.id ORDER BY u.username, p.date DESC'
     )).rows;
+
+    if (!penalties.length) {
+      return res.status(404).send('Keine Strafen gefunden');
+    }
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
@@ -138,7 +156,7 @@ router.get('/all', requireLogin, async (req, res) => {
 
     doc.end();
   } catch (err) {
-    console.error(err);
+    console.error('Fehler beim Exportieren aller Strafen:', err);
     res.status(500).send('Fehler beim Exportieren');
   }
 });
