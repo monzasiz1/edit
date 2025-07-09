@@ -7,7 +7,8 @@
     <% if (penalties.length === 0) { %>
       <p>Keine Strafen vorhanden! 🎉</p>
     <% } else { %>
-      <!-- Desktop/Table -->
+
+      <!-- Desktop/Table Ansicht -->
       <div class="only-desktop">
         <table class="responsive-table">
           <thead>
@@ -26,8 +27,8 @@
                 <td data-label="Veranstaltung"><%= p.event %></td>
                 <td data-label="Grund"><%= p.type %></td>
                 <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
-                <% total += Number(p.amount); %>
               </tr>
+              <% total += Number(p.amount); %>
             <% }) %>
           </tbody>
         </table>
@@ -37,34 +38,38 @@
       </div>
 
       <!-- Mobile/Card Ansicht -->
-<div class="dashboard-cards only-mobile">
-  <% let totalMobile = 0; %>
-  <% penalties.forEach((p, idx) => { %>
-    <div class="dashboard-card" style="animation-delay: <%= 0.07*idx %>s;">
-      <div style="font-size: 1.5em; margin-bottom: 0.12em;">
-        <%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %>
+      <div class="dashboard-cards only-mobile">
+        <% let totalMobile = 0; %>
+        <% penalties.forEach(p => { %>
+          <div class="dashboard-card">
+            <div style="font-size: 1.5em; margin-bottom: 0.12em;">
+              <%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %>
+            </div>
+            <div class="dashboard-row">
+              <span class="dashboard-label">📅 Datum</span>
+              <span class="dashboard-value"><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
+            </div>
+            <div class="dashboard-row">
+              <span class="dashboard-label">🎉 Event</span>
+              <span class="dashboard-value"><%= p.event %></span>
+            </div>
+            <div class="dashboard-row">
+              <span class="dashboard-label">🎯 Grund</span>
+              <span class="dashboard-value"><%= p.type %></span>
+            </div>
+            <div class="dashboard-row amount">
+              <span class="dashboard-label">💶 Betrag</span>
+              <span class="dashboard-value"><%= Number(p.amount).toFixed(2) %> €</span>
+            </div>
+          </div>
+          <% totalMobile += Number(p.amount); %>
+        <% }) %>
+        <div class="dashboard-card total-card">
+          <span class="dashboard-label">Gesamtbetrag</span>
+          <span class="dashboard-value"><%= totalMobile.toFixed(2) %> €</span>
+        </div>
       </div>
-      <div class="dashboard-row">
-        <span class="dashboard-label">📅 Datum</span>
-        <span class="dashboard-value"><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
-      </div>
-      <div class="dashboard-row">
-        <span class="dashboard-label">🎉 Event</span>
-        <span class="dashboard-value"><%= p.event %></span>
-      </div>
-      <div class="dashboard-row">
-        <span class="dashboard-label">🎯 Grund</span>
-        <span class="dashboard-value"><%= p.type %></span>
-      </div>
-      <div class="dashboard-row amount">
-        <span class="dashboard-label">💶 Betrag</span>
-        <span class="dashboard-value"><%= Number(p.amount).toFixed(2) %> €</span>
-      </div>
-    </div>
-    <% totalMobile += Number(p.amount); %>
-  <% }) %>
-  <div class="dashboard-card total-card">
-    <span class="dashboard-label">Gesamtbetrag</span>
-    <span class="dashboard-value"><%= totalMobile.toFixed(2) %> €</span>
-  </div>
-</div>
+
+    <% } %>
+  </section>
+<% } %>
