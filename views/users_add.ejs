@@ -1,0 +1,18 @@
+<h2>Neuen Benutzer anlegen</h2>
+<% if (error) { %>
+  <div class="error"><%= error %></div>
+<% } %>
+<form action="/users/add" method="POST" class="form-card">
+  <label for="username">Benutzername</label>
+  <input type="text" name="username" id="username" required>
+
+  <label for="password">Passwort</label>
+  <input type="password" name="password" id="password" required>
+
+  <label for="is_admin">
+    <input type="checkbox" name="is_admin" id="is_admin">
+    Administratorrechte
+  </label>
+  <button type="submit" class="btn">Hinzufügen</button>
+</form>
+<a href="/users" class="btn btn-cancel" style="margin-top:1em;">Zurück zur Übersicht</a>

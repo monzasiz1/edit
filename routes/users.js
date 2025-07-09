@@ -53,4 +53,31 @@ router.post('/delete/:id', requireAdmin, async (req, res) => {
   res.redirect('/users');
 });
 
+
+// Nutzer hinzufügen (Formular anzeigen)
+router.get('/add', requireAdmin, (req, res) => {
+  res.render('users_add', { user: req.session.user, error: null });
+});
+// Nutzer hinzufügen (Formular absenden)
+router.post('/add', requireAdmin, async (req, res) => {
+  const { username, password, is_admin } = req.body;
+  let error = null;
+  if (!username || !password) {
+    error = 'Benutzername und Passwort dürfen nicht leer sein!';
+    return res.render('users_add', { user: req.session.user, error });
+  }
+  // Prüfen, ob Name schon existiert
+  const exists = (await db.query('SELECT 1 FROM users WHERE username = $1', [username])).rowCount > 0;
+  if (exists) {
+    error = 'Benutzername existiert bereits!';
+    return res.render('users_add', { user: req.session.user, error });
+  }
+  const hash = await bcrypt.hash(password, 10);
+  await db.query(
+    'INSERT INTO users (username, password, is_admin) VALUES ($1, $2, $3)',
+    [username, hash, is_admin === 'on']
+  );
+  res.redirect('/users');
+});
+
 module.exports = router;
