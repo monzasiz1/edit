@@ -490,7 +490,6 @@ td:last-child  { border-bottom-right-radius: 14px; }
 }
 /* USER CARD-LAYOUT FOR MOBILE */
 .user-cards { display: none; }
-
 @media (max-width: 700px) {
   .user-table { display: none; }
   .user-cards {
@@ -521,4 +520,232 @@ td:last-child  { border-bottom-right-radius: 14px; }
     opacity: 0.87;
     font-size: 1em;
   }
-  .use
+  .user-card-value {
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 1em;
+    font-weight: 500;
+    color: #253053;
+    word-break: break-word;
+  }
+  .user-card-actions {
+    justify-content: flex-end;
+    gap: 0.4em;
+    padding-top: 0.2em;
+  }
+
+
+  /* RESPONSIVE TABLE STYLE! */
+  .responsive-table {
+    font-size: 0.93em;
+    border: 0;
+  }
+  .responsive-table thead {
+    display: none;
+  }
+  .responsive-table,
+  .responsive-table tbody,
+  .responsive-table tr,
+  .responsive-table td {
+    display: block;
+    width: 100%;
+  }
+  .responsive-table tr {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(41,51,91,0.10);
+    margin-bottom: 0.46em;
+    padding: 0.22em 0.55em 0.13em 0.55em;
+  }
+  .responsive-table td {
+    padding: 0.13em 0 0.08em 0;
+    border: none;
+    border-bottom: 1px solid #f1f1f2;
+    min-height: 18px;
+    font-size: 0.91em;
+    line-height: 1.18;
+    position: relative;
+  }
+  .responsive-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0.06em;
+  }
+  .responsive-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: #253053;
+    display: block;
+    font-size: 0.86em;
+    opacity: 0.91;
+    margin-bottom: 0;
+  }
+  .responsive-table .btn,
+  .responsive-table .btn-delete,
+  .responsive-table .btn-small {
+    font-size: 0.87em;
+    padding: 0.12em 0.42em;
+    border-radius: 11px;
+    margin: 0.04em 0.04em 0.03em 0;
+    min-width: 0;
+    display: inline-block;
+  }
+  .responsive-table td[data-label="Betrag"] {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .responsive-table td[data-label="Aktion"] {
+    text-align: right;
+  }
+}
+.pdf-export-section {
+  margin-top: 2.6em;
+}
+.pdf-export-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.2em;
+  margin-top: 1.3em;
+}
+.pdf-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 24px rgba(41,51,91,0.09);
+  padding: 2em 2.1em 1.3em 2.1em;
+  flex: 1 1 340px;
+  min-width: 320px;
+  max-width: 420px;
+  margin-bottom: 0.7em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+.user-pdf-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.2em 0 0 0;
+}
+.user-pdf-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7faf9;
+  border-radius: 10px;
+  padding: 0.53em 0.9em 0.43em 0.9em;
+  margin-bottom: 0.6em;
+  font-size: 1.08em;
+  box-shadow: 0 1px 6px rgba(41,51,91,0.06);
+}
+.user-pdf-list li:last-child {
+  margin-bottom: 0;
+}
+.pdf-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.18em;
+  font-size: 1.18em;
+}
+.pdf-card .muted {
+  color: var(--color-muted);
+  font-size: 0.98em;
+  margin-bottom: 0.6em;
+  margin-top: 0.1em;
+}
+@media (max-width: 700px) {
+  .pdf-export-cards {
+    flex-direction: column;
+    gap: 1.2em;
+  }
+  .pdf-card {
+    padding: 1.25em 0.9em 0.9em 0.9em;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+.pdf-export-section > h2 {
+  margin-bottom: 1.3em;
+}
+.pdf-card {
+  transition: box-shadow 0.19s cubic-bezier(.37,.34,.46,.98), transform 0.18s;
+}
+.pdf-card:hover {
+  box-shadow: 0 7px 34px rgba(41, 51, 91, 0.18);
+  transform: translateY(-2px) scale(1.012);
+}
+.user-pdf-list a.btn-small {
+  margin-left: 0.6em;
+  font-size: 0.96em;
+  padding: 0.26em 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.36em;
+}
+@media (max-width: 700px) {
+  .pdf-export-section {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+  }
+}
+/* Penalty-Cards für Mobile */
+.penalty-cards { display: none; }
+
+@media (max-width: 700px) {
+  .only-desktop { display: none !important; }
+  .only-mobile { display: block !important; }
+  .penalty-cards {
+    margin-top: 1.5em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+  .penalty-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 16px rgba(41,51,91,0.10);
+    padding: 1.1em 1.2em 1em 1.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55em;
+    font-size: 1.05em;
+    position: relative;
+    transition: box-shadow 0.17s;
+  }
+  .penalty-card:hover {
+    box-shadow: 0 8px 28px rgba(1,109,28,0.13);
+  }
+  .penalty-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.7em;
+    border-bottom: 1px solid #f2f5f4;
+    padding-bottom: 0.2em;
+    font-size: 1em;
+  }
+  .penalty-row:last-child {
+    border-bottom: none;
+  }
+  .penalty-label {
+    color: #46695c;
+    font-weight: 600;
+    opacity: 0.87;
+    min-width: 92px;
+    display: inline-block;
+    font-size: 0.97em;
+  }
+  .penalty-actions {
+    display: flex;
+    gap: 0.45em;
+    justify-content: flex-end;
+    padding-top: 0.4em;
+  }
+  .penalty-actions .btn,
+  .penalty-actions .btn-small {
+    font-size: 0.95em;
+    padding: 0.23em 0.89em;
+    border-radius: 14px;
+  }
+}
+
+@media (min-width: 701px) {
+  .only-mobile { display: none !important; }
+}

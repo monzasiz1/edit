@@ -2,23 +2,21 @@
   <a href="/" class="logo1">
     <img src="/logo.png" alt="Logo" /> Spießbuch
   </a>
-  <h1>Registrierung</h1>
+  <h2>Registrieren</h2>
   <% if (error) { %>
     <div class="error"><%= error %></div>
   <% } %>
-  <form method="POST" action="/register" class="auth-form">
+  <form action="/register" method="POST">
     <label for="username">Benutzername</label>
     <input type="text" id="username" name="username" required autofocus />
 
     <label for="password">Passwort</label>
     <input type="password" id="password" name="password" required />
 
-    <button type="submit" class="btn btn-primary">Registrieren</button>
+    <button type="submit" class="btn">Registrieren</button>
   </form>
-  <p class="switch-auth">
-    Bereits registriert? <a href="/login">Login</a>
-  </p>
-  <footer class="footer">
-  &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
-</footer>
+  <div class="switch-auth">
+    Schon registriert?
+    <a href="/login">Login</a>
+  </div>
 </div>

@@ -1,32 +1,34 @@
-
-
-<h2>📄 PDF-Export</h2>
-
-<% if (user.is_admin) { %>
-  <section>
-    <h3>📚 Alle Strafen als PDF</h3>
-    <a href="/export/all" class="btn btn-add" target="_blank">⬇️ Alle Strafen herunterladen</a>
-  </section>
-  <section style="margin-top:2em">
-    <h3>👥 PDF für einzelne Nutzer</h3>
-    <% if (users && users.length) { %>
-      <ul style="list-style:none; padding-left:0;">
-        <% users.forEach(u => { %>
-          <li style="margin-bottom:0.7em;">
-            <span style="display:inline-block; min-width:120px;"><strong>👤 <%= u.username %></strong></span>
-            <a href="/export/user/<%= u.id %>" target="_blank" class="btn btn-small">📥 PDF</a>
-          </li>
-        <% }) %>
-      </ul>
+<div class="pdf-export-section">
+  <h2>📄 PDF-Export</h2>
+  <div class="pdf-export-cards">
+    <% if (user.is_admin) { %>
+      <div class="pdf-card">
+        <h3>📚 Alle Strafen als PDF</h3>
+        <div class="muted">Lade alle Strafen als Sammel-PDF herunter.</div>
+        <a href="/export/all" class="btn btn-add" target="_blank">⬇️ Alle Strafen herunterladen</a>
+      </div>
+      <div class="pdf-card">
+        <h3>👥 PDF für einzelne Nutzer</h3>
+        <div class="muted">Exportiere das Strafenkonto einzelner Mitglieder als PDF.</div>
+        <% if (users && users.length) { %>
+          <ul class="user-pdf-list">
+            <% users.forEach(u => { %>
+              <li>
+                <span><strong>👤 <%= u.username %></strong></span>
+                <a href="/export/user/<%= u.id %>" target="_blank" class="btn btn-small">📥 PDF</a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <div class="muted">Keine Nutzer gefunden.</div>
+        <% } %>
+      </div>
     <% } else { %>
-      <p>Keine Nutzer gefunden.</p>
+      <div class="pdf-card">
+        <h3>🧾 Mein Strafenkonto als PDF</h3>
+        <div class="muted">Lade dein persönliches Strafenkonto als PDF herunter.</div>
+        <a href="/export/me" class="btn" target="_blank">📥 PDF herunterladen</a>
+      </div>
     <% } %>
-  </section>
-<% } %>
-
-<% if (!user.is_admin) { %>
-  <section>
-    <h3>🧾 Mein Strafenkonto als PDF</h3>
-    <a href="/export/me" class="btn" target="_blank">📥 PDF herunterladen</a>
-  </section>
-<% } %>
+  </div>
+</div>
