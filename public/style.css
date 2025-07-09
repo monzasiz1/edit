@@ -930,3 +930,27 @@ td:last-child  { border-bottom-right-radius: 14px; }
   0% { opacity: 0; transform: translateY(10px);}
   100% { opacity: 1; transform: none;}
 }
+/* Admin-Hinweis (Desktop) */
+.admin-tag {
+  font-size: 0.75em;
+  color: #777;
+  margin-left: 0.5em;
+}
+
+/* Admin-Hinweis (Mobile) */
+.admin-tag-mobile {
+  font-size: 0.7em;
+  color: #fff;
+  background-color: #4CAF50;
+  padding: 2px 5px;
+  border-radius: 0 4px 4px 0;
+  position: absolute;
+  left: 0;
+  top: 10px;
+}
+
+/* Positionierung für Mobile Dashboard Cards */
+.dashboard-card {
+  position: relative;
+  padding-left: 50px;
+}

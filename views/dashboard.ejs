@@ -25,7 +25,7 @@
               <tr>
                 <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
                 <td data-label="Veranstaltung"><%= p.event %></td>
-                <td data-label="Grund"><%= p.type %></td>
+                <td data-label="Grund"><%= p.type %> <span class="admin-tag">(von <%= p.admin %>)</span></td>
                 <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
               </tr>
               <% total += Number(p.amount); %>
@@ -42,6 +42,7 @@
         <% let totalMobile = 0; %>
         <% penalties.forEach(p => { %>
           <div class="dashboard-card">
+            <div class="admin-tag-mobile">von <%= p.admin %></div>
             <div style="font-size: 1.5em; margin-bottom: 0.12em;">
               <%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %>
             </div>
