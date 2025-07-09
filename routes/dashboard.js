@@ -10,28 +10,31 @@ function requireLogin(req, res, next) {
 
 // Dashboard anzeigen
 router.get('/', requireLogin, async (req, res) => {
+  let users = null;
+  let penalties = null;
+
   if (req.session.user.is_admin) {
-    // Admin sieht alle Nutzer
-    const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
-    res.render('dashboard', {
-      layout: 'layout',
-      user: req.session.user,
-      users,       // Hier die Userliste übergeben
-      title: 'Dashboard'
-    });
-  } else {
-    // Normale Nutzer sehen ihre Strafen
-    const penalties = (await db.query(
+    // Admin: Sieht alle Nutzer UND eigene Strafen
+    users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
+    penalties = (await db.query(
       'SELECT * FROM penalties WHERE user_id = $1 ORDER BY date DESC',
       [req.session.user.id]
     )).rows;
-    res.render('dashboard', {
-      layout: 'layout',
-      user: req.session.user,
-      penalties,   // Strafen übergeben
-      title: 'Mein Dashboard'
-    });
+  } else {
+    // Normale Nutzer sehen ihre Strafen
+    penalties = (await db.query(
+      'SELECT * FROM penalties WHERE user_id = $1 ORDER BY date DESC',
+      [req.session.user.id]
+    )).rows;
   }
+
+  res.render('dashboard', {
+    layout: 'layout',
+    user: req.session.user,
+    users,       // User-Liste für Admin, sonst null
+    penalties,   // Eigene Strafen (immer gesetzt)
+    title: 'Dashboard'
+  });
 });
 
 module.exports = router;

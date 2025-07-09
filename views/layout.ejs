@@ -22,19 +22,20 @@
     <button class="menu-toggle" id="menu-toggle" aria-label="Menü öffnen">
       <span></span><span></span><span></span>
     </button>
-    <ul id="main-menu">
-      <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="/penalties">Strafen</a></li>
-      <% if (user.is_admin) { %>
-        <li><a href="/users">Nutzer</a></li>
-      <% } %>
-      <li><a href="/export">Export</a></li>
-      <li>
-        <form action="/logout" method="POST" style="display:inline">
-          <button type="submit" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;">Logout</button>
-        </form>
-      </li>
-    </ul>
+   <ul id="main-menu">
+  <li><a href="/dashboard">Dashboard</a></li>
+  <% if (user.is_admin) { %>
+    <li><a href="/penalties">Strafen</a></li>
+    <li><a href="/users">Nutzer</a></li>
+  <% } %>
+  <li><a href="/export">Export</a></li>
+  <li>
+    <form action="/logout" method="POST" style="display:inline">
+      <button type="submit" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;">Logout</button>
+    </form>
+  </li>
+</ul>
+
   <% } %>
 </nav>
 
