@@ -39,17 +39,24 @@
           <tr>
             <th>Datum</th>
             <th>Grund</th>
+            <th>Betrag (€)</th>
           </tr>
         </thead>
         <tbody>
+          <% let total = 0; %>
           <% penalties.forEach(p => { %>
             <tr>
               <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
-              <td data-label="Grund"><%= p.reason %></td>
+              <td data-label="Grund"><%= p.type %></td>
+              <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
+              <% total += Number(p.amount); %>
             </tr>
           <% }) %>
         </tbody>
       </table>
+      <p class="dashboard-total">
+        Gesamtbetrag: <%= total.toFixed(2) %> €
+      </p>
     <% } %>
   </section>
 <% } %>

@@ -439,3 +439,83 @@ td:last-child  { border-bottom-right-radius: 14px; }
   margin-top: 2em;
   border-top: 1px solid #d0d0d0;
 }
+.dashboard-total, .gesamtbetrag {
+  font-weight: bold;
+  font-size: 1.15em;
+  color: #46695c;
+  margin-top: 1em;
+  text-align: right;
+}
+/* Tabellen-Design für das Dashboard */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  background: #f6f6f4;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 1rem;
+  box-shadow: 0 2px 12px rgba(70, 80, 75, 0.05);
+}
+
+th, td {
+  padding: 0.75em 1em;
+  text-align: left;
+  border-bottom: 1px solid #e0e0dd;
+}
+
+th {
+  background: #b5bd98; /* Schilfgrün-RAL6013 hell */
+  color: #343d1b;
+  font-weight: bold;
+  font-size: 1.05em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #e5e9df;
+}
+
+td[data-label="Betrag (€)"] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Gesamtsumme hervorheben */
+.dashboard-total, .gesamtbetrag {
+  font-weight: bold;
+  font-size: 1.15em;
+  color: #46695c;
+  margin-top: 1em;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  th {
+    display: none;
+  }
+  td {
+    position: relative;
+    padding-left: 50%;
+    border: none;
+    border-bottom: 1px solid #e0e0dd;
+  }
+  td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1em;
+    top: 0.75em;
+    font-weight: bold;
+    color: #697156;
+    font-size: 0.95em;
+  }
+  .dashboard-total, .gesamtbetrag {
+    text-align: left;
+  }
+}
