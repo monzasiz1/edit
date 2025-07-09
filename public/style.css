@@ -755,36 +755,47 @@ td:last-child  { border-bottom-right-radius: 14px; }
     padding-top: 0.6em;
   }
 
-  /* Buttons */
-  .penalty-actions .btn,
-  .penalty-actions .btn-small {
-    background: var(--color-accent);
-    color: var(--color-white);
-    padding: 0.5em 1.2em;
-    font-weight: 700;
-    font-size: 0.96em;
-    border-radius: 24px;
-    box-shadow: 0 3px 12px rgba(1, 109, 28, 0.3);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    user-select: none;
-    cursor: pointer;
-  }
-  .penalty-actions .btn-small.btn-delete {
-    background: #e8ebef;
-    color: #253053;
-    box-shadow: none;
-    padding: 0.46em 1em;
-  }
-  .penalty-actions .btn-small.btn-delete:hover,
-  .penalty-actions .btn-small.btn-delete:focus {
-    background: #cfd8db;
-    color: var(--color-primary);
-  }
-  .penalty-actions .btn:hover,
-  .penalty-actions .btn:focus {
-    background: #059221;
-    box-shadow: 0 6px 18px rgba(1, 109, 28, 0.45);
-  }
+  /* Buttons in Strafenkarten optimieren */
+.penalty-actions .btn,
+.penalty-actions .btn-small {
+  background: var(--color-accent);
+  color: var(--color-white);
+  padding: 0.35em 1em;        /* Etwas weniger vertikal, kompakter */
+  font-weight: 600;           /* Leicht weniger fett für Eleganz */
+  font-size: 0.9em;           /* Etwas kleiner */
+  border-radius: 12px;        /* Etwas weniger rund, moderner Look */
+  box-shadow: 0 2px 8px rgba(1, 109, 28, 0.25); /* Leichter Schatten */
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+  cursor: pointer;
+  line-height: 1.2;
+  min-width: 70px;            /* Mindestbreite für Konsistenz */
+  text-align: center;
+}
+
+.penalty-actions .btn-small.btn-delete {
+  background: #e8ebef;
+  color: #253053;
+  box-shadow: none;
+  padding: 0.3em 0.85em;
+  font-size: 0.85em;
+  border-radius: 12px;
+  min-width: 60px;
+}
+
+.penalty-actions .btn-small.btn-delete:hover,
+.penalty-actions .btn-small.btn-delete:focus {
+  background: #cfd8db;
+  color: var(--color-primary);
+}
+
+.penalty-actions .btn:hover,
+.penalty-actions .btn:focus {
+  background: #059221;
+  box-shadow: 0 4px 12px rgba(1, 109, 28, 0.5);
+  outline: none;
+}
+
 
   /* Icons für Labels */
   .penalty-label::before {
