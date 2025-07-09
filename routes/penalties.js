@@ -78,4 +78,24 @@ router.post('/delete/:id', requireAdmin, async (req, res) => {
   res.redirect('/penalties');
 });
 
+// Strafenübersicht für eingeloggte User (eigene Strafen inkl. Admin-Name)
+router.get('/meine', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  const penalties = (await db.query(
+    `SELECT p.id, p.amount, p.date, p.type, p.event, a.username AS admin
+     FROM penalties p
+     LEFT JOIN users a ON p.admin_id = a.id
+     WHERE p.user_id = $1
+     ORDER BY p.date DESC`,
+    [req.session.user.id]
+  )).rows;
+
+  penalties.forEach(p => {
+    p.amount = Number(p.amount);
+  });
+
+  // Falls dein User-Dashboard-Template z.B. "dashboard" heißt:
+  res.render('dashboard', { user: req.session.user, penalties });
+});
+
 module.exports = router;
