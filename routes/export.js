@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const PDFDocument = require('pdfkit');
+const path = require('path');
 
 // Hilfsfunktion zum deutschen Datumsformat
 function formatDate(date) {
@@ -16,64 +17,18 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// Middleware: Admin-Check
-function requireAdmin(req, res, next) {
-  if (!req.session.user || !req.session.user.is_admin) {
-    return res.status(403).send('Keine Rechte');
-  }
-  next();
-}
-
-// Hilfsfunktion zum Abrufen von Benutzern
-async function getUsers() {
-  try {
-    const result = await db.query('SELECT id, username FROM users ORDER BY username');
-    return result.rows;
-  } catch (err) {
-    console.error('Fehler beim Abrufen der Benutzer:', err);
-    throw new Error('Fehler beim Laden der Benutzer');
-  }
-}
-
-// Hilfsfunktion zum Erstellen von PDFs
-function generatePDF(res, title, data, columns, fileName) {
-  const doc = new PDFDocument({ margin: 50 });
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-  doc.pipe(res);
-
-  doc.fontSize(18).text(title);
-  doc.moveDown();
-
-  let y = doc.y;
-  columns.forEach((col, index) => {
-    doc.fontSize(12).text(col, 50 + (index * 120), y);
-  });
-  y += 20;
-
-  data.forEach((item) => {
-    if (y > 700) {
-      doc.addPage();
-      y = 50;
-    }
-    columns.forEach((col, index) => {
-      doc.fontSize(12).text(item[col] || '-', 50 + (index * 120), y);
-    });
-    y += 20;
-  });
-
-  doc.end();
+// Funktion zum Hinzufügen des Logos in das PDF
+function drawLogo(doc) {
+  const LOGO_PATH = path.join(__dirname, '../public/logo.png'); // Pfad zum Logo
+  doc.image(LOGO_PATH, 50, 30, { width: 100 });  // Position und Größe des Logos
 }
 
 // Export Übersicht /export
 router.get('/', requireLogin, async (req, res) => {
   let users = [];
   if (req.session.user.is_admin) {
-    try {
-      users = await getUsers();
-    } catch (err) {
-      return res.status(500).send(err.message);
-    }
+    const result = await db.query('SELECT id, username FROM users ORDER BY username');
+    users = result.rows;
   }
   res.render('export', { user: req.session.user, users });
 });
@@ -86,27 +41,46 @@ router.get('/me', requireLogin, async (req, res) => {
       [req.session.user.id]
     )).rows;
 
-    if (!penalties.length) {
-      return res.status(404).send('Keine Strafen gefunden');
-    }
+    const doc = new PDFDocument({ margin: 50 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="meine_strafen.pdf"');
+    doc.pipe(res);
 
-    const columns = ['date', 'type', 'event', 'reason'];
-    const data = penalties.map(penalty => ({
-      date: formatDate(penalty.date),
-      type: penalty.type,
-      event: penalty.event,
-      reason: penalty.reason
-    }));
+    // Logo in das PDF einfügen
+    drawLogo(doc);
 
-    generatePDF(res, `Strafenkonto für ${req.session.user.username}`, data, columns, 'meine_strafen.pdf');
+    // Titel
+    doc.fontSize(22).font('Helvetica-Bold').text('Strafenkonto für ' + req.session.user.username, {
+      align: 'center'
+    });
+    doc.moveDown(1);
+
+    // Tabelle der Strafen
+    doc.fontSize(12).font('Helvetica');
+    doc.text('Datum', 50, doc.y, { continued: true }).text(' | ', { continued: true });
+    doc.text('Strafart', { continued: true }).text(' | ', { continued: true });
+    doc.text('Grund', { continued: true }).text(' | ', { continued: true });
+    doc.text('Betrag', 500, doc.y);
+
+    penalties.forEach(penalty => {
+      doc.text(formatDate(penalty.date), 50, doc.y);
+      doc.text(penalty.type || '-', { continued: true });
+      doc.text(penalty.reason, { continued: true });
+      doc.text(penalty.amount.toFixed(2) + ' €', 500, doc.y);
+      doc.moveDown();
+    });
+
+    doc.end();
   } catch (err) {
-    console.error('Fehler beim Exportieren der Strafen:', err);
+    console.error(err);
     res.status(500).send('Fehler beim Exportieren');
   }
 });
 
 // Admin: Alle Strafen eines Users als PDF
-router.get('/user/:id', requireLogin, requireAdmin, async (req, res) => {
+router.get('/user/:id', requireLogin, async (req, res) => {
+  if (!req.session.user.is_admin) return res.status(403).send('Keine Rechte');
+
   try {
     const user = (await db.query('SELECT username FROM users WHERE id = $1', [req.params.id])).rows[0];
     if (!user) return res.status(404).send('User nicht gefunden');
@@ -116,48 +90,85 @@ router.get('/user/:id', requireLogin, requireAdmin, async (req, res) => {
       [req.params.id]
     )).rows;
 
-    if (!penalties.length) {
-      return res.status(404).send('Keine Strafen für diesen Benutzer gefunden');
-    }
+    const doc = new PDFDocument({ margin: 50 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="strafen_${user.username}.pdf"`);
+    doc.pipe(res);
 
-    const columns = ['date', 'type', 'event', 'reason'];
-    const data = penalties.map(penalty => ({
-      date: formatDate(penalty.date),
-      type: penalty.type,
-      event: penalty.event,
-      reason: penalty.reason
-    }));
+    // Logo in das PDF einfügen
+    drawLogo(doc);
 
-    generatePDF(res, `Strafenkonto für ${user.username}`, data, columns, `strafen_${user.username}.pdf`);
+    // Titel
+    doc.fontSize(22).font('Helvetica-Bold').text('Strafenkonto für ' + user.username, {
+      align: 'center'
+    });
+    doc.moveDown(1);
+
+    // Tabelle der Strafen
+    doc.fontSize(12).font('Helvetica');
+    doc.text('Datum', 50, doc.y, { continued: true }).text(' | ', { continued: true });
+    doc.text('Strafart', { continued: true }).text(' | ', { continued: true });
+    doc.text('Grund', { continued: true }).text(' | ', { continued: true });
+    doc.text('Betrag', 500, doc.y);
+
+    penalties.forEach(penalty => {
+      doc.text(formatDate(penalty.date), 50, doc.y);
+      doc.text(penalty.type || '-', { continued: true });
+      doc.text(penalty.reason, { continued: true });
+      doc.text(penalty.amount.toFixed(2) + ' €', 500, doc.y);
+      doc.moveDown();
+    });
+
+    doc.end();
   } catch (err) {
-    console.error('Fehler beim Exportieren der Strafen für Benutzer:', err);
-    res.status(500).send(`Fehler beim Exportieren: ${err.message}`);
+    console.error(err);
+    res.status(500).send('Fehler beim Exportieren');
   }
 });
 
 // Admin: Alle Strafen aller Nutzer als PDF
-router.get('/all', requireLogin, requireAdmin, async (req, res) => {
+router.get('/all', requireLogin, async (req, res) => {
+  if (!req.session.user.is_admin) return res.status(403).send('Keine Rechte');
+
   try {
     const penalties = (await db.query(
       'SELECT p.date, p.reason, p.type, p.event, u.username FROM penalties p JOIN users u ON p.user_id = u.id ORDER BY u.username, p.date DESC'
     )).rows;
 
-    if (!penalties.length) {
-      return res.status(404).send('Keine Strafen gefunden');
-    }
+    const doc = new PDFDocument({ margin: 50 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="alle_strafen.pdf"');
+    doc.pipe(res);
 
-    const columns = ['username', 'date', 'type', 'event', 'reason'];
-    const data = penalties.map(penalty => ({
-      username: penalty.username,
-      date: formatDate(penalty.date),
-      type: penalty.type,
-      event: penalty.event,
-      reason: penalty.reason
-    }));
+    // Logo in das PDF einfügen
+    drawLogo(doc);
 
-    generatePDF(res, 'Alle Strafen', data, columns, 'alle_strafen.pdf');
+    // Titel
+    doc.fontSize(22).font('Helvetica-Bold').text('Alle Strafen', {
+      align: 'center'
+    });
+    doc.moveDown(1);
+
+    // Tabelle der Strafen
+    doc.fontSize(12).font('Helvetica');
+    doc.text('Benutzername', 50, doc.y, { continued: true }).text(' | ', { continued: true });
+    doc.text('Datum', { continued: true }).text(' | ', { continued: true });
+    doc.text('Strafart', { continued: true }).text(' | ', { continued: true });
+    doc.text('Grund', { continued: true }).text(' | ', { continued: true });
+    doc.text('Betrag', 500, doc.y);
+
+    penalties.forEach(penalty => {
+      doc.text(penalty.username, 50, doc.y);
+      doc.text(formatDate(penalty.date), { continued: true });
+      doc.text(penalty.type || '-', { continued: true });
+      doc.text(penalty.reason, { continued: true });
+      doc.text(penalty.amount.toFixed(2) + ' €', 500, doc.y);
+      doc.moveDown();
+    });
+
+    doc.end();
   } catch (err) {
-    console.error('Fehler beim Exportieren aller Strafen:', err);
+    console.error(err);
     res.status(500).send('Fehler beim Exportieren');
   }
 });
