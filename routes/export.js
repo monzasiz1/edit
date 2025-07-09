@@ -16,7 +16,8 @@ function formatDate(date) {
 
 function drawLogo(doc) {
   if (fs.existsSync(LOGO_PATH)) {
-    doc.image(LOGO_PATH, 50, 35, { width: 70 });
+    // Platz für das Logo, um es schön zu positionieren
+    doc.image(LOGO_PATH, 50, 30, { width: 100 });
   }
 }
 
@@ -24,6 +25,16 @@ function drawLogo(doc) {
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
+}
+
+// Funktion für Tabellenkopf
+function generateTableHeader(doc, y) {
+  doc.fontSize(12).font('Helvetica-Bold');
+  doc.text('Datum', 50, y);
+  doc.text('Grund', 150, y);
+  doc.text('Veranstaltung', 270, y);
+  doc.text('Betrag (€)', 450, y, { width: 60, align: 'right' });
+  return y + 20;  // Höhe nach dem Tabellenkopf
 }
 
 // Export Übersicht /export
@@ -51,37 +62,33 @@ router.get('/me', requireLogin, async (req, res) => {
 
     // Logo und Titel
     drawLogo(doc);
-    doc.fontSize(18).text('Strafenkonto für ' + req.session.user.username, 130, 50);
+    doc.fontSize(18).text('Strafenkonto für ' + req.session.user.username, 150, 80);
     doc.moveDown(2);
 
-    // Tabellenkopf
-    const tableTop = doc.y + 10;
-    doc.fontSize(12).font('Helvetica-Bold');
-    doc.text('Datum', 50, tableTop);
-    doc.text('Grund', 120, tableTop);
-    doc.text('Veranstaltung', 260, tableTop);
-    doc.text('Betrag (€)', 430, tableTop, { width: 60, align: 'right' });
+    let y = 120; // Beginn der Tabelle
+    y = generateTableHeader(doc, y);
 
-    doc.font('Helvetica');
-    let y = tableTop + 18;
     let total = 0;
     penalties.forEach((p) => {
-      if (y > 730) {
+      if (y > 750) {
         doc.addPage();
-        y = 50;
+        y = 50;  // Position zurücksetzen, wenn Seite voll ist
+        generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
       }
-      doc.text(formatDate(p.date), 50, y);
-      doc.text(p.type || '-', 120, y);
-      doc.text(p.event || '-', 260, y, { width: 160 });
-      doc.text(Number(p.amount).toFixed(2), 430, y, { width: 60, align: 'right' });
+      doc.font('Helvetica')
+        .text(formatDate(p.date), 50, y)
+        .text(p.type || '-', 150, y)
+        .text(p.event || '-', 270, y)
+        .text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
+      
       total += Number(p.amount);
-      y += 18;
+      y += 18; // Zeilenhöhe
     });
 
     // Gesamtsumme
     doc.font('Helvetica-Bold');
-    doc.text('Gesamtbetrag:', 260, y + 10);
-    doc.text(total.toFixed(2) + ' €', 430, y + 10, { width: 60, align: 'right' });
+    doc.text('Gesamtbetrag:', 270, y + 10);
+    doc.text(total.toFixed(2) + ' €', 450, y + 10, { width: 60, align: 'right' });
 
     doc.end();
   } catch (err) {
@@ -110,37 +117,33 @@ router.get('/user/:id', requireLogin, async (req, res) => {
 
     // Logo und Titel
     drawLogo(doc);
-    doc.fontSize(18).text('Strafenkonto für ' + user.username, 130, 50);
+    doc.fontSize(18).text('Strafenkonto für ' + user.username, 150, 80);
     doc.moveDown(2);
 
-    // Tabellenkopf
-    const tableTop = doc.y + 10;
-    doc.fontSize(12).font('Helvetica-Bold');
-    doc.text('Datum', 50, tableTop);
-    doc.text('Grund', 120, tableTop);
-    doc.text('Veranstaltung', 260, tableTop);
-    doc.text('Betrag (€)', 430, tableTop, { width: 60, align: 'right' });
+    let y = 120; // Beginn der Tabelle
+    y = generateTableHeader(doc, y);
 
-    doc.font('Helvetica');
-    let y = tableTop + 18;
     let total = 0;
     penalties.forEach((p) => {
-      if (y > 730) {
+      if (y > 750) {
         doc.addPage();
-        y = 50;
+        y = 50;  // Position zurücksetzen, wenn Seite voll ist
+        generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
       }
-      doc.text(formatDate(p.date), 50, y);
-      doc.text(p.type || '-', 120, y);
-      doc.text(p.event || '-', 260, y, { width: 160 });
-      doc.text(Number(p.amount).toFixed(2), 430, y, { width: 60, align: 'right' });
+      doc.font('Helvetica')
+        .text(formatDate(p.date), 50, y)
+        .text(p.type || '-', 150, y)
+        .text(p.event || '-', 270, y)
+        .text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
+
       total += Number(p.amount);
-      y += 18;
+      y += 18; // Zeilenhöhe
     });
 
     // Gesamtsumme
     doc.font('Helvetica-Bold');
-    doc.text('Gesamtbetrag:', 260, y + 10);
-    doc.text(total.toFixed(2) + ' €', 430, y + 10, { width: 60, align: 'right' });
+    doc.text('Gesamtbetrag:', 270, y + 10);
+    doc.text(total.toFixed(2) + ' €', 450, y + 10, { width: 60, align: 'right' });
 
     doc.end();
   } catch (err) {
@@ -165,33 +168,28 @@ router.get('/all', requireLogin, async (req, res) => {
 
     // Logo und Titel
     drawLogo(doc);
-    doc.fontSize(18).text('Alle Strafen', 130, 50);
+    doc.fontSize(18).text('Alle Strafen', 150, 80);
     doc.moveDown(2);
 
-    // Tabellenkopf
-    const tableTop = doc.y + 10;
-    doc.fontSize(12).font('Helvetica-Bold');
-    doc.text('Benutzer', 50, tableTop);
-    doc.text('Datum', 120, tableTop);
-    doc.text('Grund', 190, tableTop);
-    doc.text('Veranstaltung', 320, tableTop);
-    doc.text('Betrag (€)', 490, tableTop, { width: 60, align: 'right' });
+    let y = 120; // Beginn der Tabelle
+    y = generateTableHeader(doc, y);
 
-    doc.font('Helvetica');
-    let y = tableTop + 18;
     let total = 0;
     penalties.forEach((p) => {
-      if (y > 730) {
+      if (y > 750) {
         doc.addPage();
-        y = 50;
+        y = 50;  // Position zurücksetzen, wenn Seite voll ist
+        generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
       }
-      doc.text(p.username, 50, y);
-      doc.text(formatDate(p.date), 120, y);
-      doc.text(p.type || '-', 190, y);
-      doc.text(p.event || '-', 320, y, { width: 160 });
-      doc.text(Number(p.amount).toFixed(2), 490, y, { width: 60, align: 'right' });
+      doc.font('Helvetica')
+        .text(p.username, 50, y)
+        .text(formatDate(p.date), 120, y)
+        .text(p.type || '-', 190, y)
+        .text(p.event || '-', 320, y)
+        .text(Number(p.amount).toFixed(2), 490, y, { width: 60, align: 'right' });
+
       total += Number(p.amount);
-      y += 18;
+      y += 18; // Zeilenhöhe
     });
 
     // Gesamtsumme
