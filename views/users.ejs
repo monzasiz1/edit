@@ -1,17 +1,33 @@
-
 <h2>Benutzerübersicht</h2>
-<table>
-  <tr><th>Benutzername</th><th>Rolle</th><th>Aktion</th></tr>
-  <% users.forEach(u => { %>
+
+<a href="/users/add" class="btn btn-add" style="margin-bottom:1em;display:inline-block;">➕ Benutzer hinzufügen</a>
+
+<table class="user-table">
+  <thead>
     <tr>
-      <td><%= u.username %></td>
-      <td><%= u.is_admin ? 'Admin' : 'Mitglied' %></td>
-      <td>
-        <a href="/users/edit/<%= u.id %>">Bearbeiten</a>
-        <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-          <button onclick="return confirm('Wirklich löschen?')">Löschen</button>
-        </form>
-      </td>
+      <th>Benutzername</th>
+      <th>Rolle</th>
+      <th>Aktionen</th>
     </tr>
-  <% }) %>
+  </thead>
+  <tbody>
+    <% users.forEach(u => { %>
+      <tr>
+        <td><strong><%= u.username %></strong></td>
+        <td>
+          <% if (u.is_admin) { %>
+            <span class="role role-admin">👑 Admin</span>
+          <% } else { %>
+            <span class="role role-member">👤 Mitglied</span>
+          <% } %>
+        </td>
+        <td>
+          <a href="/users/edit/<%= u.id %>" class="btn btn-small">✏️ Bearbeiten</a>
+          <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
+            <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
 </table>
