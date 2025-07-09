@@ -749,3 +749,89 @@ td:last-child  { border-bottom-right-radius: 14px; }
 @media (min-width: 701px) {
   .only-mobile { display: none !important; }
 }
+.dashboard-cards { display: none; }
+@media (max-width: 700px) {
+  .only-desktop { display: none !important; }
+  .dashboard-cards.only-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-top: 1.3em;
+  }
+  .dashboard-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(41,51,91,0.11);
+    padding: 1.1em 1.2em 0.9em 1.2em;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.19s, transform 0.17s;
+    gap: 0.4em;
+    animation: fadeInUp 0.7s cubic-bezier(.33,.77,.63,1.11);
+    font-size: 1.06em;
+    position: relative;
+  }
+  .dashboard-card:active {
+   box-shadow: 0 1px 8px rgba(1,109,28,0.10);
+  transform: scale(0.97);
+}
+.dashboard-card:focus-within {
+  box-shadow: 0 0 0 2px #bbf7d0, 0 2px 12px rgba(41,51,91,0.10);
+}
+
+  .dashboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.7em;
+    border-bottom: 1px solid #f3f6f3;
+    padding-bottom: 0.22em;
+    font-size: 1em;
+  }
+  .dashboard-row:last-child { border-bottom: none; }
+  .dashboard-label {
+    font-weight: 600;
+    color: #46695c;
+    opacity: 0.88;
+    font-size: 0.97em;
+    min-width: 90px;
+    display: inline-block;
+  }
+  .dashboard-value {
+    color: #253053;
+    font-weight: 500;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .dashboard-row.amount .dashboard-value {
+    font-weight: 700;
+    color: #016d1c;
+  }
+  .dashboard-card.total-card {
+    margin-top: 0.9em;
+    background: #f4fff6;
+    border: 1.5px solid #bbf7d0;
+    box-shadow: none;
+    font-size: 1.09em;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #253053;
+  }
+
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(22px); }
+    100% { opacity: 1; transform: none; }
+  }
+}
+@media (min-width: 701px) {
+  .only-mobile { display: none !important; }
+}
+.dashboard-row {
+  animation: fadeRow 0.42s cubic-bezier(.5,.6,.3,1.1);
+}
+@keyframes fadeRow {
+  0% { opacity: 0; transform: translateY(10px);}
+  100% { opacity: 1; transform: none;}
+}
