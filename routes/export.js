@@ -70,7 +70,7 @@ router.get('/me', requireLogin, async (req, res) => {
 
     let total = 0;
     penalties.forEach((p) => {
-      if (y > 750) {
+      if (y > 750) {  // Wenn die Seite voll ist
         doc.addPage();
         y = 50;  // Position zurücksetzen, wenn Seite voll ist
         generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
@@ -80,7 +80,7 @@ router.get('/me', requireLogin, async (req, res) => {
         .text(p.type || '-', 150, y)
         .text(p.event || '-', 270, y)
         .text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
-      
+
       total += Number(p.amount);
       y += 18; // Zeilenhöhe
     });
@@ -125,7 +125,7 @@ router.get('/user/:id', requireLogin, async (req, res) => {
 
     let total = 0;
     penalties.forEach((p) => {
-      if (y > 750) {
+      if (y > 750) {  // Wenn die Seite voll ist
         doc.addPage();
         y = 50;  // Position zurücksetzen, wenn Seite voll ist
         generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
@@ -176,7 +176,7 @@ router.get('/all', requireLogin, async (req, res) => {
 
     let total = 0;
     penalties.forEach((p) => {
-      if (y > 750) {
+      if (y > 750) {  // Wenn die Seite voll ist
         doc.addPage();
         y = 50;  // Position zurücksetzen, wenn Seite voll ist
         generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen

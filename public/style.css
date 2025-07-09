@@ -1079,7 +1079,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/backgroundimg.jpg') no-repeat center center;
+  background: url('public/backgroundimg.jpg') no-repeat center center;
   background-size: cover; /* Bild soll den gesamten Bereich abdecken */
   z-index: -1; /* Das Bild bleibt hinter dem Formular */
   filter: brightness(0.5); /* Dimmt das Bild für bessere Lesbarkeit des Textes */
