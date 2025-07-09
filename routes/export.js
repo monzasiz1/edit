@@ -78,6 +78,7 @@ router.get('/me', requireLogin, async (req, res) => {
 });
 
 // Admin: Alle Strafen eines Users als PDF
+// Admin: Alle Strafen eines Users als PDF
 router.get('/user/:id', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Keine Rechte');
 
@@ -112,11 +113,17 @@ router.get('/user/:id', requireLogin, async (req, res) => {
     doc.text('Betrag', 500, doc.y);
 
     penalties.forEach(penalty => {
-      doc.text(formatDate(penalty.date), 50, doc.y);
-      doc.text(penalty.type || '-', { continued: true });
-      doc.text(penalty.reason, { continued: true });
-      doc.text(penalty.amount.toFixed(2) + ' €', 500, doc.y);
-      doc.moveDown();
+      // Sicherstellen, dass amount als Zahl behandelt wird
+      const amount = parseFloat(penalty.amount);
+      if (!isNaN(amount)) {
+        doc.text(formatDate(penalty.date), 50, doc.y);
+        doc.text(penalty.type || '-', { continued: true });
+        doc.text(penalty.reason || '-', { continued: true });
+        doc.text(amount.toFixed(2) + ' €', 500, doc.y); // Ausgabe des Betrags mit 2 Dezimalstellen
+        doc.moveDown();
+      } else {
+        console.warn(`Ungültiger Betrag für Strafe ID ${penalty.id}: ${penalty.amount}`);
+      }
     });
 
     doc.end();
@@ -125,6 +132,7 @@ router.get('/user/:id', requireLogin, async (req, res) => {
     res.status(500).send('Fehler beim Exportieren');
   }
 });
+
 
 // Admin: Alle Strafen aller Nutzer als PDF
 router.get('/all', requireLogin, async (req, res) => {
@@ -144,27 +152,30 @@ router.get('/all', requireLogin, async (req, res) => {
     drawLogo(doc);
 
     // Titel
-    doc.fontSize(22).font('Helvetica-Bold').text('Alle Strafen', {
-      align: 'center'
-    });
-    doc.moveDown(1);
-
-    // Tabelle der Strafen
     doc.fontSize(12).font('Helvetica');
-    doc.text('Benutzername', 50, doc.y, { continued: true }).text(' | ', { continued: true });
-    doc.text('Datum', { continued: true }).text(' | ', { continued: true });
-    doc.text('Strafart', { continued: true }).text(' | ', { continued: true });
-    doc.text('Grund', { continued: true }).text(' | ', { continued: true });
-    doc.text('Betrag', 500, doc.y);
 
-    penalties.forEach(penalty => {
-      doc.text(penalty.username, 50, doc.y);
-      doc.text(formatDate(penalty.date), { continued: true });
-      doc.text(penalty.type || '-', { continued: true });
-      doc.text(penalty.reason, { continued: true });
-      doc.text(penalty.amount.toFixed(2) + ' €', 500, doc.y);
-      doc.moveDown();
-    });
+// Tabelle Kopfzeile
+doc.fontSize(14).font('Helvetica-Bold').text('Datum', 50, doc.y, { continued: true })
+   .text(' | ', { continued: true })
+   .text('Strafart', { continued: true })
+   .text(' | ', { continued: true })
+   .text('Grund', { continued: true })
+   .text(' | ', { continued: true })
+   .text('Betrag', 500, doc.y);
+doc.moveDown(1);
+
+// Tabelle Inhalt
+penalties.forEach(penalty => {
+  const amount = parseFloat(penalty.amount);
+  if (!isNaN(amount)) {
+    doc.text(formatDate(penalty.date), 50, doc.y);
+    doc.text(penalty.type || '-', { continued: true });
+    doc.text(penalty.reason || '-', { continued: true });
+    doc.text(amount.toFixed(2) + ' €', 500, doc.y);
+    doc.moveDown();
+  }
+});
+
 
     doc.end();
   } catch (err) {
