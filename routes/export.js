@@ -37,15 +37,11 @@ function generateTableHeader(doc, y) {
   return y + 20;  // Höhe nach dem Tabellenkopf
 }
 
-// Export Übersicht /export
-router.get('/', requireLogin, async (req, res) => {
-  let users = [];
-  if (req.session.user.is_admin) {
-    const result = await db.query('SELECT id, username FROM users ORDER BY username');
-    users = result.rows;
-  }
-  res.render('export', { user: req.session.user, users });
-});
+// Funktion zum automatischen Umbruch von Text
+function drawTextWithWordWrap(doc, text, x, y, width) {
+  doc.font('Helvetica').fontSize(10);
+  doc.text(text, x, y, { width: width, height: 400, align: 'left', lineBreak: true });
+}
 
 // Eigenes Strafregister exportieren (Mitglied/Admin)
 router.get('/me', requireLogin, async (req, res) => {
@@ -75,11 +71,12 @@ router.get('/me', requireLogin, async (req, res) => {
         y = 50;  // Position zurücksetzen, wenn Seite voll ist
         generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
       }
-      doc.font('Helvetica')
-        .text(formatDate(p.date), 50, y)
-        .text(p.type || '-', 150, y)
-        .text(p.event || '-', 270, y)
-        .text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
+
+      // Text mit automatischem Umbruch
+      drawTextWithWordWrap(doc, formatDate(p.date), 50, y, 100);
+      drawTextWithWordWrap(doc, p.type || '-', 150, y, 120);
+      drawTextWithWordWrap(doc, p.event || '-', 270, y, 180);
+      doc.text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
 
       total += Number(p.amount);
       y += 18; // Zeilenhöhe
@@ -130,11 +127,12 @@ router.get('/user/:id', requireLogin, async (req, res) => {
         y = 50;  // Position zurücksetzen, wenn Seite voll ist
         generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
       }
-      doc.font('Helvetica')
-        .text(formatDate(p.date), 50, y)
-        .text(p.type || '-', 150, y)
-        .text(p.event || '-', 270, y)
-        .text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
+
+      // Text mit automatischem Umbruch
+      drawTextWithWordWrap(doc, formatDate(p.date), 50, y, 100);
+      drawTextWithWordWrap(doc, p.type || '-', 150, y, 120);
+      drawTextWithWordWrap(doc, p.event || '-', 270, y, 180);
+      doc.text(Number(p.amount).toFixed(2), 450, y, { width: 60, align: 'right' });
 
       total += Number(p.amount);
       y += 18; // Zeilenhöhe
@@ -144,58 +142,6 @@ router.get('/user/:id', requireLogin, async (req, res) => {
     doc.font('Helvetica-Bold');
     doc.text('Gesamtbetrag:', 270, y + 10);
     doc.text(total.toFixed(2) + ' €', 450, y + 10, { width: 60, align: 'right' });
-
-    doc.end();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Fehler beim Exportieren');
-  }
-});
-
-// Admin: Alle Strafen aller Nutzer als PDF
-router.get('/all', requireLogin, async (req, res) => {
-  if (!req.session.user.is_admin) return res.status(403).send('Keine Rechte');
-
-  try {
-    const penalties = (await db.query(
-      'SELECT p.date, p.type, p.event, p.amount, u.username FROM penalties p JOIN users u ON p.user_id = u.id ORDER BY u.username, p.date DESC'
-    )).rows;
-
-    const doc = new PDFDocument({ margin: 50 });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="alle_strafen.pdf"');
-    doc.pipe(res);
-
-    // Logo und Titel
-    drawLogo(doc);
-    doc.fontSize(18).text('Alle Strafen', 150, 80);
-    doc.moveDown(2);
-
-    let y = 120; // Beginn der Tabelle
-    y = generateTableHeader(doc, y);
-
-    let total = 0;
-    penalties.forEach((p) => {
-      if (y > 750) {  // Wenn die Seite voll ist
-        doc.addPage();
-        y = 50;  // Position zurücksetzen, wenn Seite voll ist
-        generateTableHeader(doc, y); // Kopf nach dem Seitenumbruch erneut zeichnen
-      }
-      doc.font('Helvetica')
-        .text(p.username, 50, y)
-        .text(formatDate(p.date), 120, y)
-        .text(p.type || '-', 190, y)
-        .text(p.event || '-', 320, y)
-        .text(Number(p.amount).toFixed(2), 490, y, { width: 60, align: 'right' });
-
-      total += Number(p.amount);
-      y += 18; // Zeilenhöhe
-    });
-
-    // Gesamtsumme
-    doc.font('Helvetica-Bold');
-    doc.text('Gesamtbetrag:', 320, y + 10);
-    doc.text(total.toFixed(2) + ' €', 490, y + 10, { width: 60, align: 'right' });
 
     doc.end();
   } catch (err) {
