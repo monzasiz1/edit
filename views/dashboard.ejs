@@ -1,35 +1,6 @@
 <h2>Dashboard</h2>
 <p class="dashboard-greeting">Hallo <%= user.username %>!</p>
 
-<% if (user.is_admin && users) { %>
-  <section>
-    <h3>Alle Nutzer</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Benutzername</th>
-          <th>Rolle</th>
-          <th>Aktionen</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% users.forEach(u => { %>
-          <tr>
-            <td data-label="Benutzername"><strong><%= u.username %></strong></td>
-            <td data-label="Rolle"><%= u.is_admin ? "Admin" : "Mitglied" %></td>
-            <td data-label="Aktionen">
-              <a href="/users/edit/<%= u.id %>" class="btn btn-small">Bearbeiten</a>
-              <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-                <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">Löschen</button>
-              </form>
-              <a href="/export/user/<%= u.id %>" class="btn btn-small">PDF</a>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </section>
-<% } %>
 <% if (penalties) { %>
   <section>
     <h3>Meine Strafen</h3>
