@@ -6,47 +6,44 @@
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
   <link rel="stylesheet" href="/style.css" />
   <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="/logo.png">
-
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/logo.png">
 </head>
 <body>
   <nav class="main-nav">
- <a href="/" class="logo logo-large">
-  <img src="/logo.png" alt="Logo" /> Spießbuch
-</a>
+    <a href="/" class="logo logo-large">
+      <img src="/logo.png" alt="Logo" /> Spießbuch
+    </a>
 
+    <% if (user) { %>
+      <!-- Hamburger-Button für Mobile -->
+      <button class="menu-toggle" id="menu-toggle" aria-label="Menü öffnen">
+        <span></span><span></span><span></span>
+      </button>
+      <ul id="main-menu">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <% if (user.is_admin) { %>
+          <li><a href="/penalties">Strafen</a></li>
+          <li><a href="/users">Nutzer</a></li>
+        <% } %>
+        <li><a href="/export">Export</a></li>
+        <li><a href="/strafenkatalog.pdf" target="_blank" rel="noopener">📄 Strafenkatalog</a></li>
+        <li>
+         <form action="/logout" method="POST" style="display:inline">
+  <button type="submit" class="btn btn-small btn-logout">Logout</button>
+</form>
 
-  <% if (user) { %>
-    <!-- Hamburger-Button für Mobile -->
-    <button class="menu-toggle" id="menu-toggle" aria-label="Menü öffnen">
-      <span></span><span></span><span></span>
-    </button>
-   <ul id="main-menu">
-  <li><a href="/dashboard">Dashboard</a></li>
-  <% if (user.is_admin) { %>
-    <li><a href="/penalties">Strafen</a></li>
-    <li><a href="/users">Nutzer</a></li>
-  <% } %>
-  <li><a href="/export">Export</a></li>
-  <li>
-    <form action="/logout" method="POST" style="display:inline">
-      <button type="submit" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;">Logout</button>
-    </form>
-  </li>
-</ul>
-
-  <% } %>
-</nav>
-
+        </li>
+      </ul>
+    <% } %>
+  </nav>
 
   <main class="container">
     <%- body %>
   </main>
-    <script src="/menu.js"></script>
+  <script src="/menu.js"></script>
   <footer class="footer">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
   </footer>
 </body>
-
 </html>

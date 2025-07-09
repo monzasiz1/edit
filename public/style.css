@@ -35,9 +35,7 @@ body {
   min-height: 100vh;
 }
 
-/* ---------------------------
-   CONTAINER
----------------------------- */
+/* CONTAINER */
 .container {
   max-width: var(--max-width);
   margin: calc(var(--nav-height) + 2.6rem) auto 2.6rem auto;
@@ -47,19 +45,8 @@ body {
   box-shadow: var(--shadow);
   transition: box-shadow var(--transition), padding var(--transition);
 }
-@media (max-width: 700px) {
-  .container {
-    max-width: 97vw;
-    padding: 1.1rem 0.6rem;
-    margin: calc(var(--nav-height) + 1.1rem) 0 1.1rem 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
-}
 
-/* ---------------------------
-   NAVIGATION
----------------------------- */
+/* NAVIGATION */
 nav.main-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -120,8 +107,6 @@ nav.main-nav ul li button:focus {
   border-bottom-color: var(--color-accent);
   outline: none;
 }
-
-/* Hamburger Menu - Mobile */
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -194,10 +179,8 @@ nav.main-nav ul li button:focus {
   }
 }
 
-/* ---------------------------
-   BUTTONS
----------------------------- */
-button, a.btn {
+/* BUTTONS */
+.btn, button, a.btn {
   background: var(--color-accent);
   color: var(--color-white);
   border: none;
@@ -213,21 +196,15 @@ button, a.btn {
   display: inline-block;
   margin: 0.18rem 0;
 }
-button:hover, a.btn:hover,
-button:focus, a.btn:focus {
+.btn:hover,
+.btn:focus,
+button:hover,
+button:focus,
+a.btn:hover,
+a.btn:focus {
   background: #059221;
+  color: #fff;
   box-shadow: 0 4px 16px rgba(1,109,28,0.14);
-}
-a.btn-delete, .btn.btn-delete {
-  background: #e8ebef;
-  color: #2b3445;
-  box-shadow: none;
-  margin-left: 0.7rem;
-  transition: background 0.21s;
-}
-a.btn-delete:hover, .btn.btn-delete:hover {
-  background: #d2d6db;
-  color: #253053;
 }
 .btn-cancel {
   background: #e9ecf4;
@@ -245,10 +222,17 @@ a.btn-delete:hover, .btn.btn-delete:hover {
   border-radius: 18px;
   margin-right: 0.3rem;
 }
+.btn-add {
+  background: #ced7c2;
+  color: #46695c;
+  font-size: 1em;
+  margin-bottom: 1.1em;
+}
+.btn-add:hover {
+  background: #b5bd98;
+}
 
-/* ---------------------------
-   FORMS & INPUTS
----------------------------- */
+/* FORMS & INPUTS */
 form {
   max-width: 510px;
   margin-top: 1.4rem;
@@ -269,11 +253,7 @@ label {
   color: #253053;
   letter-spacing: 0.02em;
 }
-select, 
-input[type="text"], 
-input[type="date"], 
-input[type="password"], 
-textarea {
+select, input[type="text"], input[type="date"], input[type="password"], textarea {
   width: 100%;
   padding: 0.62rem 1rem;
   margin-bottom: 1.2rem;
@@ -286,90 +266,66 @@ textarea {
   transition: border-color 0.25s;
   box-shadow: 0 2px 6px rgba(41,51,91,0.06);
 }
-select:focus,
-input:focus {
+select:focus, input:focus {
   border-color: #016d1c;
   outline: none;
   background: #f4fff6;
   box-shadow: 0 0 0 2px #bbf7d0;
 }
 
-/* ---------------------------
-   TABLES (Responsive Cards)
----------------------------- */
-table {
+/* TABLES (DESKTOP) */
+table, .user-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 18px;
-  margin-top: 2.3rem;
-  font-size: 1.09rem;
-  background: none;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  background: #f6f6f4;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 1rem;
+  box-shadow: 0 2px 12px rgba(70, 80, 75, 0.05);
 }
-th, td {
-  padding: 1.1rem 1.4rem;
+th, td, .user-table th, .user-table td {
+  padding: 0.9em 1em;
   text-align: left;
+  border-bottom: 1px solid #e0e0dd;
   vertical-align: middle;
 }
-th {
-  background: var(--color-primary);
-  color: var(--color-white);
-  font-weight: 700;
-  border-radius: 14px 14px 0 0;
-  letter-spacing: 0.04em;
-  user-select: none;
-  font-size: 1.07rem;
+th, .user-table th {
+  background: #b5bd98;
+  color: #343d1b;
+  font-weight: bold;
+  font-size: 1.05em;
 }
-tr {
-  background: var(--color-white);
-  box-shadow: 0 9px 30px rgba(41,51,91,0.08);
-  border-radius: 0 0 14px 14px;
-  transition: box-shadow 0.25s, background 0.18s;
-  cursor: default;
+tr:last-child td, .user-table tr:last-child td {
+  border-bottom: none;
 }
-tr:hover {
-  box-shadow: 0 16px 40px rgba(1,109,28,0.13);
-  background: #f6fbf7;
+tbody tr:hover, .user-table tbody tr:hover {
+  background: #e5e9df;
 }
-td:first-child { border-bottom-left-radius: 14px; }
-td:last-child  { border-bottom-right-radius: 14px; }
-
-/* ---- CARD-STYLE TABLES ON MOBILE ---- */
-@media (max-width: 700px) {
-  table { border: 0; width: 100%; background: none; box-shadow: none; margin-top: 1.1rem; font-size: 0.99rem; }
-  thead { display: none; }
-  tbody, tr, td { display: block; width: 100%; }
-  tr {
-    margin-bottom: 1.25rem;
-    background: var(--color-white);
-    border-radius: 14px;
-    box-shadow: 0 5px 24px rgba(41,51,91,0.13);
-    padding: 1.1rem 1.2rem;
-    position: relative;
-  }
-  td {
-    padding: 0.56rem 0;
-    border: none;
-    border-bottom: 1px solid #ecf0f5;
-    position: relative;
-    min-height: 28px;
-    font-size: 1rem;
-  }
-  td:last-child { border-bottom: none; }
-  td::before {
-    content: attr(data-label) ": ";
-    font-weight: 600;
-    color: var(--color-primary);
-    display: block;
-    margin-bottom: 3px;
-    font-size: 0.96em;
-    opacity: 0.93;
-    letter-spacing: 0.01em;
-  }
+td[data-label="Betrag (€)"], .user-table td[data-label="Betrag (€)"] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---------------------------
-   FEEDBACK & UTILS
----------------------------- */
+/* Rollen-Badges */
+.role {
+  padding: 0.14em 0.85em;
+  border-radius: 1em;
+  font-size: 0.96em;
+  display: inline-block;
+  font-weight: 600;
+  margin-right: 0.2em;
+}
+.role-admin {
+  background: #ced7c2;
+  color: #49613a;
+}
+.role-member {
+  background: #e9eee3;
+  color: #46695c;
+}
+
+/* FEEDBACK & UTILS */
 .error {
   background: #fff2f2;
   color: var(--color-error);
@@ -378,6 +334,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
   margin: 1.7rem 0;
   font-weight: 700;
   box-shadow: 0 0 16px #d06b6b27;
+  border-left: 4px solid var(--color-error);
 }
 .success {
   background: #e9ffe8;
@@ -387,54 +344,15 @@ td:last-child  { border-bottom-right-radius: 14px; }
   margin: 1.4rem 0;
   font-weight: 600;
   box-shadow: 0 0 14px #8ce09a2f;
+  border-left: 4px solid var(--color-success);
 }
 .hidden { display: none !important; }
-
-/* Auth / Login/Register Card Styles */
-.auth-box,
-.auth-container {
-  max-width: 410px;
-  margin: 2.8rem auto;
-  padding: 2.5rem 2.2rem 1.4rem 2.2rem;
-  background: var(--color-white);
-  border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(41,51,91,0.12);
-  text-align: center;
-}
-.auth-box .logo1,
-.auth-container .logo1 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.3rem;
-  margin-bottom: 1.3rem;
-  color: var(--color-primary);
-  text-decoration: none;
-}
-.auth-box .logo1 img,
-.auth-container .logo1 img {
-  height: 36px;
-  margin-right: 10px;
-}
-
-/* Switch Auth Links */
-.switch-auth {
-  margin-top: 2rem;
-  color: var(--color-muted);
-  font-size: 1.03rem;
-}
-.switch-auth a {
-  color: var(--color-accent);
-  text-decoration: underline;
-  font-weight: 600;
-}
 
 .footer {
   text-align: center;
   padding: 1em 0;
   font-size: 0.9em;
-  color: #6b7a67; /* RAL 6013 - Schilfgrün oder eine passende Farbe */
+  color: #6b7a67;
   background: #f5f5f5;
   margin-top: 2em;
   border-top: 1px solid #d0d0d0;
@@ -446,76 +364,141 @@ td:last-child  { border-bottom-right-radius: 14px; }
   margin-top: 1em;
   text-align: right;
 }
-/* Tabellen-Design für das Dashboard */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1.5em;
-  background: #f6f6f4;
-  border-radius: 12px;
-  overflow: hidden;
-  font-size: 1rem;
-  box-shadow: 0 2px 12px rgba(70, 80, 75, 0.05);
-}
-
-th, td {
-  padding: 0.75em 1em;
-  text-align: left;
-  border-bottom: 1px solid #e0e0dd;
-}
-
-th {
-  background: #b5bd98; /* Schilfgrün-RAL6013 hell */
-  color: #343d1b;
-  font-weight: bold;
-  font-size: 1.05em;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-tbody tr:hover {
-  background: #e5e9df;
-}
-
-td[data-label="Betrag (€)"] {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Gesamtsumme hervorheben */
-.dashboard-total, .gesamtbetrag {
-  font-weight: bold;
-  font-size: 1.15em;
+.dashboard-greeting {
+  font-size: 1.3em;
+  font-weight: 600;
   color: #46695c;
-  margin-top: 1em;
-  text-align: right;
+  margin-bottom: 0.7em;
 }
 
-@media (max-width: 600px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
+/* =========================
+   MOBILE-OPTIMIERUNG
+   ========================= */
+@media (max-width: 700px) {
+  body {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-bg);
   }
-  th {
-    display: none;
+  .container {
+    padding: 0.8rem 0.2rem;
+    margin-top: calc(var(--nav-height) + 0.3rem);
+    margin-bottom: 1.3rem;
+    border-radius: 0;
+    box-shadow: none;
   }
-  td {
-    position: relative;
-    padding-left: 50%;
-    border: none;
-    border-bottom: 1px solid #e0e0dd;
+  h2 {
+    font-size: 1.22em;
+    margin-top: 0.3em;
+    margin-bottom: 1em;
+    text-align: left;
+    letter-spacing: 0.01em;
   }
-  td:before {
-    content: attr(data-label);
-    position: absolute;
-    left: 1em;
-    top: 0.75em;
-    font-weight: bold;
-    color: #697156;
-    font-size: 0.95em;
-  }
-  .dashboard-total, .gesamtbetrag {
+  .dashboard-greeting {
+    font-size: 1em;
+    margin-bottom: 1.2em;
     text-align: left;
   }
+  /* Buttons & Touchflächen */
+  .btn, button, a.btn {
+    font-size: 1.11rem;
+    padding: 0.85em 1.2em;
+    min-width: 140px;
+    margin: 0.22em 0 0.22em 0;
+    border-radius: 22px;
+  }
+  .btn-small {
+    font-size: 1em;
+    padding: 0.52em 1.1em;
+    min-width: 120px;
+    margin-bottom: 0.18em;
+    border-radius: 19px;
+  }
+  .btn-add {
+    width: 100%;
+    margin-bottom: 1em;
+    font-size: 1.11em;
+  }
+  /* Mobile Tabelle: Buttons untereinander & cardiger Look */
+  table, .user-table { border: 0; background: none; box-shadow: none; margin-top: 1.1rem; font-size: 0.99rem; }
+  thead, .user-table thead { display: none; }
+  tbody, .user-table tbody, tr, .user-table tr, td, .user-table td { display: block; width: 100%; }
+  tr, .user-table tr {
+    margin-bottom: 1.3em;
+    background: var(--color-white);
+    border-radius: 16px !important;
+    box-shadow: 0 5px 20px rgba(1,109,28,0.10);
+    padding: 1.3em 1.1em;
+    position: relative;
+  }
+  td, .user-table td {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45em;
+    align-items: flex-start;
+    padding: 0.65em 0.4em !important;
+    border: none;
+    border-bottom: 1px solid #e0e0dd;
+    min-height: 30px;
+    font-size: 1em;
+  }
+  td:last-child, .user-table td:last-child { border-bottom: none; }
+  td::before, .user-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: #697156;
+    margin-bottom: 4px;
+    font-size: 0.95em;
+    opacity: 0.93;
+    letter-spacing: 0.01em;
+  }
+  .user-table td form, .user-table td a, td form, td a {
+    width: 100%;
+  }
+  .user-table td form button, .user-table td a.btn,
+  td form button, td a.btn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .dashboard-total, .gesamtbetrag {
+    font-size: 1.06em;
+    margin-top: 1.4em;
+    text-align: left;
+  }
+  /* Inputs/Forms: größer, mehr Abstand */
+  input, select, textarea {
+    font-size: 1.09em;
+    padding: 0.9em 1.1em;
+    border-radius: 11px;
+    margin-bottom: 1.5em;
+  }
+  label {
+    font-size: 1em;
+    margin-bottom: 0.2em;
+  }
+  form.form-card {
+    padding: 1.3rem 0.7rem 1.1rem 0.7rem;
+  }
+  /* Feedback */
+  .error, .success {
+    font-size: 1em;
+    padding: 0.9em 0.7em;
+    border-radius: 12px;
+    margin: 1em 0;
+  }
+}
+
+.btn-logout {
+  background: #df4646;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  border-radius: 19px;
+  transition: background 0.21s, color 0.17s;
+  margin-left: 0.2em;
+}
+.btn-logout:hover,
+.btn-logout:focus {
+  background: #ba2222;
+  color: #fff;
 }
