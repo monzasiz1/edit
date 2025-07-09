@@ -38,6 +38,7 @@
         <thead>
           <tr>
             <th>Datum</th>
+            <th>Veranstaltung</th>
             <th>Grund</th>
             <th>Betrag (€)</th>
           </tr>
@@ -47,6 +48,7 @@
           <% penalties.forEach(p => { %>
             <tr>
               <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
+              <td data-label="Veranstaltung"><%= p.event %></td>
               <td data-label="Grund"><%= p.type %></td>
               <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
               <% total += Number(p.amount); %>
