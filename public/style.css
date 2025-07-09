@@ -687,63 +687,133 @@ td:last-child  { border-bottom-right-radius: 14px; }
   }
 }
 /* Penalty-Cards für Mobile */
-.penalty-cards { display: none; }
+/* Container für Strafenkarten auf Mobile */
+.penalty-cards {
+  display: none;
+}
 
 @media (max-width: 700px) {
   .only-desktop { display: none !important; }
   .only-mobile { display: block !important; }
+
   .penalty-cards {
     margin-top: 1.5em;
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 1.2em;
   }
+
   .penalty-card {
-    background: #fff;
-    border-radius: 13px;
-    box-shadow: 0 4px 16px rgba(41,51,91,0.10);
-    padding: 1.1em 1.2em 1em 1.2em;
+    background: var(--color-white);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(1, 109, 28, 0.12);
+    padding: 1.4em 1.6em;
     display: flex;
     flex-direction: column;
-    gap: 0.55em;
-    font-size: 1.05em;
-    position: relative;
-    transition: box-shadow 0.17s;
+    gap: 0.8em;
+    font-size: 1.1em;
+    color: var(--color-primary);
+    transition: box-shadow 0.3s ease, transform 0.25s ease;
+    cursor: default;
+    user-select: none;
   }
-  .penalty-card:hover {
-    box-shadow: 0 8px 28px rgba(1,109,28,0.13);
+  .penalty-card:hover, .penalty-card:focus-within {
+    box-shadow: 0 10px 36px rgba(1, 109, 28, 0.25);
+    transform: translateY(-3px);
   }
+  .penalty-card:active {
+    box-shadow: 0 4px 14px rgba(1, 109, 28, 0.18);
+    transform: translateY(0);
+  }
+
   .penalty-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 0.7em;
-    border-bottom: 1px solid #f2f5f4;
-    padding-bottom: 0.2em;
-    font-size: 1em;
+    align-items: center;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #e6f0e6;
   }
   .penalty-row:last-child {
     border-bottom: none;
   }
+
   .penalty-label {
-    color: #46695c;
-    font-weight: 600;
-    opacity: 0.87;
-    min-width: 92px;
-    display: inline-block;
-    font-size: 0.97em;
+    font-weight: 700;
+    color: var(--color-accent);
+    min-width: 110px;
+    font-size: 0.98em;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
   }
+
+  /* Buttons Container */
   .penalty-actions {
     display: flex;
-    gap: 0.45em;
     justify-content: flex-end;
-    padding-top: 0.4em;
+    gap: 0.8em;
+    padding-top: 0.6em;
   }
+
+  /* Buttons */
   .penalty-actions .btn,
   .penalty-actions .btn-small {
-    font-size: 0.95em;
-    padding: 0.23em 0.89em;
-    border-radius: 14px;
+    background: var(--color-accent);
+    color: var(--color-white);
+    padding: 0.5em 1.2em;
+    font-weight: 700;
+    font-size: 0.96em;
+    border-radius: 24px;
+    box-shadow: 0 3px 12px rgba(1, 109, 28, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    user-select: none;
+    cursor: pointer;
+  }
+  .penalty-actions .btn-small.btn-delete {
+    background: #e8ebef;
+    color: #253053;
+    box-shadow: none;
+    padding: 0.46em 1em;
+  }
+  .penalty-actions .btn-small.btn-delete:hover,
+  .penalty-actions .btn-small.btn-delete:focus {
+    background: #cfd8db;
+    color: var(--color-primary);
+  }
+  .penalty-actions .btn:hover,
+  .penalty-actions .btn:focus {
+    background: #059221;
+    box-shadow: 0 6px 18px rgba(1, 109, 28, 0.45);
+  }
+
+  /* Icons für Labels */
+  .penalty-label::before {
+    content: '';
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  /* Beispiel Icons per data-attribute oder klassenspezifisch, falls du willst */
+
+  /* Optional: sanfte Animation beim Laden */
+  .penalty-card {
+    opacity: 0;
+    transform: translateY(15px);
+    animation: fadeSlideIn 0.5s forwards;
+  }
+  .penalty-card:nth-child(1) { animation-delay: 0s; }
+  .penalty-card:nth-child(2) { animation-delay: 0.12s; }
+  .penalty-card:nth-child(3) { animation-delay: 0.24s; }
+  .penalty-card:nth-child(4) { animation-delay: 0.36s; }
+  /* etc. */
+
+  @keyframes fadeSlideIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
