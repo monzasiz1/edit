@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const PDFDocument = require('pdfkit');
+const PDFDocument = require('wkhtmltopdf');
 
 // Hilfsfunktion zum deutschen Datumsformat
 function formatDate(date) {
