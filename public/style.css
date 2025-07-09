@@ -488,3 +488,37 @@ td:last-child  { border-bottom-right-radius: 14px; }
   background: #e9eee3;
   color: #46695c;
 }
+/* USER CARD-LAYOUT FOR MOBILE */
+.user-cards { display: none; }
+
+@media (max-width: 700px) {
+  .user-table { display: none; }
+  .user-cards {
+    display: block;
+    margin-top: 1.4em;
+  }
+  .user-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 16px rgba(41,51,91,0.10);
+    margin-bottom: 1.2em;
+    padding: 1.1em 1.2em 0.9em 1.2em;
+    font-size: 1.05em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+  }
+  .user-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7em;
+    padding-bottom: 0.17em;
+  }
+  .user-card-label {
+    font-weight: 600;
+    color: #46695c;
+    opacity: 0.87;
+    font-size: 1em;
+  }
+  .use

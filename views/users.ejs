@@ -24,10 +24,37 @@
         <td>
           <a href="/users/edit/<%= u.id %>" class="btn btn-small">✏️ Bearbeiten</a>
           <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-            <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
+            <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️</button>
           </form>
         </td>
       </tr>
     <% }) %>
   </tbody>
 </table>
+
+<div class="user-cards">
+  <% users.forEach(u => { %>
+    <div class="user-card">
+      <div class="user-card-row">
+        <div class="user-card-label">Benutzername:</div>
+        <div class="user-card-value"><strong><%= u.username %></strong></div>
+      </div>
+      <div class="user-card-row">
+        <div class="user-card-label">Rolle:</div>
+        <div class="user-card-value">
+          <% if (u.is_admin) { %>
+            <span class="role role-admin">👑 Admin</span>
+          <% } else { %>
+            <span class="role role-member">👤 Mitglied</span>
+          <% } %>
+        </div>
+      </div>
+      <div class="user-card-row user-card-actions">
+        <a href="/users/edit/<%= u.id %>" class="btn btn-small">✏️ Bearbeiten</a>
+        <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
+          <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️</button>
+        </form>
+      </div>
+    </div>
+  <% }) %>
+</div>
