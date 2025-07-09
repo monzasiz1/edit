@@ -1057,3 +1057,85 @@ td:last-child  { border-bottom-right-radius: 14px; }
     word-break: break-word;
   }
 }
+/* Auth / Login/Register Card Styles */
+.auth-box,
+.auth-container {
+  max-width: 410px;
+  margin: 2.8rem auto;
+  padding: 2.5rem 2.2rem 1.4rem 2.2rem;
+  background: var(--color-white); /* Hintergrund für das Formular */
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(41,51,91,0.12);
+  text-align: center;
+  position: relative; /* Notwendig für das Hintergrundbild */
+  z-index: 1;
+}
+
+/* Hinzufügen des Hintergrundbilds */
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/backgroundimg.jpg') no-repeat center center;
+  background-size: cover; /* Bild soll den gesamten Bereich abdecken */
+  z-index: -1; /* Das Bild bleibt hinter dem Formular */
+  filter: brightness(0.5); /* Dimmt das Bild für bessere Lesbarkeit des Textes */
+}
+
+/* Logo */
+.logo1 img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+/* Titel */
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+/* Wechsel zur Registrierung */
+.switch-auth {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.switch-auth a {
+  color: #016d1c;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Fehleranzeige */
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+/* Media Query für kleinere Bildschirme */
+@media (max-width: 700px) {
+  .auth-container {
+    max-width: 90%; /* Formular nimmt mehr Platz auf mobilen Geräten ein */
+    padding: 2rem 1.5rem;
+    margin-top: 1.5rem; /* Etwas weniger Abstand von oben */
+  }
+
+  h2 {
+    font-size: 1.4rem; /* Kleinere Schriftgröße für den Titel */
+  }
+
+  .logo1 img {
+    height: 40px; /* Kleinere Logo-Größe auf mobilen Geräten */
+  }
+
+  .switch-auth {
+    font-size: 0.9rem; /* Kleinere Schriftgröße für den "Registrieren"-Link */
+  }
+}
