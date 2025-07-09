@@ -967,3 +967,93 @@ td:last-child  { border-bottom-right-radius: 14px; }
   border-radius: 5px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Leichter Schatten für bessere Lesbarkeit */
 }
+
+/* Admin-Hinweis (Benutzerübersicht) */
+.admin-tag-users {
+  font-size: 1rem;
+  color: white;
+  background-color: #FF9800; /* Oranger Hintergrund für Admin */
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+  transition: transform 0.3s ease;
+}
+
+/* Hover-Effekt für den Admin-Tag in der Benutzerübersicht */
+.admin-tag-users:hover {
+  transform: scale(1.05);
+  background-color: #FF5722; /* Dunklerer Hintergrund bei Hover */
+}
+/* Allgemeine Button-Stile */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.7rem;
+  text-align: center;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 2px 7px rgba(21,109,28,0.09);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+}
+
+.btn:hover, .btn:focus {
+  background: #059221;
+  box-shadow: 0 4px 16px rgba(1,109,28,0.14);
+}
+
+.btn-small {
+  font-size: 0.93rem;
+  padding: 0.34rem 1rem;
+  border-radius: 18px;
+  margin-right: 0.3rem;
+}
+/* Benutzer-Cards für Mobile */
+.user-cards {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .user-table { display: none; }
+  .user-cards {
+    display: block;
+    margin-top: 1.4em;
+  }
+  .user-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 16px rgba(41,51,91,0.10);
+    margin-bottom: 1.2em;
+    padding: 1.1em 1.2em 0.9em 1.2em;
+    font-size: 1.05em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+  }
+  .user-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7em;
+    padding-bottom: 0.17em;
+  }
+  .user-card-label {
+    font-weight: 600;
+    color: #46695c;
+    opacity: 0.87;
+    font-size: 1em;
+  }
+  .user-card-value {
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 1em;
+    font-weight: 500;
+    color: #253053;
+    word-break: break-word;
+  }
+}
