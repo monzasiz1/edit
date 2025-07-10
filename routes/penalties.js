@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// Leitet /penalties auf /penalties/all (Grid/Modal)
-router.get('/', (req, res) => res.redirect('/penalties/all'));
-
 // Middleware
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
@@ -14,6 +11,9 @@ function requireAdmin(req, res, next) {
   if (!req.session.user || !req.session.user.is_admin) return res.redirect('/login');
   next();
 }
+
+// /penalties leitet auf /penalties/all weiter
+router.get('/', (req, res) => res.redirect('/penalties/all'));
 
 // Alle Nutzer + deren Strafen GRUPPIERT (für moderne Übersicht/Modal)
 router.get('/all', requireAdmin, async (req, res) => {
@@ -59,7 +59,68 @@ router.get('/meine', requireLogin, async (req, res) => {
   res.render('dashboard', { user: req.session.user, penalties });
 });
 
-// Strafe anlegen/bearbeiten/löschen wie gehabt...
-// ...
+// Neue Strafe anlegen (Formular anzeigen)
+router.get('/add', requireAdmin, async (req, res) => {
+  const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+  res.render('penalties_add', { users, user: req.session.user, error: null });
+});
 
+// Neue Strafe anlegen (Formular absenden)
+router.post('/add', requireAdmin, async (req, res) => {
+  const { user_id, type, event, amount, date } = req.body;
+  try {
+    await db.query(
+      'INSERT INTO penalties (user_id, type, event, amount, date, admin_id) VALUES ($1, $2, $3, $4, $5, $6)',
+      [user_id, type, event, amount, date, req.session.user.id]
+    );
+    res.redirect('/penalties/admin');
+  } catch (e) {
+    const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+    res.render('penalties_add', { users, user: req.session.user, error: 'Fehler beim Speichern! ' + e.message });
+  }
+});
+
+// Strafe bearbeiten (Formular anzeigen)
+router.get('/edit/:id', requireAdmin, async (req, res) => {
+  const penaltyId = req.params.id;
+  const penaltyRes = await db.query('SELECT * FROM penalties WHERE id = $1', [penaltyId]);
+  if (!penaltyRes.rows[0]) return res.status(404).render('404', { user: req.session.user });
+  const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+  res.render('penalties_edit', { 
+    penalty: penaltyRes.rows[0],
+    users, 
+    error: null,
+    user: req.session.user
+  });
+});
+
+// Strafe bearbeiten (Formular absenden)
+router.post('/edit/:id', requireAdmin, async (req, res) => {
+  const penaltyId = req.params.id;
+  const { user_id, type, event, amount, date } = req.body;
+  try {
+    await db.query(
+      'UPDATE penalties SET user_id=$1, type=$2, event=$3, amount=$4, date=$5 WHERE id=$6',
+      [user_id, type, event, amount, date, penaltyId]
+    );
+    res.redirect('/penalties/admin');
+  } catch (e) {
+    const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+    const penaltyRes = await db.query('SELECT * FROM penalties WHERE id = $1', [penaltyId]);
+    res.render('penalties_edit', { 
+      penalty: penaltyRes.rows[0] || {}, 
+      users,
+      error: 'Fehler beim Speichern! ' + e.message,
+      user: req.session.user
+    });
+  }
+});
+
+// Strafe löschen
+router.post('/delete/:id', requireAdmin, async (req, res) => {
+  await db.query('DELETE FROM penalties WHERE id = $1', [req.params.id]);
+  res.redirect('/penalties/admin');
+});
+
+// --- GANZ ZUM SCHLUSS! ---
 module.exports = router;
