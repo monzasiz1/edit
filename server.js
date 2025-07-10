@@ -4,6 +4,7 @@ const session = require('express-session');
 const methodOverride = require('method-override');
 const path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
+const rankingRoutes = require('./routes/ranking');
 
 const app = express();
 
