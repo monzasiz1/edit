@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // Datenbankverbindung
+const db = require('../db'); // Deine Datenbankverbindung
 
-router.get('/ranking', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     // Alle Benutzer und deren Strafen zählen
     const users = await db.query(`
@@ -12,7 +12,7 @@ router.get('/ranking', async (req, res) => {
       GROUP BY u.id
       ORDER BY penalty_count DESC
     `);
-    
+
     // Prüfen, ob der aktuelle Benutzer Admin ist
     const isAdmin = req.session.user && req.session.user.is_admin;
 

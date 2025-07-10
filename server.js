@@ -39,6 +39,7 @@ app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users', require('./routes/users'));
+app.use('/ranking', rankingRoutes);
 app.use('/export', require('./routes/export'));
 app.use('/logout', require('./routes/logout'));
 
