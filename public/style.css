@@ -1400,3 +1400,131 @@ h2 {
     align-items: flex-end; /* Ausrichtung auf der rechten Seite */
   }
 }
+/* Allgemeine Einstellungen */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f7fc;
+  color: #2a2a2a;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Titel des Rankings */
+.ranking-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #394933;
+  margin-top: 2rem;
+}
+
+/* Tabellen-Stile */
+.ranking-table {
+  width: 100%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  max-width: 1100px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.ranking-table thead {
+  background-color: #394933;
+  color: #fff;
+  font-weight: bold;
+}
+
+.ranking-table th, .ranking-table td {
+  padding: 1.2rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.ranking-table th {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.ranking-table td {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.ranking-table tr:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+/* Highlight the user (current user) row */
+.highlight-user {
+  background-color: #c8e6c9; /* Sanftes Grün für den aktuellen Benutzer */
+  font-weight: bold;
+  color: #2d6a4f;
+  border-radius: 8px;
+}
+
+/* Benutzer, die nicht der aktuelle Benutzer sind, werden abgeblendet */
+.blurred {
+  filter: blur(3px);
+  background-color: #f1f1f1;
+  opacity: 0.5;
+}
+
+/* Strafen-Bereich für Buttons */
+.ranking-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.btn-ranking {
+  background-color: #016d1c;
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+.btn-ranking:hover {
+  background-color: #045c1a;
+}
+
+/* Animationen für das Ranking */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ranking-table {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@media (max-width: 768px) {
+  .ranking-table th, .ranking-table td {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+
+  .ranking-title {
+    font-size: 2rem;
+  }
+
+  .ranking-btns {
+    flex-direction: column;
+  }
+
+  .btn-ranking {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
