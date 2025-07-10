@@ -687,7 +687,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
   }
 }
 
-}
+
 
 @media (min-width: 701px) {
   .only-mobile { display: none !important; }
@@ -1288,20 +1288,23 @@ h2 {
     padding-bottom: 3em;     /* Platz für Aktionsbuttons unten */
   }
   .penalty-actions-bottomright {
-    position: absolute;
+     position: absolute;
     right: 1em;
     bottom: 1em;
     display: flex;
     gap: 0.5em;
     z-index: 10;
+    border: 1px solid red; /* nur zum Testen */
+    background: yellow;    /* nur zum Testen */
   }
   .icon-btn {
     background: #e9ecf4;
     color: #46695c;
     border: none;
     border-radius: 50%;
-    padding: 0.3em 0.35em;
-    font-size: 1.1em;
+    padding: 0.2em 0.25em;
+    font-size: 0.85em;
+     min-width: 2.2em;      /* Minimumbreite für besseres Layout */
     cursor: pointer;
     box-shadow: 0 1px 4px #b7e7c60c;
     transition: background 0.17s;
