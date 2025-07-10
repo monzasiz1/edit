@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-const Penalty = require('../models/Penalty');
+const User = require('./user');
+const Penalty = require('./penalties');
 
 router.get('/ranking', async (req, res) => {
   try {
