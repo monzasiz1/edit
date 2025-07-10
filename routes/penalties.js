@@ -73,7 +73,7 @@ router.post('/add', requireAdmin, async (req, res) => {
       'INSERT INTO penalties (user_id, type, event, amount, date, admin_id) VALUES ($1, $2, $3, $4, $5, $6)',
       [user_id, type, event, amount, date, req.session.user.id]
     );
-    res.redirect('/penalties/admin');
+    res.redirect('/penalties/all');
   } catch (e) {
     const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
     res.render('penalties_add', { users, user: req.session.user, error: 'Fehler beim Speichern! ' + e.message });
@@ -121,7 +121,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
 router.post('/delete/:id', requireAdmin, async (req, res) => {
   const id = req.params.id;
   await db.query('DELETE FROM penalties WHERE id = $1', [id]);
-  res.redirect('/penalties/admin');
+  res.redirect('/penalties/all');
 });
 
 
