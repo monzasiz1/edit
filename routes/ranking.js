@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');  // Deine DB-Verbindung
+const db = require('../db'); // Deine DB-Verbindung
 
-router.get('/ranking', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    // Benutzer abrufen, Anzahl der Strafen zählen
+    // Deine Abfrage und Logik hier
     const users = await db.query(`
       SELECT u.id, u.username, COUNT(p.id) AS penalty_count
       FROM users u
@@ -13,10 +13,9 @@ router.get('/ranking', async (req, res) => {
       ORDER BY penalty_count DESC
     `);
 
-    // Der aktuell eingeloggte Benutzer
+    const isAdmin = req.session.user && req.session.user.is_admin;
     const userId = req.session.user ? req.session.user.id : null;
 
-    // Alle Benutzer an das Template übergeben
     res.render('ranking', { users: users.rows, userId });
   } catch (err) {
     console.error(err);  // Fehler in der Konsole ausgeben
@@ -24,4 +23,4 @@ router.get('/ranking', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;  // Achte darauf, dass du den Router exportierst!
