@@ -1,62 +1,75 @@
-
-<h2 class="headline">Alle Mitglieder</h2>
+<!-- User Grid -->
+<h2 class="headline">Alle Mitglieder & Strafen</h2>
 <div class="users-grid">
-  <% users.forEach(member => { %>
-    <div class="user-card" onclick="openPenaltiesModal(<%= member.id %>)">
-      <div class="avatar"><%= member.username[0].toUpperCase() %></div>
-      <div class="username"><%= member.username %></div>
-      <div class="user-strikes">Strafen: <%= member.penalties.length %></div>
+  <% users.forEach(user => { %>
+    <div class="user-card" onclick="openPenaltiesModal(<%= user.id %>)">
+      <div class="avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+      <div class="username"><%= user.username %></div>
+      <div class="user-strikes">
+        <%= user.penalties.length %> Strafen
+      </div>
       <button class="see-penalties-btn">Anzeigen</button>
     </div>
   <% }) %>
 </div>
 
-<!-- MODAL -->
-<div id="penalties-modal" class="modal-backdrop" style="display:none;">
+<!-- Modal-Backdrop -->
+<div class="modal-backdrop" id="penaltiesModal" style="display:none;">
   <div class="modal-window">
     <div class="modal-header">
-      <span id="modal-username"></span>
-      <button onclick="closePenaltiesModal()" class="modal-close">✖</button>
+      <span id="modalUsername"></span>
+      <button class="modal-close" onclick="closePenaltiesModal()">×</button>
     </div>
-    <div id="modal-penalties-list"></div>
+    <table class="penalties-table" id="modalPenaltiesTable">
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Grund</th>
+          <th>Veranstaltung</th>
+          <th>Betrag</th>
+          <th>Aktion</th>
+        </tr>
+      </thead>
+      <tbody id="modalPenaltiesRows">
+        <!-- JS füllt hier die Zeilen ein! -->
+      </tbody>
+    </table>
+    <button class="btn" id="addPenaltyBtn" style="margin-top:1em;" onclick="location.href='/penalties/add'">➕ Strafe hinzufügen</button>
   </div>
 </div>
 
 <script>
+  // Daten für Modal (direkt als JSON rein, damit kein zweiter Call nötig ist)
   const users = <%- JSON.stringify(users) %>;
-  function openPenaltiesModal(id) {
-    const member = users.find(u => u.id === id);
-    if (!member) return;
-    document.getElementById('modal-username').textContent = member.username + ' – Strafen';
-    let html = '';
-    if (member.penalties.length === 0) {
-      html = '<p>Keine Strafen vorhanden.</p>';
-    } else {
-      html = '<table class="penalties-table"><thead><tr><th>Datum</th><th>Art</th><th>Grund</th><th>Betrag</th></tr></thead><tbody>';
-      let sum = 0;
-      member.penalties.forEach(p => {
-        const betrag = (parseFloat(p.amount) || 0).toFixed(2) + ' €';
-        sum += parseFloat(p.amount) || 0;
-        html += `<tr>
-          <td>${p.date ? (p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date) : ''}</td>
-          <td>${p.type || '-'}</td>
-          <td>${p.event || '-'}</td>
-          <td style="text-align:right;">${betrag}</td>
-        </tr>`;
-      });
-      html += `<tr class="sum-row"><td colspan="3" style="text-align:right;font-weight:bold;">Summe</td><td style="text-align:right;font-weight:bold;">${sum.toFixed(2)} €</td></tr>`;
-      html += '</tbody></table>';
-    }
-    document.getElementById('modal-penalties-list').innerHTML = html;
-    document.getElementById('penalties-modal').style.display = 'flex';
+
+  function openPenaltiesModal(userId) {
+    const modal = document.getElementById('penaltiesModal');
+    const rows = document.getElementById('modalPenaltiesRows');
+    const username = document.getElementById('modalUsername');
+    const user = users.find(u => u.id === userId);
+    username.textContent = user.username + ' – Strafen';
+    rows.innerHTML = '';
+    user.penalties.forEach(p => {
+      rows.innerHTML += `
+        <tr>
+          <td>${p.date ? (typeof p.date === 'string' ? p.date.slice(0,10) : new Date(p.date).toISOString().slice(0,10)) : ''}</td>
+          <td>${p.type}</td>
+          <td>${p.event}</td>
+          <td style="text-align:right;">${Number(p.amount).toFixed(2)} €</td>
+          <td>
+            <a href="/penalties/edit/${p.id}" class="btn btn-small">✏️</a>
+            <form action="/penalties/delete/${p.id}" method="POST" style="display:inline">
+              <button class="btn btn-small btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️</button>
+            </form>
+          </td>
+        </tr>
+      `;
+    });
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // No scroll bg
   }
   function closePenaltiesModal() {
-    document.getElementById('penalties-modal').style.display = 'none';
+    document.getElementById('penaltiesModal').style.display = 'none';
+    document.body.style.overflow = '';
   }
-  document.getElementById('penalties-modal').addEventListener('click', function(e) {
-    if (e.target === this) closePenaltiesModal();
-  });
-  window.addEventListener('keydown', function(e) {
-    if (e.key === "Escape") closePenaltiesModal();
-  });
 </script>
