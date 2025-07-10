@@ -4,10 +4,11 @@ const session = require('express-session');
 const methodOverride = require('method-override');
 const path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
+
+// Routen-Imports
 const rankingRoutes = require('./routes/ranking');
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
 
@@ -39,7 +40,7 @@ app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users', require('./routes/users'));
-app.use('/ranking', rankingRoutes);
+app.use('/ranking', rankingRoutes);  // Ranking Route einbinden!
 app.use('/export', require('./routes/export'));
 app.use('/logout', require('./routes/logout'));
 
