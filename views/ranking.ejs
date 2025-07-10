@@ -13,15 +13,20 @@
         <tr class="highlight-user">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.penalty_count %></td> <!-- Verwende die gezählte Anzahl der Strafen -->
+          <td><%= user.penalty_count %></td>
         </tr>
       <% } else { %> <!-- Alle anderen Benutzer werden abgeblendet -->
         <tr class="blurred">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.penalty_count %></td> <!-- Verwende die gezählte Anzahl der Strafen -->
+          <td><%= user.penalty_count %></td>
         </tr>
       <% } %>
     <% }); %>
   </tbody>
 </table>
+
+<!-- Button zurück zum Dashboard -->
+<div class="back-button-container">
+  <a href="/dashboard" class="btn btn-small">Zurück zum Dashboard</a>
+</div>

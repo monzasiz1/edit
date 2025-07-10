@@ -1528,3 +1528,21 @@ body {
     margin-bottom: 1rem;
   }
 }
+.back-button-container {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.back-button-container .btn {
+  background-color: #02681b;  /* Farbe anpassen */
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.back-button-container .btn:hover {
+  background-color: #059221;  /* Hover-Farbe */
+}
