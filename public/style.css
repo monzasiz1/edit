@@ -1466,7 +1466,7 @@ body {
 
 /* Benutzer, die nicht der aktuelle Benutzer sind, werden abgeblendet */
 .blurred {
-  filter: blur(3px);
+  filter: blur(8px);
   background-color: #f1f1f1;
   opacity: 0.5;
 }

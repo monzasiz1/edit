@@ -9,17 +9,17 @@
   </thead>
   <tbody>
     <% users.forEach((user, index) => { %>
-      <% if (user._id === userId) { %> <!-- Der aktuelle Benutzer wird hervorgehoben -->
+      <% if (user.id === userId) { %> <!-- Der aktuelle Benutzer wird hervorgehoben -->
         <tr class="highlight-user">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.penalties ? user.penalties.length : 0 %></td> <!-- Sicherstellen, dass penalties existieren -->
+          <td><%= user.penalty_count %></td> <!-- Verwende die gezählte Anzahl der Strafen -->
         </tr>
       <% } else { %> <!-- Alle anderen Benutzer werden abgeblendet -->
         <tr class="blurred">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.penalties ? user.penalties.length : 0 %></td> <!-- Sicherstellen, dass penalties existieren -->
+          <td><%= user.penalty_count %></td> <!-- Verwende die gezählte Anzahl der Strafen -->
         </tr>
       <% } %>
     <% }); %>
