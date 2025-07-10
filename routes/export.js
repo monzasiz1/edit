@@ -3,74 +3,38 @@ const router = express.Router();
 const db = require('../db');
 const PDFDocument = require('pdfkit');
 const path = require('path');
+const PDFTable = require('pdfkit-table');
 
-// Hilfsfunktion zum deutschen Datumsformat
+// Hilfsfunktion
 function formatDate(date) {
   if (!date) return '';
   const d = new Date(date);
   return d.toLocaleDateString('de-DE');
 }
 
-// Middleware: Login-Check
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
 }
 
-// Logo mit Abstand (kleiner, mit Abstand nach unten)
 function drawLogo(doc) {
   try {
     const LOGO_PATH = path.join(__dirname, '../public/logo.png');
     doc.image(LOGO_PATH, 50, 30, { width: 60 });
-    doc.moveDown();
-    doc.moveDown();
-    doc.moveDown(); // Mehr Abstand nach unten
+    doc.moveDown(2);
   } catch (err) {
-    console.warn('Logo konnte nicht geladen werden:', err.message);
     doc.moveDown(2);
   }
 }
 
-// Tabellarische Kopfzeile
-function drawTableHeader(doc, y) {
-  doc.fontSize(12).font('Helvetica-Bold')
-    .text('Datum', 50, y)
-    .text('Strafart', 130, y)
-    .text('Grund', 230, y)
-    .text('Betrag (€)', 450, y, { align: 'right' });
-  doc.moveTo(50, y + 15)
-    .lineTo(550, y + 15)
-    .stroke();
-}
-
-// Eine Zeile
-function drawTableRow(doc, y, penalty) {
-  doc.fontSize(11).font('Helvetica')
-    .text(formatDate(penalty.date), 50, y)
-    .text(penalty.type || '-', 130, y)
-    .text(penalty.reason || '-', 230, y, { width: 200 })
-    .text((parseFloat(penalty.amount) || 0).toFixed(2), 450, y, { width: 80, align: 'right' });
-}
-
-function drawSumRow(doc, y, sum) {
-  doc.fontSize(12).font('Helvetica-Bold')
-    .text('Summe', 230, y)
-    .text(sum.toFixed(2) + ' €', 450, y, { width: 80, align: 'right' });
-  doc.moveTo(50, y + 15)
-    .lineTo(550, y + 15)
-    .stroke();
-}
-
 // =============================
-// Eigenes Strafregister exportieren (Mitglied/Admin)
+// 1. Eigenes Strafregister exportieren
 router.get('/me', requireLogin, async (req, res) => {
   try {
     const penalties = (await db.query(
       'SELECT * FROM penalties WHERE user_id = $1 ORDER BY date DESC',
       [req.session.user.id]
     )).rows;
-
-    let sum = 0;
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
@@ -82,25 +46,38 @@ router.get('/me', requireLogin, async (req, res) => {
     doc.fontSize(18).font('Helvetica-Bold').text('Strafenkonto für ' + req.session.user.username, { align: 'center' });
     doc.moveDown(2);
 
-    let y = doc.y;
-    drawTableHeader(doc, y);
-    y += 25;
+    // Tabelle vorbereiten
+    let sum = 0;
+    const table = {
+      headers: [
+        { label: "Datum", property: "date", width: 70 },
+        { label: "Strafart", property: "type", width: 80 },
+        { label: "Grund", property: "reason", width: 220 },
+        { label: "Betrag (€)", property: "amount", width: 80, align: "right" }
+      ],
+      datas: penalties.map(p => {
+        const amount = parseFloat(p.amount) || 0;
+        sum += amount;
+        return {
+          date: formatDate(p.date),
+          type: p.type || "-",
+          reason: p.reason || "-",
+          amount: amount.toFixed(2)
+        };
+      }),
+      rows: []
+    };
+    // Gesamtsumme als letzte Zeile
+    table.rows.push([
+      {colSpan: 3, label: 'Summe', align: 'right', fontSize: 12, fontBold: true},
+      {label: sum.toFixed(2) + ' €', align: 'right', fontSize: 12, fontBold: true}
+    ]);
 
-    penalties.forEach(penalty => {
-      if (y > 720) { // neue Seite ab ca. Zeile 35
-        doc.addPage();
-        y = 50;
-        drawTableHeader(doc, y);
-        y += 25;
-      }
-      drawTableRow(doc, y, penalty);
-      sum += parseFloat(penalty.amount) || 0;
-      y += 20;
+    // Tabelle ausgeben
+    await doc.table(table, {
+      prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+      prepareRow: (row, i) => doc.font('Helvetica').fontSize(11)
     });
-
-    // Gesamtsumme
-    y += 10;
-    drawSumRow(doc, y, sum);
 
     doc.end();
   } catch (err) {
@@ -110,7 +87,7 @@ router.get('/me', requireLogin, async (req, res) => {
 });
 
 // =============================
-// Admin: Alle Strafen eines Users als PDF
+// 2. Admin: Alle Strafen eines Users als PDF
 router.get('/user/:id', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Keine Rechte');
 
@@ -123,8 +100,6 @@ router.get('/user/:id', requireLogin, async (req, res) => {
       [req.params.id]
     )).rows;
 
-    let sum = 0;
-
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="strafen_${user.username}.pdf"`);
@@ -135,24 +110,35 @@ router.get('/user/:id', requireLogin, async (req, res) => {
     doc.fontSize(18).font('Helvetica-Bold').text('Strafenkonto für ' + user.username, { align: 'center' });
     doc.moveDown(2);
 
-    let y = doc.y;
-    drawTableHeader(doc, y);
-    y += 25;
+    let sum = 0;
+    const table = {
+      headers: [
+        { label: "Datum", property: "date", width: 70 },
+        { label: "Strafart", property: "type", width: 80 },
+        { label: "Grund", property: "reason", width: 220 },
+        { label: "Betrag (€)", property: "amount", width: 80, align: "right" }
+      ],
+      datas: penalties.map(p => {
+        const amount = parseFloat(p.amount) || 0;
+        sum += amount;
+        return {
+          date: formatDate(p.date),
+          type: p.type || "-",
+          reason: p.reason || "-",
+          amount: amount.toFixed(2)
+        };
+      }),
+      rows: []
+    };
+    table.rows.push([
+      {colSpan: 3, label: 'Summe', align: 'right', fontSize: 12, fontBold: true},
+      {label: sum.toFixed(2) + ' €', align: 'right', fontSize: 12, fontBold: true}
+    ]);
 
-    penalties.forEach(penalty => {
-      if (y > 720) {
-        doc.addPage();
-        y = 50;
-        drawTableHeader(doc, y);
-        y += 25;
-      }
-      drawTableRow(doc, y, penalty);
-      sum += parseFloat(penalty.amount) || 0;
-      y += 20;
+    await doc.table(table, {
+      prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+      prepareRow: (row, i) => doc.font('Helvetica').fontSize(11)
     });
-
-    y += 10;
-    drawSumRow(doc, y, sum);
 
     doc.end();
   } catch (err) {
@@ -162,7 +148,7 @@ router.get('/user/:id', requireLogin, async (req, res) => {
 });
 
 // =============================
-// Admin: Alle Strafen aller Nutzer als PDF
+// 3. Admin: Alle Strafen aller Nutzer als PDF
 router.get('/all', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Keine Rechte');
 
@@ -170,8 +156,6 @@ router.get('/all', requireLogin, async (req, res) => {
     const penalties = (await db.query(
       'SELECT p.date, p.reason, p.type, p.amount, u.username FROM penalties p JOIN users u ON p.user_id = u.id ORDER BY u.username, p.date DESC'
     )).rows;
-
-    let sum = 0;
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
@@ -183,51 +167,37 @@ router.get('/all', requireLogin, async (req, res) => {
     doc.fontSize(18).font('Helvetica-Bold').text('Alle Strafen', { align: 'center' });
     doc.moveDown(2);
 
-    // Kopfzeile für alle mit Username
-    let y = doc.y;
-    doc.fontSize(12).font('Helvetica-Bold')
-      .text('User', 50, y)
-      .text('Datum', 120, y)
-      .text('Strafart', 200, y)
-      .text('Grund', 290, y)
-      .text('Betrag (€)', 450, y, { align: 'right' });
-    doc.moveTo(50, y + 15)
-      .lineTo(550, y + 15)
-      .stroke();
-    y += 25;
+    let sum = 0;
+    const table = {
+      headers: [
+        { label: "User", property: "username", width: 80 },
+        { label: "Datum", property: "date", width: 70 },
+        { label: "Strafart", property: "type", width: 80 },
+        { label: "Grund", property: "reason", width: 180 },
+        { label: "Betrag (€)", property: "amount", width: 80, align: "right" }
+      ],
+      datas: penalties.map(p => {
+        const amount = parseFloat(p.amount) || 0;
+        sum += amount;
+        return {
+          username: p.username,
+          date: formatDate(p.date),
+          type: p.type || "-",
+          reason: p.reason || "-",
+          amount: amount.toFixed(2)
+        };
+      }),
+      rows: []
+    };
+    table.rows.push([
+      {colSpan: 4, label: 'Summe', align: 'right', fontSize: 12, fontBold: true},
+      {label: sum.toFixed(2) + ' €', align: 'right', fontSize: 12, fontBold: true}
+    ]);
 
-    penalties.forEach(penalty => {
-      if (y > 720) {
-        doc.addPage();
-        y = 50;
-        doc.fontSize(12).font('Helvetica-Bold')
-          .text('User', 50, y)
-          .text('Datum', 120, y)
-          .text('Strafart', 200, y)
-          .text('Grund', 290, y)
-          .text('Betrag (€)', 450, y, { align: 'right' });
-        doc.moveTo(50, y + 15)
-          .lineTo(550, y + 15)
-          .stroke();
-        y += 25;
-      }
-      doc.fontSize(11).font('Helvetica')
-        .text(penalty.username, 50, y)
-        .text(formatDate(penalty.date), 120, y)
-        .text(penalty.type || '-', 200, y)
-        .text(penalty.reason || '-', 290, y, { width: 150 })
-        .text((parseFloat(penalty.amount) || 0).toFixed(2), 450, y, { width: 80, align: 'right' });
-      sum += parseFloat(penalty.amount) || 0;
-      y += 20;
+    await doc.table(table, {
+      prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+      prepareRow: (row, i) => doc.font('Helvetica').fontSize(11)
     });
-
-    y += 10;
-    doc.fontSize(12).font('Helvetica-Bold')
-      .text('Summe', 290, y)
-      .text(sum.toFixed(2) + ' €', 450, y, { width: 80, align: 'right' });
-    doc.moveTo(50, y + 15)
-      .lineTo(550, y + 15)
-      .stroke();
 
     doc.end();
   } catch (err) {
