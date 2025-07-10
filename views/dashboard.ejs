@@ -1,3 +1,4 @@
+<% layout('layout') %>
 <h2>Dashboard</h2>
 <p class="dashboard-greeting">Hallo <%= user.username %>!</p>
 
@@ -8,43 +9,41 @@
       <p>Keine Strafen vorhanden! 🎉</p>
     <% } else { %>
       <!-- Desktop/Table Ansicht -->
-<div class="only-desktop">
-  <table class="responsive-table">
-    <thead>
-      <tr>
-        <th>Datum</th>
-        <th>Veranstaltung</th>
-        <th>Grund</th>
-        <th>Betrag (€)</th>
-        <th>Admin</th> <!-- Neue Spalte für Admin-Namen -->
-      </tr>
-    </thead>
-    <tbody>
-      <% let total = 0; %>
-      <% penalties.forEach(p => { %>
-        <tr>
-          <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
-          <td data-label="Veranstaltung"><%= p.event %></td>
-          <td data-label="Grund"><%= p.type %></td>
-          <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
-          <td data-label="Admin">
-            <% if (p.admin) { %>
-              <span class="admin-tag-desktop">von <%= p.admin %></span>
-            <% } else { %>
-              <span class="admin-tag-desktop">Kein Admin</span>
-            <% } %>
-          </td>
-        </tr>
-        <% total += Number(p.amount); %>
-      <% }) %>
-    </tbody>
-  </table>
-  <p class="dashboard-total">
-    Gesamtbetrag: <%= total.toFixed(2) %> €
-  </p>
-</div>
-
-
+      <div class="only-desktop">
+        <table class="responsive-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Veranstaltung</th>
+              <th>Grund</th>
+              <th>Betrag (€)</th>
+              <th>Spieß</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% let total = 0; %>
+            <% penalties.forEach(p => { %>
+              <tr>
+                <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
+                <td data-label="Veranstaltung"><%= p.event %></td>
+                <td data-label="Grund"><%= p.type %></td>
+                <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
+                <td data-label="Admin">
+                  <% if (p.admin) { %>
+                    <span class="admin-tag-desktop">von <%= p.admin %></span>
+                  <% } else { %>
+                    <span class="admin-tag-desktop">Kein Spieß</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% total += Number(p.amount); %>
+            <% }) %>
+          </tbody>
+        </table>
+        <p class="dashboard-total">
+          Gesamtbetrag: <%= total.toFixed(2) %> €
+        </p>
+      </div>
       <!-- Mobile/Card Ansicht -->
       <div class="dashboard-cards only-mobile">
         <% let totalMobile = 0; %>
