@@ -1,32 +1,29 @@
-<h2 class="ranking-title">Strafen-Ranking</h2>
+<h2 class="ranking-title">Ranking der Benutzer</h2>
 <table class="ranking-table">
   <thead>
     <tr>
       <th>Platz</th>
       <th>Benutzername</th>
-      <th>Strafen</th>
+      <th>Betrag</th>
     </tr>
   </thead>
   <tbody>
     <% users.forEach((user, index) => { %>
       <% if (user.id === userId) { %> <!-- Der aktuelle Benutzer wird hervorgehoben -->
-          <tr class="highlight-user">
+        <tr class="highlight-user">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.total_penalty_amount.toFixed(2) %></td>
+          <td><%= user.total_penalty_amount && !isNaN(user.total_penalty_amount) ? user.total_penalty_amount.toFixed(2) : '0.00' %></td>
         </tr>
       <% } else { %> <!-- Alle anderen Benutzer werden abgeblendet -->
         <tr class="blurred">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.total_penalty_amount.toFixed(2) %></td>
+          <td><%= user.total_penalty_amount && !isNaN(user.total_penalty_amount) ? user.total_penalty_amount.toFixed(2) : '0.00' %></td>
         </tr>
       <% } %>
     <% }); %>
   </tbody>
 </table>
 
-<!-- Button zurück zum Dashboard -->
-<div class="back-button-container">
-  <a href="/dashboard" class="btn btn-small">Zurück zum Dashboard</a>
-</div>
+<a href="/ranking" class="btn btn-small">Zurück zum Dashboard</a>

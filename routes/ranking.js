@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');  // Deine DB-Verbindung
+const db = require('../db'); // Deine DB-Verbindung
 
-// Route für das Ranking
 router.get('/', async (req, res) => {
   try {
-    // Alle Benutzer und die Summe ihrer Strafenbeträge abrufen
+    // Alle Benutzer und deren Strafen zählen
     const users = await db.query(`
       SELECT u.id, u.username, COALESCE(SUM(p.amount), 0) AS total_penalty_amount
       FROM users u
@@ -14,12 +13,11 @@ router.get('/', async (req, res) => {
       ORDER BY total_penalty_amount DESC
     `);
 
-    // Aktuell eingeloggten Benutzer und Adminrechte aus der Session holen
+    // Aktuell eingeloggten Benutzer und Adminrechte überprüfen
     const isAdmin = req.session.user && req.session.user.is_admin;
     const userId = req.session.user ? req.session.user.id : null;
 
-    // Alle Benutzer an das Template übergeben
-    res.render('ranking', { users: users.rows, userId, isAdmin });
+    res.render('ranking', { users: users.rows, userId });
   } catch (err) {
     console.error(err);  // Fehler in der Konsole ausgeben
     res.status(500).send('Server Error');
