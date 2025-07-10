@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+// Leitet /penalties auf /penalties/all (Grid/Modal)
+router.get('/', (req, res) => res.redirect('/penalties/all'));
+
 // Middleware
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
