@@ -29,6 +29,24 @@
         <div class="muted">Lade dein persönliches Strafenkonto als PDF herunter.</div>
         <a href="/export/me" class="btn" target="_blank">📥 PDF herunterladen</a>
       </div>
+      <div class="export-section">
+  <h2>Exportieren von Strafen</h2>
+  <form action="/export/export" method="get">
+    <label for="startDate">Startdatum:</label>
+    <input type="date" name="startDate" id="startDate" required>
+    <label for="endDate">Enddatum:</label>
+    <input type="date" name="endDate" id="endDate" required>
+    
+    <label for="format">Format:</label>
+    <select name="format" id="format" required>
+      <option value="csv">CSV</option>
+      <option value="excel">Excel</option>
+    </select>
+    
+    <button type="submit">Exportieren</button>
+  </form>
+</div>
+
     <% } %>
   </div>
 </div>
