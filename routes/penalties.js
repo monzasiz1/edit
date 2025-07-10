@@ -117,10 +117,13 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
 });
 
 // Strafe löschen
+// Strafe löschen
 router.post('/delete/:id', requireAdmin, async (req, res) => {
-  await db.query('DELETE FROM penalties WHERE id = $1', [req.params.id]);
+  const id = req.params.id;
+  await db.query('DELETE FROM penalties WHERE id = $1', [id]);
   res.redirect('/penalties/admin');
 });
+
 
 // --- GANZ ZUM SCHLUSS! ---
 module.exports = router;
