@@ -1,4 +1,3 @@
-
 <h2 class="headline">Alle Strafen (Tabellenansicht)</h2>
 <a href="/penalties/add" class="btn btn-add">➕ Neue Strafe vergeben</a>
 
@@ -19,7 +18,13 @@
       <% penalties.forEach(p => { sum += parseFloat(p.amount) || 0; %>
         <tr>
           <td data-label="Nutzer"><%= p.username %></td>
-          <td data-label="Datum"><%= p.date ? (p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date) : '' %></td>
+          <td data-label="Datum">
+            <%= p.date
+              ? (typeof p.date === 'string'
+                  ? new Date(p.date).toLocaleDateString('de-DE')
+                  : p.date.toLocaleDateString('de-DE'))
+              : '' %>
+          </td>
           <td data-label="Grund"><%= p.type %></td>
           <td data-label="Veranstaltung"><%= p.event %></td>
           <td data-label="Betrag" style="text-align:right;"><%= Number(p.amount).toFixed(2) %> €</td>
@@ -40,12 +45,23 @@
   </table>
 </div>
 
+<!-- Mobile Card Ansicht -->
 <div class="penalty-cards only-mobile">
+  <a href="/penalties/add" class="btn btn-add" style="margin-bottom: 1em;">➕ Neue Strafe</a>
   <% let mobileSum = 0; %>
   <% penalties.forEach(p => { mobileSum += parseFloat(p.amount) || 0; %>
     <div class="penalty-card">
       <div class="penalty-row"><span class="penalty-label">👤 Nutzer</span><span><%= p.username %></span></div>
-      <div class="penalty-row"><span class="penalty-label">📆 Datum</span><span><%= p.date ? (p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date) : '' %></span></div>
+      <div class="penalty-row">
+        <span class="penalty-label">📆 Datum</span>
+        <span>
+          <%= p.date
+            ? (typeof p.date === 'string'
+                ? new Date(p.date).toLocaleDateString('de-DE')
+                : p.date.toLocaleDateString('de-DE'))
+            : '' %>
+        </span>
+      </div>
       <div class="penalty-row"><span class="penalty-label">🎯 Grund</span><span><%= p.type %></span></div>
       <div class="penalty-row"><span class="penalty-label">🎉 Veranstaltung</span><span><%= p.event %></span></div>
       <div class="penalty-row"><span class="penalty-label">💶 Betrag</span><span><%= Number(p.amount).toFixed(2) %> €</span></div>
