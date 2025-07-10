@@ -1,71 +1,62 @@
-<h2 class="headline">Alle Strafen</h2>
-<a href="/penalties/add" class="btn btn-add">➕ Neue Strafe vergeben</a>
 
-<!-- Desktop/Table -->
-<div class="only-desktop">
-  <table class="responsive-table penalties-table">
-    <thead>
-      <tr>
-        <th>👤 Nutzer</th>
-        <th>📆 Datum</th>
-        <th>🎯 Grund</th>
-        <th>🎉 Veranstaltung</th>
-        <th>💶 Betrag</th>
-        <th>⚙️ Aktion</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% let sum = 0; %>
-      <% penalties.forEach(p => { 
-           sum += parseFloat(p.amount) || 0;
-      %>
-        <tr>
-          <td data-label="Nutzer"><%= p.username %></td>
-          <td data-label="Datum"><%= p.date ? (p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date) : '' %></td>
-          <td data-label="Grund"><%= p.type %></td>
-          <td data-label="Veranstaltung"><%= p.event %></td>
-          <td data-label="Betrag" style="text-align:right;"><%= Number(p.amount).toFixed(2) %> €</td>
-          <td data-label="Aktion">
-            <a href="/penalties/edit/<%= p.id %>" class="btn btn-small">✏️ Bearbeiten</a>
-            <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
-              <button class="btn btn-small btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
-            </form>
-          </td>
-        </tr>
-      <% }) %>
-      <!-- SUMME -->
-      <tr class="sum-row">
-        <td colspan="4" style="text-align:right; font-weight:bold;">Summe</td>
-        <td style="text-align:right; font-weight:bold;"><%= sum.toFixed(2) %> €</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Mobile/Card-Ansicht -->
-<div class="penalty-cards only-mobile">
-  <% let mobileSum = 0; %>
-  <% penalties.forEach(p => { mobileSum += parseFloat(p.amount) || 0; %>
-    <div class="penalty-card">
-      <div class="penalty-row"><span class="penalty-label">👤 Nutzer</span><span><%= p.username %></span></div>
-      <div class="penalty-row"><span class="penalty-label">📆 Datum</span><span><%= p.date ? (p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date) : '' %></span></div>
-      <div class="penalty-row"><span class="penalty-label">🎯 Grund</span><span><%= p.type %></span></div>
-      <div class="penalty-row"><span class="penalty-label">🎉 Veranstaltung</span><span><%= p.event %></span></div>
-      <div class="penalty-row"><span class="penalty-label">💶 Betrag</span><span><%= Number(p.amount).toFixed(2) %> €</span></div>
-      <div class="penalty-actions">
-        <a href="/penalties/edit/<%= p.id %>" class="btn btn-small">✏️ Bearbeiten</a>
-        <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
-          <button class="btn btn-small btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
-        </form>
-      </div>
+<h2 class="headline">Alle Mitglieder</h2>
+<div class="users-grid">
+  <% users.forEach(member => { %>
+    <div class="user-card" onclick="openPenaltiesModal(<%= member.id %>)">
+      <div class="avatar"><%= member.username[0].toUpperCase() %></div>
+      <div class="username"><%= member.username %></div>
+      <div class="user-strikes">Strafen: <%= member.penalties.length %></div>
+      <button class="see-penalties-btn">Anzeigen</button>
     </div>
   <% }) %>
-  <!-- SUMME -->
-  <div class="penalty-card sum-row" style="background:#e4e7dc;">
-    <div class="penalty-row" style="font-weight:bold;justify-content:space-between;">
-      <span>Gesamtsumme</span>
-      <span><%= mobileSum.toFixed(2) %> €</span>
+</div>
+
+<!-- MODAL -->
+<div id="penalties-modal" class="modal-backdrop" style="display:none;">
+  <div class="modal-window">
+    <div class="modal-header">
+      <span id="modal-username"></span>
+      <button onclick="closePenaltiesModal()" class="modal-close">✖</button>
     </div>
+    <div id="modal-penalties-list"></div>
   </div>
 </div>
+
+<script>
+  const users = <%- JSON.stringify(users) %>;
+  function openPenaltiesModal(id) {
+    const member = users.find(u => u.id === id);
+    if (!member) return;
+    document.getElementById('modal-username').textContent = member.username + ' – Strafen';
+    let html = '';
+    if (member.penalties.length === 0) {
+      html = '<p>Keine Strafen vorhanden.</p>';
+    } else {
+      html = '<table class="penalties-table"><thead><tr><th>Datum</th><th>Art</th><th>Grund</th><th>Betrag</th></tr></thead><tbody>';
+      let sum = 0;
+      member.penalties.forEach(p => {
+        const betrag = (parseFloat(p.amount) || 0).toFixed(2) + ' €';
+        sum += parseFloat(p.amount) || 0;
+        html += `<tr>
+          <td>${p.date ? (p.date.toISOString ? p.date.toISOString().slice(0,10) : p.date) : ''}</td>
+          <td>${p.type || '-'}</td>
+          <td>${p.event || '-'}</td>
+          <td style="text-align:right;">${betrag}</td>
+        </tr>`;
+      });
+      html += `<tr class="sum-row"><td colspan="3" style="text-align:right;font-weight:bold;">Summe</td><td style="text-align:right;font-weight:bold;">${sum.toFixed(2)} €</td></tr>`;
+      html += '</tbody></table>';
+    }
+    document.getElementById('modal-penalties-list').innerHTML = html;
+    document.getElementById('penalties-modal').style.display = 'flex';
+  }
+  function closePenaltiesModal() {
+    document.getElementById('penalties-modal').style.display = 'none';
+  }
+  document.getElementById('penalties-modal').addEventListener('click', function(e) {
+    if (e.target === this) closePenaltiesModal();
+  });
+  window.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") closePenaltiesModal();
+  });
+</script>
