@@ -1,38 +1,34 @@
-<h2 class="ranking-title">Strafen-Ranking</h2>
-<table class="ranking-table">
-  <thead>
-    <tr>
-      <th>Platz</th>
-      <th>Benutzername</th>
-      <th>Betrag</th> <!-- Betrag der Strafen -->
-    </tr>
-  </thead>
-  <tbody>
-    <% users.forEach((user, index) => { %>
-      <% if (user.id === userId) { %> <!-- Der aktuelle Benutzer wird hervorgehoben -->
-        <tr class="highlight-user">
-          <td><%= index + 1 %></td>
-          <td><%= user.username %></td>
-          <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
-        </tr>
-      <% } else { %> 
-        <% if (isAdmin) { %> <!-- Admin sieht alle Benutzer ohne Blur -->
-          <tr>
-            <td><%= index + 1 %></td>
-            <td><%= user.username %></td>
-            <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
-          </tr>
-        <% } else { %> <!-- Nicht-Admin sieht andere Benutzer geblurrt -->
-          <tr class="blurred">
-            <td><%= index + 1 %></td>
-            <td><%= user.username %></td>
-            <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
-          </tr>
+<div class="pdf-export-section">
+  <h2>📄 PDF-Export</h2>
+  <div class="pdf-export-cards">
+    <% if (user.is_admin) { %>
+      <div class="pdf-card">
+        <h3>📚 Alle Strafen als PDF</h3>
+        <div class="muted">Lade alle Strafen als Sammel-PDF herunter.</div>
+        <a href="/export/all" class="btn btn-add" target="_blank">⬇️ Alle Strafen herunterladen</a>
+      </div>
+      <div class="pdf-card">
+        <h3>👥 PDF für einzelne Nutzer</h3>
+        <div class="muted">Exportiere das Strafenkonto einzelner Mitglieder als PDF.</div>
+        <% if (users && users.length) { %>
+          <ul class="user-pdf-list">
+            <% users.forEach(u => { %>
+              <li>
+                <span><strong>👤 <%= u.username %></strong></span>
+                <a href="/export/user/<%= u.id %>" target="_blank" class="btn btn-small">📥 PDF</a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <div class="muted">Keine Nutzer gefunden.</div>
         <% } %>
-      <% } %>
-    <% }); %>
-  </tbody>
-</table>
-<div class="back-to-dashboard">
-  <a href="/dashboard" class="btn btn-back">🔙 Zurück zum Dashboard</a>
+      </div>
+    <% } else { %>
+      <div class="pdf-card">
+        <h3>🧾 Mein Strafenkonto als PDF</h3>
+        <div class="muted">Lade dein persönliches Strafenkonto als PDF herunter.</div>
+        <a href="/export/me" class="btn" target="_blank">📥 PDF herunterladen</a>
+      </div>
+    <% } %>
+  </div>
 </div>
