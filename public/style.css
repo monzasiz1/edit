@@ -1007,11 +1007,13 @@ h2 {
   margin-bottom: 2rem;
   color: #394933;
 }
+
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 2rem;
 }
+
 .user-card {
   background: #fff;
   border-radius: 1.2rem;
@@ -1019,14 +1021,16 @@ h2 {
   padding: 2rem 1rem;
   text-align: center;
   cursor: pointer;
-  transition: box-shadow .25s;
+  transition: box-shadow 0.25s;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .user-card:hover {
   box-shadow: 0 4px 24px #a2ad8870;
 }
+
 .avatar {
   background: #b4beae;
   color: #fff;
@@ -1037,29 +1041,33 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: .7rem;
+  margin-bottom: 0.7rem;
 }
+
 .username {
   font-size: 1.2rem;
   font-weight: 600;
   color: #394933;
-  margin-bottom: .2rem;
+  margin-bottom: 0.2rem;
 }
+
 .user-strikes {
   color: #888;
-  font-size: .97rem;
-  margin-bottom: .9rem;
+  font-size: 0.97rem;
+  margin-bottom: 0.9rem;
 }
+
 .see-penalties-btn {
   background: #78866b;
   color: #fff;
   border: none;
-  border-radius: .7rem;
-  padding: .5rem 1.3rem;
+  border-radius: 0.7rem;
+  padding: 0.5rem 1.3rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background .22s;
+  transition: background 0.22s;
 }
+
 .see-penalties-btn:hover {
   background: #394933;
 }
@@ -1068,12 +1076,13 @@ h2 {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.12);
+  background: rgba(0, 0, 0, 0.12);
   z-index: 99;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .modal-window {
   background: #fff;
   border-radius: 1.4rem;
@@ -1082,12 +1091,20 @@ h2 {
   max-width: 97vw;
   padding: 2rem;
   position: relative;
-  animation: fadeIn .2s;
+  animation: fadeIn 0.2s;
 }
+
 @keyframes fadeIn {
-  from { opacity:0; transform:scale(.97);}
-  to { opacity:1; transform:scale(1);}
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
 .modal-header {
   font-size: 1.15rem;
   font-weight: 700;
@@ -1097,6 +1114,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
 }
+
 .modal-close {
   background: transparent;
   border: none;
@@ -1104,52 +1122,66 @@ h2 {
   color: #477f96;
   cursor: pointer;
 }
+
 .penalties-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
 }
+
 .penalties-table th,
 .penalties-table td {
   border-bottom: 1px solid #dbe4c6;
-  padding: .5rem .2rem;
+  padding: 0.5rem 0.2rem;
   text-align: left;
 }
+
 .penalties-table th {
   color: #427992;
   font-weight: 700;
   background: #e4e7dc;
 }
+
 .penalties-table td:last-child,
 .penalties-table th:last-child {
   text-align: right;
 }
+
 .sum-row td {
   border-top: 2px solid #3e5da1;
   font-weight: bold;
 }
-@media (max-width: 600px) {
-  .users-grid { grid-template-columns: 1fr; }
-  .modal-window { min-width:unset; padding:1rem; }
-}
+
 /* --- Mobile-Optimierung für dich (alles wird kompakter!) --- */
 @media (max-width: 700px) {
   body {
     font-size: 15.3px; /* Die Schriftgröße wird auf kleinen Geräten handlicher */
   }
+
   .container {
     padding: 0.5rem 0.18rem; /* Weniger Rand – mehr Platz für den Inhalt */
   }
-  h1, h2, h3 {
+
+  h1,
+  h2,
+  h3 {
     font-size: 1.08rem; /* Überschriften werden mobiler und übersichtlicher */
     margin-bottom: 0.6rem;
   }
-  .headline { font-size: 1.18rem; margin-bottom: 1rem; }
-  .btn, button, .btn-small {
+
+  .headline {
+    font-size: 1.18rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn,
+  button,
+  .btn-small {
     padding: 0.29rem 0.75rem !important; /* Buttons auf dem Handy griffig, aber nicht zu fett */
     font-size: 0.95rem !important;
     border-radius: 13px !important;
   }
+
   .dashboard-card,
   .penalty-card,
   .user-card {
@@ -1157,16 +1189,19 @@ h2 {
     font-size: 0.97em !important;
     gap: 0.33em !important;
   }
+
   .dashboard-row,
   .penalty-row,
   .user-card-row {
     padding-bottom: 0.08em !important;
     font-size: 0.91em !important;
   }
+
   .dashboard-card.total-card {
     padding: 0.36em 0.6em !important;
     font-size: 0.99em !important;
   }
+
   .penalty-actions .btn,
   .penalty-actions .btn-small {
     min-width: 0 !important;
@@ -1174,14 +1209,18 @@ h2 {
     font-size: 0.87em !important;
     border-radius: 10px !important;
   }
-  th, td {
+
+  th,
+  td {
     padding: 0.5em 0.25em !important; /* Tabellenzellen kompakter, besser für unterwegs */
   }
+
   /* Modal für dich auf Handy weniger ausladend */
   .modal-window {
     padding: 0.65em !important;
     min-width: unset !important;
   }
+
   /* Cards rücken enger zusammen – mehr Übersicht auf einen Blick */
   .penalty-cards,
   .dashboard-cards {
@@ -1189,23 +1228,28 @@ h2 {
     margin-top: 0.5em !important;
   }
 }
+
+/* Modal Window für mobile Geräte */
 @media (max-width: 700px) {
   .modal-window {
     padding: 0.7em !important;
     max-width: 99vw;
     font-size: 0.96em;
   }
+
   .penalties-table-mobile th,
   .penalties-table-mobile td {
     padding: 0.29em 0.15em !important;
     font-size: 0.93em !important;
     white-space: nowrap;
   }
+
   .penalties-table-mobile td.actions-cell {
     min-width: 74px;
     text-align: right;
     padding-right: 0 !important;
   }
+
   .btn.btn-xxs,
   .btn-xxs {
     font-size: 0.95em !important;
@@ -1216,87 +1260,50 @@ h2 {
     display: inline-block;
     vertical-align: middle;
   }
-  .btn.btn-xxs.btn-delete { background: #e8ebef; color: #253053; }
-  .btn.btn-xxs.btn-delete:hover { background: #cfd8db; color: #016d1c; }
-  .modal-header { font-size: 1em !important; }
-}
 
-@media (max-width: 400px) {
-  .modal-window { font-size: 0.88em; }
-  .penalties-table-mobile th,
-  .penalties-table-mobile td { font-size: 0.9em !important; }
-}
-
-@media (max-width: 700px) {
-  /* Modal-Window kleiner und Schrift kompakter */
-  .modal-window {
-    font-size: 0.93em !important;
-    padding: 0.72em 0.3em !important;
-    max-width: 99vw;
+  .btn.btn-xxs.btn-delete {
+    background: #e8ebef;
+    color: #253053;
   }
+
+  .btn.btn-xxs.btn-delete:hover {
+    background: #cfd8db;
+    color: #016d1c;
+  }
+
   .modal-header {
     font-size: 1em !important;
   }
-  .penalties-table, .penalties-table th, .penalties-table td {
-    font-size: 0.96em !important;
-    padding: 0.35em 0.15em !important;
-    white-space: nowrap;
-  }
-  /* Kompakter für die Actions (Bearbeiten/Löschen) */
-  .penalties-table td:last-child, .penalties-table th:last-child {
-    padding-right: 0.1em !important;
-    min-width: 68px !important;
-    text-align: right !important;
-  }
-  /* Action-Buttons (Bearbeiten/Löschen) im Modal klein, schmal, nicht umbrechen! */
-  .penalties-table .btn,
-  .penalties-table .btn-small,
-  .penalties-table .btn-xxs {
-    font-size: 0.89em !important;
-    padding: 0.14em 0.45em !important;
-    min-width: 0 !important;
-    border-radius: 9px !important;
-    margin-right: 2px;
-    margin-bottom: 1px;
-    display: inline-block;
-    vertical-align: middle;
-  }
-  .penalties-table .btn-delete {
-    padding: 0.14em 0.42em !important;
-    font-size: 0.85em !important;
+}
+
+@media (max-width: 400px) {
+  .modal-window {
+    font-size: 0.88em;
   }
 
-  /* Optional: Zeile nicht umbrechen (damit Buttons immer sichtbar sind) */
-  .penalties-table td {
-    overflow-x: auto;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  /* Bei Cards auch Buttons kleiner machen */
-  .penalty-actions .btn,
-  .penalty-actions .btn-small {
-    font-size: 0.88em !important;
-    padding: 0.15em 0.43em !important;
-    border-radius: 10px !important;
-    min-width: 0 !important;
-    margin-right: 2px;
+  .penalties-table-mobile th,
+  .penalties-table-mobile td {
+    font-size: 0.9em !important;
   }
 }
+
+/* Verbesserung der Action Buttons (Bearbeiten/Löschen) */
 @media (max-width: 700px) {
   .penalty-card {
-    position: relative;      /* Bezugspunkt für absolute Positionierung */
-    padding-bottom: 3em;     /* Platz für Aktionsbuttons unten */
+    position: relative;
+    padding-bottom: 3em; /* Platz für Aktionsbuttons unten */
   }
+
   .penalty-actions-bottomright {
-     position: absolute;
+    position: absolute;
     right: 1em;
     bottom: 1em;
     display: flex;
     gap: 0.5em;
     z-index: 10;
-    border: 1px solid red; /* nur zum Testen */
-    background: yellow;    /* nur zum Testen */
+    background: yellow; /* nur zum Testen */
   }
+
   .icon-btn {
     background: #e9ecf4;
     color: #46695c;
@@ -1311,6 +1318,7 @@ h2 {
     align-items: center;
     justify-content: center;
   }
+
   .icon-btn:hover {
     background: #d2d6db;
     color: #059221;
