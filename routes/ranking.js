@@ -4,6 +4,7 @@ const db = require('../db'); // Deine DB-Verbindung
 
 router.get('/', async (req, res) => {
   try {
+    // Abfrage, um Benutzer mit Strafen abzurufen
     const users = await db.query(`
       SELECT u.id, u.username, COALESCE(SUM(p.amount), 0) AS total_penalty_amount
       FROM users u
@@ -12,11 +13,18 @@ router.get('/', async (req, res) => {
       ORDER BY total_penalty_amount DESC
     `);
 
-    console.log(users.rows); // Protokolliert die Benutzer und ihre Strafensummen
+    // Sicherstellen, dass total_penalty_amount immer ein gültiger Wert ist
+    users.rows.forEach(user => {
+      user.total_penalty_amount = parseFloat(user.total_penalty_amount) || 0; 
+    });
 
+    console.log(users.rows); // Ausgabe der Benutzerdaten zur Kontrolle
+
+    // Überprüfen, ob der Benutzer Admin ist
     const isAdmin = req.session.user && req.session.user.is_admin;
     const userId = req.session.user ? req.session.user.id : null;
 
+    // Alle Benutzer an die View übergeben
     res.render('ranking', { users: users.rows, userId });
   } catch (err) {
     console.error('Fehler beim Abrufen der Benutzerdaten:', err);  // Fehler detailliert protokollieren
