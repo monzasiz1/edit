@@ -16,17 +16,17 @@
           <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
         </tr>
       <% } else { %> 
-        <% if (isAdmin) { %> <!-- Wenn Admin, keine Abblendung -->
+        <% if (isAdmin) { %> <!-- Admin sieht alle Benutzer ohne Blur -->
           <tr>
             <td><%= index + 1 %></td>
             <td><%= user.username %></td>
-            <td><%= user.total_penalty_amount && !isNaN(user.total_penalty_amount) ? user.total_penalty_amount.toFixed(2) : '0.00' %> €</td>
+            <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
           </tr>
-        <% } else { %> <!-- Wenn normaler Benutzer, abgeblendet -->
+        <% } else { %> <!-- Nicht-Admin sieht andere Benutzer geblurrt -->
           <tr class="blurred">
             <td><%= index + 1 %></td>
             <td><%= user.username %></td>
-            <td><%= user.total_penalty_amount && !isNaN(user.total_penalty_amount) ? user.total_penalty_amount.toFixed(2) : '0.00' %> €</td>
+            <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
           </tr>
         <% } %>
       <% } %>

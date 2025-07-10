@@ -4,7 +4,6 @@ const db = require('../db'); // Deine DB-Verbindung
 
 router.get('/', async (req, res) => {
   try {
-    // Abfrage, um Benutzer mit Strafen abzurufen
     const users = await db.query(`
       SELECT u.id, u.username, COALESCE(SUM(p.amount), 0) AS total_penalty_amount
       FROM users u
@@ -15,7 +14,7 @@ router.get('/', async (req, res) => {
 
     // Sicherstellen, dass total_penalty_amount immer ein gültiger Wert ist
     users.rows.forEach(user => {
-      user.total_penalty_amount = parseFloat(user.total_penalty_amount) || 0; 
+      user.total_penalty_amount = parseFloat(user.total_penalty_amount) || 0;
     });
 
     console.log(users.rows); // Ausgabe der Benutzerdaten zur Kontrolle
@@ -24,12 +23,12 @@ router.get('/', async (req, res) => {
     const isAdmin = req.session.user && req.session.user.is_admin;
     const userId = req.session.user ? req.session.user.id : null;
 
-    // Alle Benutzer an die View übergeben
-    res.render('ranking', { users: users.rows, userId });
+    // Alle Benutzer an die View übergeben, einschließlich der `isAdmin`-Variable
+    res.render('ranking', { users: users.rows, userId, isAdmin });
   } catch (err) {
-    console.error('Fehler beim Abrufen der Benutzerdaten:', err);  // Fehler detailliert protokollieren
+    console.error('Fehler beim Abrufen der Benutzerdaten:', err);
     res.status(500).send('Server Error');
   }
 });
 
-module.exports = router;  // Achte darauf, dass du den Router exportierst!
+module.exports = router;
