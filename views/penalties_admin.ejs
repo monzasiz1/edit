@@ -50,10 +50,9 @@
   <a href="/penalties/add" class="btn btn-add" style="margin-bottom: 1em;">➕ Neue Strafe</a>
   <% let mobileSum = 0; %>
   <% penalties.forEach(p => { mobileSum += parseFloat(p.amount) || 0; %>
-    <div class="penalty-card">
-      <div class="penalty-row"><span class="penalty-label">👤 Nutzer</span><span><%= p.username %></span></div>
-      <div class="penalty-row">
-        <span class="penalty-label">📆 Datum</span>
+    <div class="penalty-card penalty-card-mobile">
+      <div class="penalty-row"><span class="penalty-label">👤</span><span><%= p.username %></span></div>
+      <div class="penalty-row"><span class="penalty-label">📆</span>
         <span>
           <%= p.date
             ? (typeof p.date === 'string'
@@ -62,13 +61,13 @@
             : '' %>
         </span>
       </div>
-      <div class="penalty-row"><span class="penalty-label">🎯 Grund</span><span><%= p.type %></span></div>
-      <div class="penalty-row"><span class="penalty-label">🎉 Veranstaltung</span><span><%= p.event %></span></div>
-      <div class="penalty-row"><span class="penalty-label">💶 Betrag</span><span><%= Number(p.amount).toFixed(2) %> €</span></div>
-      <div class="penalty-actions">
-        <a href="/penalties/edit/<%= p.id %>" class="btn btn-small">✏️ Bearbeiten</a>
+      <div class="penalty-row"><span class="penalty-label">🎯</span><span><%= p.type %></span></div>
+      <div class="penalty-row"><span class="penalty-label">🎉</span><span><%= p.event %></span></div>
+      <div class="penalty-row"><span class="penalty-label">💶</span><span><%= Number(p.amount).toFixed(2) %> €</span></div>
+      <div class="penalty-actions-bottomright">
+        <a href="/penalties/edit/<%= p.id %>" class="icon-btn" title="Bearbeiten"><span>✏️</span></a>
         <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
-          <button class="btn btn-small btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
+          <button class="icon-btn" title="Löschen" onclick="return confirm('Wirklich löschen?')"><span>🗑️</span></button>
         </form>
       </div>
     </div>
@@ -80,3 +79,4 @@
     </div>
   </div>
 </div>
+
