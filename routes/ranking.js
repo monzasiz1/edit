@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('./users');
 const Penalty = require('./penalties');
+const db = require('../db'); // Datenbankverbindung
 
 router.get('/ranking', async (req, res) => {
   try {
