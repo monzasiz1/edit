@@ -18,6 +18,8 @@
     "express-session": "^1.18.1",
     "method-override": "^3.0.0",
     "pdfkit": "^0.17.1",
-    "pg": "^8.11.3"
+    "pdfkit-table": "^0.1.99",
+    "pg": "^8.11.3",
+    "wkhtmltopdf": "^0.4.0"
   }
 }
