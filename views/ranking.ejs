@@ -13,13 +13,13 @@
         <tr class="highlight-user">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.penalties.length %></td>
+          <td><%= user.penalties ? user.penalties.length : 0 %></td> <!-- Sicherstellen, dass penalties existieren -->
         </tr>
       <% } else { %> <!-- Alle anderen Benutzer werden abgeblendet -->
         <tr class="blurred">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.penalties.length %></td>
+          <td><%= user.penalties ? user.penalties.length : 0 %></td> <!-- Sicherstellen, dass penalties existieren -->
         </tr>
       <% } %>
     <% }); %>
