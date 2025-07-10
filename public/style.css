@@ -686,146 +686,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
     padding-right: 0.3em;
   }
 }
-/* Penalty-Cards für Mobile */
-/* Container für Strafenkarten auf Mobile */
-.penalty-cards {
-  display: none;
-}
 
-@media (max-width: 700px) {
-  .only-desktop { display: none !important; }
-  .only-mobile { display: block !important; }
-
-  .penalty-cards {
-    margin-top: 1.5em;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2em;
-  }
-
-  .penalty-card {
-    background: var(--color-white);
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(1, 109, 28, 0.12);
-    padding: 1.4em 1.6em;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8em;
-    font-size: 1.1em;
-    color: var(--color-primary);
-    transition: box-shadow 0.3s ease, transform 0.25s ease;
-    cursor: default;
-    user-select: none;
-  }
-  .penalty-card:hover, .penalty-card:focus-within {
-    box-shadow: 0 10px 36px rgba(1, 109, 28, 0.25);
-    transform: translateY(-3px);
-  }
-  .penalty-card:active {
-    box-shadow: 0 4px 14px rgba(1, 109, 28, 0.18);
-    transform: translateY(0);
-  }
-
-  .penalty-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.3em;
-    border-bottom: 1px solid #e6f0e6;
-  }
-  .penalty-row:last-child {
-    border-bottom: none;
-  }
-
-  .penalty-label {
-    font-weight: 700;
-    color: var(--color-accent);
-    min-width: 110px;
-    font-size: 0.98em;
-    display: flex;
-    align-items: center;
-    gap: 0.4em;
-  }
-
-  /* Buttons Container */
-  .penalty-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.8em;
-    padding-top: 0.6em;
-  }
-
-  /* Buttons in Strafenkarten optimieren */
-.penalty-actions .btn,
-.penalty-actions .btn-small {
-  background: var(--color-accent);
-  color: var(--color-white);
-  padding: 0.35em 1em;        /* Etwas weniger vertikal, kompakter */
-  font-weight: 600;           /* Leicht weniger fett für Eleganz */
-  font-size: 0.9em;           /* Etwas kleiner */
-  border-radius: 12px;        /* Etwas weniger rund, moderner Look */
-  box-shadow: 0 2px 8px rgba(1, 109, 28, 0.25); /* Leichter Schatten */
-  transition: background-color 0.25s ease, box-shadow 0.25s ease;
-  user-select: none;
-  cursor: pointer;
-  line-height: 1.2;
-  min-width: 70px;            /* Mindestbreite für Konsistenz */
-  text-align: center;
-}
-
-.penalty-actions .btn-small.btn-delete {
-  background: #e8ebef;
-  color: #253053;
-  box-shadow: none;
-  padding: 0.3em 0.85em;
-  font-size: 0.85em;
-  border-radius: 12px;
-  min-width: 60px;
-}
-
-.penalty-actions .btn-small.btn-delete:hover,
-.penalty-actions .btn-small.btn-delete:focus {
-  background: #cfd8db;
-  color: var(--color-primary);
-}
-
-.penalty-actions .btn:hover,
-.penalty-actions .btn:focus {
-  background: #059221;
-  box-shadow: 0 4px 12px rgba(1, 109, 28, 0.5);
-  outline: none;
-}
-
-
-  /* Icons für Labels */
-  .penalty-label::before {
-    content: '';
-    display: inline-block;
-    width: 22px;
-    height: 22px;
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-  /* Beispiel Icons per data-attribute oder klassenspezifisch, falls du willst */
-
-  /* Optional: sanfte Animation beim Laden */
-  .penalty-card {
-    opacity: 0;
-    transform: translateY(15px);
-    animation: fadeSlideIn 0.5s forwards;
-  }
-  .penalty-card:nth-child(1) { animation-delay: 0s; }
-  .penalty-card:nth-child(2) { animation-delay: 0.12s; }
-  .penalty-card:nth-child(3) { animation-delay: 0.24s; }
-  .penalty-card:nth-child(4) { animation-delay: 0.36s; }
-  /* etc. */
-
-  @keyframes fadeSlideIn {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 }
 
 @media (min-width: 701px) {
@@ -1421,68 +1282,19 @@ h2 {
     margin-right: 2px;
   }
 }
-/* --- Mobile-Ansicht Strafen Karten kompakt mit Icons unten rechts --- */
 @media (max-width: 700px) {
-  .only-desktop { display: none !important; }
-  .only-mobile { display: block !important; }
-
-  .penalty-cards {
-    margin-top: 1.5em;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2em;
-  }
-
   .penalty-card {
-    background: var(--color-white);
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(1, 109, 28, 0.12);
-    padding: 1.2em 1.4em;
-    display: flex;
-    flex-direction: column;
-    gap: 0.7em;
-    font-size: 0.93em; /* etwas kleiner, mobiler */
-    color: var(--color-primary);
-    transition: box-shadow 0.3s ease, transform 0.25s ease;
-    cursor: default;
-    user-select: none;
-    position: relative; /* für Aktionsbuttons */
-    padding-bottom: 3.0em; /* Platz unten für Buttons */
+    position: relative;      /* Bezugspunkt für absolute Positionierung */
+    padding-bottom: 3em;     /* Platz für Aktionsbuttons unten */
   }
-  .penalty-card:hover, .penalty-card:focus-within {
-    box-shadow: 0 10px 36px rgba(1, 109, 28, 0.25);
-    transform: translateY(-3px);
-  }
-  .penalty-card:active {
-    box-shadow: 0 4px 14px rgba(1, 109, 28, 0.18);
-    transform: translateY(0);
-  }
-
-  .penalty-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.2em;
-    font-size: 0.92em;
-  }
-  .penalty-label {
-    min-width: 32px;
-    font-size: 1em;
-    font-weight: 600;
-    opacity: 0.8;
-    color: var(--color-accent);
-  }
-
-  /* Buttons unten rechts in der Karte */
   .penalty-actions-bottomright {
     position: absolute;
     right: 1em;
     bottom: 1em;
     display: flex;
     gap: 0.5em;
-    z-index: 3;
+    z-index: 10;
   }
-
   .icon-btn {
     background: #e9ecf4;
     color: #46695c;
@@ -1500,19 +1312,5 @@ h2 {
   .icon-btn:hover {
     background: #d2d6db;
     color: #059221;
-  }
-}
-@media (max-width: 700px) {
-  .penalty-card {
-    position: relative !important;
-    padding-bottom: 3em !important;
-  }
-  .penalty-actions-bottomright {
-    position: absolute !important;
-    right: 1em !important;
-    bottom: 1em !important;
-    display: flex !important;
-    gap: 0.5em !important;
-    z-index: 3 !important;
   }
 }
