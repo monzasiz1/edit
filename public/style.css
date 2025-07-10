@@ -1139,3 +1139,135 @@ h2 {
     font-size: 0.9rem; /* Kleinere Schriftgröße für den "Registrieren"-Link */
   }
 }
+/* --- Mitglieder-GRID und Cards --- */
+.headline {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #394933;
+}
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 2rem;
+}
+.user-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px #a2ad8885;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow .25s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.user-card:hover {
+  box-shadow: 0 4px 24px #a2ad8870;
+}
+.avatar {
+  background: #b4beae;
+  color: #fff;
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .7rem;
+}
+.username {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #394933;
+  margin-bottom: .2rem;
+}
+.user-strikes {
+  color: #888;
+  font-size: .97rem;
+  margin-bottom: .9rem;
+}
+.see-penalties-btn {
+  background: #78866b;
+  color: #fff;
+  border: none;
+  border-radius: .7rem;
+  padding: .5rem 1.3rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .22s;
+}
+.see-penalties-btn:hover {
+  background: #394933;
+}
+
+/* --- MODAL Styles --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.12);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-window {
+  background: #fff;
+  border-radius: 1.4rem;
+  box-shadow: 0 8px 48px #0002;
+  min-width: 310px;
+  max-width: 97vw;
+  padding: 2rem;
+  position: relative;
+  animation: fadeIn .2s;
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:scale(.97);}
+  to { opacity:1; transform:scale(1);}
+}
+.modal-header {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #394933;
+  margin-bottom: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  color: #78866b;
+  cursor: pointer;
+}
+.penalties-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.penalties-table th,
+.penalties-table td {
+  border-bottom: 1px solid #dbe4c6;
+  padding: .5rem .2rem;
+  text-align: left;
+}
+.penalties-table th {
+  color: #394933;
+  font-weight: 700;
+  background: #e4e7dc;
+}
+.penalties-table td:last-child,
+.penalties-table th:last-child {
+  text-align: right;
+}
+.sum-row td {
+  border-top: 2px solid #b4beae;
+  font-weight: bold;
+}
+@media (max-width: 600px) {
+  .users-grid { grid-template-columns: 1fr; }
+  .modal-window { min-width:unset; padding:1rem; }
+}
