@@ -31,6 +31,9 @@ body {
   min-height: 100vh;
 }
 
+/* ---------------------------
+   CONTAINER
+---------------------------- */
 .container {
   max-width: var(--max-width);
   margin: calc(var(--nav-height) + 2.6rem) auto 2.6rem auto;
@@ -41,7 +44,19 @@ body {
   transition: box-shadow var(--transition), padding var(--transition);
 }
 
-/* NAVIGATION */
+@media (max-width: 700px) {
+  .container {
+    max-width: 97vw;
+    padding: 1.1rem 0.6rem;
+    margin: calc(var(--nav-height) + 1.1rem) 0 1.1rem 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* ---------------------------
+   NAVIGATION
+---------------------------- */
 nav.main-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -102,6 +117,7 @@ nav.main-nav ul li button:focus {
   border-bottom-color: var(--color-accent);
   outline: none;
 }
+
 /* Hamburger Menu - Mobile */
 .menu-toggle {
   display: none;
@@ -126,8 +142,58 @@ nav.main-nav ul li button:focus {
   border-radius: 2px;
   transition: var(--transition);
 }
+@media (max-width: 900px) {
+  nav.main-nav {
+    padding: 0 1rem;
+  }
+  .menu-toggle {
+    display: flex !important;
+  }
+  nav.main-nav ul {
+    position: fixed;
+    top: var(--nav-height);
+    right: 0;
+    background: var(--color-white);
+    flex-direction: column;
+    width: 76vw;
+    max-width: 270px;
+    height: calc(100vh - var(--nav-height));
+    padding: 2rem 1.3rem 1.7rem 1.3rem;
+    box-shadow: -12px 0 28px rgba(41,51,91,0.13);
+    transform: translateX(100%);
+    transition: transform var(--transition);
+    border-radius: 0 0 0 15px;
+    overflow-y: auto;
+    z-index: 1200;
+    gap: 0;
+    display: flex;
+  }
+  nav.main-nav ul.active {
+    transform: translateX(0);
+  }
+  nav.main-nav ul li {
+    margin-bottom: 1.1rem;
+    text-align: left;
+  }
+  nav.main-nav ul li:last-child {
+    margin-bottom: 0;
+  }
+  nav.main-nav ul li a, nav.main-nav ul li button {
+    font-size: 1.13rem;
+    color: var(--color-primary);
+    width: 100%;
+    text-align: left;
+    padding: 0.42em 0;
+    margin: 0;
+  }
+  nav.main-nav ul:not(.active) {
+    display: none;
+  }
+}
 
-/* BUTTONS */
+/* ---------------------------
+   BUTTONS
+---------------------------- */
 button, a.btn, .btn {
   background: var(--color-accent);
   color: var(--color-white);
@@ -176,8 +242,21 @@ a.btn-delete:hover, .btn.btn-delete:hover {
   border-radius: 18px;
   margin-right: 0.3rem;
 }
+@media (max-width: 600px) {
+  button, a.btn, .btn {
+    padding: 0.38rem 1.08rem;
+    font-size: 0.97rem;
+    margin: 0.07rem 0;
+  }
+  .btn-small {
+    font-size: 0.90rem;
+    padding: 0.2rem 0.7rem;
+  }
+}
 
-/* FORMS & INPUTS */
+/* ---------------------------
+   FORMS & INPUTS
+---------------------------- */
 form {
   max-width: 510px;
   margin-top: 1.4rem;
@@ -223,7 +302,9 @@ input:focus {
   box-shadow: 0 0 0 2px #bbf7d0;
 }
 
-/* TABLES (Responsive Cards) */
+/* ---------------------------
+   TABLES (Responsive Cards)
+---------------------------- */
 table {
   width: 100%;
   border-collapse: separate;
@@ -260,122 +341,23 @@ tr:hover {
 td:first-child { border-bottom-left-radius: 14px; }
 td:last-child  { border-bottom-right-radius: 14px; }
 
-/* FEEDBACK & UTILS */
-.error {
-  background: #fff2f2;
-  color: var(--color-error);
-  padding: 1.25rem 1.5rem;
-  border-radius: var(--radius-base);
-  margin: 1.7rem 0;
-  font-weight: 700;
-  box-shadow: 0 0 16px #d06b6b27;
-}
-.success {
-  background: #e9ffe8;
-  color: var(--color-success);
-  padding: 1.15rem 1.5rem;
-  border-radius: var(--radius-base);
-  margin: 1.4rem 0;
-  font-weight: 600;
-  box-shadow: 0 0 14px #8ce09a2f;
-}
-.hidden { display: none !important; }
-
-.footer {
-  text-align: center;
-  padding: 1em 0;
-  font-size: 0.9em;
-  color: #6b7a67;
-  background: #f5f5f5;
+/* User-Tables & Card-Look on mobile */
+.user-table, .responsive-table {
+  width: 100%;
+  border-collapse: separate;
   margin-top: 2em;
-  border-top: 1px solid #d0d0d0;
+  font-size: 1.04rem;
 }
-.dashboard-total, .gesamtbetrag {
-  font-weight: bold;
-  font-size: 1.15em;
-  color: #46695c;
-  margin-top: 1em;
-  text-align: right;
-}
-.dashboard-greeting {
-  font-size: 1.3em;
-  font-weight: 600;
-  color: #46695c;
-  margin-bottom: 0.7em;
-}
-/* Rollen-Badges */
-.role {
-  padding: 0.14em 0.85em;
-  border-radius: 1em;
-  font-size: 0.96em;
-  display: inline-block;
-  font-weight: 600;
-  margin-right: 0.2em;
-}
-.role-admin { background: #ced7c2; color: #49613a; }
-.role-member { background: #e9eee3; color: #46695c; }
-
-/* User Cards Desktop (wird für Mobile später ausgeblendet) */
-.user-cards { display: none; }
-
-/* --- Mobile Optimierung --- */
 @media (max-width: 700px) {
-  body { font-size: 15.3px; }
-  .container {
-    max-width: 97vw;
-    padding: 0.5rem 0.18rem;
-    margin: calc(var(--nav-height) + 1.1rem) 0 1.1rem 0;
-    border-radius: 0;
-    box-shadow: none;
+  .user-table, .responsive-table {
+    border: 0;
+    font-size: 0.99rem;
   }
-  h1, h2, h3 { font-size: 1.08rem; margin-bottom: 0.6rem; }
-  .headline { font-size: 1.18rem; margin-bottom: 1rem; }
-  .btn, button, .btn-small {
-    padding: 0.29rem 0.75rem !important;
-    font-size: 0.95rem !important;
-    border-radius: 13px !important;
-  }
-  .dashboard-card,
-  .penalty-card,
-  .user-card {
-    padding: 0.68em 0.6em !important;
-    font-size: 0.97em !important;
-    gap: 0.33em !important;
-  }
-  .dashboard-row,
-  .penalty-row,
-  .user-card-row {
-    padding-bottom: 0.08em !important;
-    font-size: 0.91em !important;
-  }
-  .dashboard-card.total-card {
-    padding: 0.36em 0.6em !important;
-    font-size: 0.99em !important;
-  }
-  .penalty-actions .btn,
-  .penalty-actions .btn-small {
-    min-width: 0 !important;
-    padding: 0.13em 0.41em !important;
-    font-size: 0.87em !important;
-    border-radius: 10px !important;
-  }
-  th, td {
-    padding: 0.5em 0.25em !important;
-  }
-  .modal-window {
-    padding: 0.65em !important;
-    min-width: unset !important;
-  }
-  .penalty-cards,
-  .dashboard-cards {
-    gap: 0.6em !important;
-    margin-top: 0.5em !important;
-  }
-  .user-table, .responsive-table { font-size: 0.99rem; border: 0; }
   .user-table thead, .responsive-table thead { display: none; }
   .user-table tbody, .user-table tr, .user-table td,
   .responsive-table tbody, .responsive-table tr, .responsive-table td {
-    display: block; width: 100%;
+    display: block;
+    width: 100%;
   }
   .user-table tr, .responsive-table tr {
     margin-bottom: 1.12rem;
@@ -402,44 +384,947 @@ td:last-child  { border-bottom-right-radius: 14px; }
     font-size: 0.92em;
     opacity: 0.92;
   }
+}
+
+/* ---------------------------
+   FEEDBACK & UTILS
+---------------------------- */
+.error {
+  background: #fff2f2;
+  color: var(--color-error);
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-base);
+  margin: 1.7rem 0;
+  font-weight: 700;
+  box-shadow: 0 0 16px #d06b6b27;
+}
+.success {
+  background: #e9ffe8;
+  color: var(--color-success);
+  padding: 1.15rem 1.5rem;
+  border-radius: var(--radius-base);
+  margin: 1.4rem 0;
+  font-weight: 600;
+  box-shadow: 0 0 14px #8ce09a2f;
+}
+.hidden { display: none !important; }
+
+/* Auth / Login/Register Card Styles */
+.auth-box,
+.auth-container {
+  max-width: 410px;
+  margin: 2.8rem auto;
+  padding: 2.5rem 2.2rem 1.4rem 2.2rem;
+  background: var(--color-white);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(41,51,91,0.12);
+  text-align: center;
+}
+.auth-box .logo1,
+.auth-container .logo1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 1.3rem;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.auth-box .logo1 img,
+.auth-container .logo1 img {
+  height: 36px;
+  margin-right: 10px;
+}
+
+/* Switch Auth Links */
+.switch-auth {
+  margin-top: 2rem;
+  color: var(--color-muted);
+  font-size: 1.03rem;
+}
+.switch-auth a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.footer {
+  text-align: center;
+  padding: 1em 0;
+  font-size: 0.9em;
+  color: #6b7a67; /* RAL 6013 - Schilfgrün oder eine passende Farbe */
+  background: #f5f5f5;
+  margin-top: 2em;
+  border-top: 1px solid #d0d0d0;
+}
+.dashboard-total, .gesamtbetrag {
+  font-weight: bold;
+  font-size: 1.15em;
+  color: #46695c;
+  margin-top: 1em;
+  text-align: right;
+}
+.dashboard-greeting {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #46695c;
+  margin-bottom: 0.7em;
+}
+
+/* Rollen-Badges */
+.role {
+  padding: 0.14em 0.85em;
+  border-radius: 1em;
+  font-size: 0.96em;
+  display: inline-block;
+  font-weight: 600;
+  margin-right: 0.2em;
+}
+.role-admin {
+  background: #ced7c2;
+  color: #49613a;
+}
+.role-member {
+  background: #e9eee3;
+  color: #46695c;
+}
+/* USER CARD-LAYOUT FOR MOBILE */
+.user-cards { display: none; }
+@media (max-width: 700px) {
+  .user-table { display: none; }
   .user-cards {
     display: block;
     margin-top: 1.4em;
   }
+  .user-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 16px rgba(41,51,91,0.10);
+    margin-bottom: 1.2em;
+    padding: 1.1em 1.2em 0.9em 1.2em;
+    font-size: 1.05em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+  }
+  .user-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7em;
+    padding-bottom: 0.17em;
+  }
+  .user-card-label {
+    font-weight: 600;
+    color: #46695c;
+    opacity: 0.87;
+    font-size: 1em;
+  }
+  .user-card-value {
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 1em;
+    font-weight: 500;
+    color: #253053;
+    word-break: break-word;
+  }
+  .user-card-actions {
+    justify-content: flex-end;
+    gap: 0.4em;
+    padding-top: 0.2em;
+  }
+
+
+  /* RESPONSIVE TABLE STYLE! */
+  .responsive-table {
+    font-size: 0.93em;
+    border: 0;
+  }
+  .responsive-table thead {
+    display: none;
+  }
+  .responsive-table,
+  .responsive-table tbody,
+  .responsive-table tr,
+  .responsive-table td {
+    display: block;
+    width: 100%;
+  }
+  .responsive-table tr {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(41,51,91,0.10);
+    margin-bottom: 0.46em;
+    padding: 0.22em 0.55em 0.13em 0.55em;
+  }
+  .responsive-table td {
+    padding: 0.13em 0 0.08em 0;
+    border: none;
+    border-bottom: 1px solid #f1f1f2;
+    min-height: 18px;
+    font-size: 0.91em;
+    line-height: 1.18;
+    position: relative;
+  }
+  .responsive-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0.06em;
+  }
+  .responsive-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: #253053;
+    display: block;
+    font-size: 0.86em;
+    opacity: 0.91;
+    margin-bottom: 0;
+  }
+  .responsive-table .btn,
+  .responsive-table .btn-delete,
+  .responsive-table .btn-small {
+    font-size: 0.87em;
+    padding: 0.12em 0.42em;
+    border-radius: 11px;
+    margin: 0.04em 0.04em 0.03em 0;
+    min-width: 0;
+    display: inline-block;
+  }
+  .responsive-table td[data-label="Betrag"] {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .responsive-table td[data-label="Aktion"] {
+    text-align: right;
+  }
+}
+.pdf-export-section {
+  margin-top: 2.6em;
+}
+.pdf-export-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.2em;
+  margin-top: 1.3em;
+}
+.pdf-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 24px rgba(41,51,91,0.09);
+  padding: 2em 2.1em 1.3em 2.1em;
+  flex: 1 1 340px;
+  min-width: 320px;
+  max-width: 420px;
+  margin-bottom: 0.7em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+.user-pdf-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.2em 0 0 0;
+}
+.user-pdf-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7faf9;
+  border-radius: 10px;
+  padding: 0.53em 0.9em 0.43em 0.9em;
+  margin-bottom: 0.6em;
+  font-size: 1.08em;
+  box-shadow: 0 1px 6px rgba(41,51,91,0.06);
+}
+.user-pdf-list li:last-child {
+  margin-bottom: 0;
+}
+.pdf-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.18em;
+  font-size: 1.18em;
+}
+.pdf-card .muted {
+  color: var(--color-muted);
+  font-size: 0.98em;
+  margin-bottom: 0.6em;
+  margin-top: 0.1em;
+}
+@media (max-width: 700px) {
+  .pdf-export-cards {
+    flex-direction: column;
+    gap: 1.2em;
+  }
+  .pdf-card {
+    padding: 1.25em 0.9em 0.9em 0.9em;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+.pdf-export-section > h2 {
+  margin-bottom: 1.3em;
+}
+.pdf-card {
+  transition: box-shadow 0.19s cubic-bezier(.37,.34,.46,.98), transform 0.18s;
+}
+.pdf-card:hover {
+  box-shadow: 0 7px 34px rgba(41, 51, 91, 0.18);
+  transform: translateY(-2px) scale(1.012);
+}
+.user-pdf-list a.btn-small {
+  margin-left: 0.6em;
+  font-size: 0.96em;
+  padding: 0.26em 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.36em;
+}
+@media (max-width: 700px) {
+  .pdf-export-section {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+  }
+}
+/* Penalty-Cards für Mobile */
+/* Container für Strafenkarten auf Mobile */
+.penalty-cards {
+  display: none;
 }
 
-@media (max-width: 900px) {
-  nav.main-nav { padding: 0 1rem; }
-  .menu-toggle { display: flex !important; }
-  nav.main-nav ul {
-    position: fixed;
-    top: var(--nav-height);
-    right: 0;
-    background: var(--color-white);
-    flex-direction: column;
-    width: 76vw;
-    max-width: 270px;
-    height: calc(100vh - var(--nav-height));
-    padding: 2rem 1.3rem 1.7rem 1.3rem;
-    box-shadow: -12px 0 28px rgba(41,51,91,0.13);
-    transform: translateX(100%);
-    transition: transform var(--transition);
-    border-radius: 0 0 0 15px;
-    overflow-y: auto;
-    z-index: 1200;
-    gap: 0;
+@media (max-width: 700px) {
+  .only-desktop { display: none !important; }
+  .only-mobile { display: block !important; }
+
+  .penalty-cards {
+    margin-top: 1.5em;
     display: flex;
+    flex-direction: column;
+    gap: 1.2em;
   }
-  nav.main-nav ul.active { transform: translateX(0); }
-  nav.main-nav ul li { margin-bottom: 1.1rem; text-align: left; }
-  nav.main-nav ul li:last-child { margin-bottom: 0; }
-  nav.main-nav ul li a, nav.main-nav ul li button {
-    font-size: 1.13rem;
+
+  .penalty-card {
+    background: var(--color-white);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(1, 109, 28, 0.12);
+    padding: 1.4em 1.6em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+    font-size: 1.1em;
     color: var(--color-primary);
-    width: 100%;
-    text-align: left;
-    padding: 0.42em 0;
-    margin: 0;
+    transition: box-shadow 0.3s ease, transform 0.25s ease;
+    cursor: default;
+    user-select: none;
   }
-  nav.main-nav ul:not(.active) { display: none; }
+  .penalty-card:hover, .penalty-card:focus-within {
+    box-shadow: 0 10px 36px rgba(1, 109, 28, 0.25);
+    transform: translateY(-3px);
+  }
+  .penalty-card:active {
+    box-shadow: 0 4px 14px rgba(1, 109, 28, 0.18);
+    transform: translateY(0);
+  }
+
+  .penalty-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #e6f0e6;
+  }
+  .penalty-row:last-child {
+    border-bottom: none;
+  }
+
+  .penalty-label {
+    font-weight: 700;
+    color: var(--color-accent);
+    min-width: 110px;
+    font-size: 0.98em;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+
+  /* Buttons Container */
+  .penalty-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8em;
+    padding-top: 0.6em;
+  }
+
+  /* Buttons in Strafenkarten optimieren */
+.penalty-actions .btn,
+.penalty-actions .btn-small {
+  background: var(--color-accent);
+  color: var(--color-white);
+  padding: 0.35em 1em;        /* Etwas weniger vertikal, kompakter */
+  font-weight: 600;           /* Leicht weniger fett für Eleganz */
+  font-size: 0.9em;           /* Etwas kleiner */
+  border-radius: 12px;        /* Etwas weniger rund, moderner Look */
+  box-shadow: 0 2px 8px rgba(1, 109, 28, 0.25); /* Leichter Schatten */
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+  cursor: pointer;
+  line-height: 1.2;
+  min-width: 70px;            /* Mindestbreite für Konsistenz */
+  text-align: center;
+}
+
+.penalty-actions .btn-small.btn-delete {
+  background: #e8ebef;
+  color: #253053;
+  box-shadow: none;
+  padding: 0.3em 0.85em;
+  font-size: 0.85em;
+  border-radius: 12px;
+  min-width: 60px;
+}
+
+.penalty-actions .btn-small.btn-delete:hover,
+.penalty-actions .btn-small.btn-delete:focus {
+  background: #cfd8db;
+  color: var(--color-primary);
+}
+
+.penalty-actions .btn:hover,
+.penalty-actions .btn:focus {
+  background: #059221;
+  box-shadow: 0 4px 12px rgba(1, 109, 28, 0.5);
+  outline: none;
+}
+
+
+  /* Icons für Labels */
+  .penalty-label::before {
+    content: '';
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  /* Beispiel Icons per data-attribute oder klassenspezifisch, falls du willst */
+
+  /* Optional: sanfte Animation beim Laden */
+  .penalty-card {
+    opacity: 0;
+    transform: translateY(15px);
+    animation: fadeSlideIn 0.5s forwards;
+  }
+  .penalty-card:nth-child(1) { animation-delay: 0s; }
+  .penalty-card:nth-child(2) { animation-delay: 0.12s; }
+  .penalty-card:nth-child(3) { animation-delay: 0.24s; }
+  .penalty-card:nth-child(4) { animation-delay: 0.36s; }
+  /* etc. */
+
+  @keyframes fadeSlideIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (min-width: 701px) {
+  .only-mobile { display: none !important; }
+}
+.dashboard-cards { display: none; }
+@media (max-width: 700px) {
+  .only-desktop { display: none !important; }
+  .dashboard-cards.only-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-top: 1.3em;
+  }
+  .dashboard-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(41,51,91,0.11);
+    padding: 1.1em 1.2em 0.9em 1.2em;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.19s, transform 0.17s;
+    gap: 0.4em;
+    animation: fadeInUp 0.7s cubic-bezier(.33,.77,.63,1.11);
+    font-size: 1.06em;
+    position: relative;
+  }
+  .dashboard-card:active {
+   box-shadow: 0 1px 8px rgba(1,109,28,0.10);
+  transform: scale(0.97);
+}
+.dashboard-card:focus-within {
+  box-shadow: 0 0 0 2px #bbf7d0, 0 2px 12px rgba(41,51,91,0.10);
+}
+
+  .dashboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.7em;
+    border-bottom: 1px solid #f3f6f3;
+    padding-bottom: 0.22em;
+    font-size: 1em;
+  }
+  .dashboard-row:last-child { border-bottom: none; }
+  .dashboard-label {
+    font-weight: 600;
+    color: #46695c;
+    opacity: 0.88;
+    font-size: 0.97em;
+    min-width: 90px;
+    display: inline-block;
+  }
+  .dashboard-value {
+    color: #253053;
+    font-weight: 500;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .dashboard-row.amount .dashboard-value {
+    font-weight: 700;
+    color: #016d1c;
+  }
+  .dashboard-card.total-card {
+    margin-top: 0.9em;
+    background: #f4fff6;
+    border: 1.5px solid #bbf7d0;
+    box-shadow: none;
+    font-size: 1.09em;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #253053;
+  }
+  .dashboard-icon {
+  width: 2.5em;
+  height: 2.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f4fff6 70%, #e7f5eb 100%);
+  font-size: 1.2em;
+  margin-bottom: 0.15em;
+  box-shadow: 0 2px 10px rgba(1,109,28,0.05);
+}
+
+
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(22px); }
+    100% { opacity: 1; transform: none; }
+  }
+}
+@media (min-width: 701px) {
+  .only-mobile { display: none !important; }
+}
+.dashboard-row {
+  animation: fadeRow 0.42s cubic-bezier(.5,.6,.3,1.1);
+}
+@keyframes fadeRow {
+  0% { opacity: 0; transform: translateY(10px);}
+  100% { opacity: 1; transform: none;}
+}
+/* Admin-Hinweis (Desktop) */
+.admin-tag {
+  font-size: 0.75em;
+  color: #777;
+  margin-left: 0.5em;
+}
+
+/* Admin-Hinweis (Mobile) */
+.admin-tag-mobile {
+  font-size: 0.7em;
+  color: #fff;
+  background-color: #4CAF50;
+  padding: 2px 5px;
+  border-radius: 0 4px 4px 0;
+  position: absolute;
+  left: 0;
+  top: 10px;
+}
+
+/* Positionierung für Mobile Dashboard Cards */
+.dashboard-card {
+  position: relative;
+  padding-left: 50px;
+}
+
+/* Admin-Hinweis (Desktop) */
+.admin-tag-desktop {
+  font-size: 0.9em;
+  color: #4CAF50; /* Grüne Farbe für den Admin */
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+  background-color: #f1f1f1; /* Heller Hintergrund für Admin-Hinweis */
+  padding: 3px 8px;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Leichter Schatten für bessere Lesbarkeit */
+}
+
+/* Admin-Hinweis (Benutzerübersicht) */
+.admin-tag-users {
+  font-size: 1rem;
+  color: white;
+  background-color: #FF9800; /* Oranger Hintergrund für Admin */
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+  transition: transform 0.3s ease;
+}
+
+/* Hover-Effekt für den Admin-Tag in der Benutzerübersicht */
+.admin-tag-users:hover {
+  transform: scale(1.05);
+  background-color: #FF5722; /* Dunklerer Hintergrund bei Hover */
+}
+/* Allgemeine Button-Stile */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.7rem;
+  text-align: center;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 2px 7px rgba(21,109,28,0.09);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+}
+
+.btn:hover, .btn:focus {
+  background: #059221;
+  box-shadow: 0 4px 16px rgba(1,109,28,0.14);
+}
+
+.btn-small {
+  font-size: 0.93rem;
+  padding: 0.34rem 1rem;
+  border-radius: 18px;
+  margin-right: 0.3rem;
+}
+/* Benutzer-Cards für Mobile */
+.user-cards {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .user-table { display: none; }
+  .user-cards {
+    display: block;
+    margin-top: 1.4em;
+  }
+  .user-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 16px rgba(41,51,91,0.10);
+    margin-bottom: 1.2em;
+    padding: 1.1em 1.2em 0.9em 1.2em;
+    font-size: 1.05em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+  }
+  .user-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7em;
+    padding-bottom: 0.17em;
+  }
+  .user-card-label {
+    font-weight: 600;
+    color: #46695c;
+    opacity: 0.87;
+    font-size: 1em;
+  }
+  .user-card-value {
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 1em;
+    font-weight: 500;
+    color: #253053;
+    word-break: break-word;
+  }
+}
+/* Auth / Login/Register Card Styles */
+.auth-box,
+.auth-container {
+  max-width: 410px;
+  margin: 2.8rem auto;
+  padding: 2.5rem 2.2rem 1.4rem 2.2rem;
+  background: var(--color-white); /* Hintergrund für das Formular */
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(41,51,91,0.12);
+  text-align: center;
+  position: relative; /* Notwendig für das Hintergrundbild */
+  z-index: 1;
+}
+
+/* Hinzufügen des Hintergrundbilds */
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('public/backgroundimg.jpg') no-repeat center center;
+  background-size: cover; /* Bild soll den gesamten Bereich abdecken */
+  z-index: -1; /* Das Bild bleibt hinter dem Formular */
+  filter: brightness(0.5); /* Dimmt das Bild für bessere Lesbarkeit des Textes */
+}
+
+/* Logo */
+.logo1 img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+/* Titel */
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+/* Wechsel zur Registrierung */
+.switch-auth {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.switch-auth a {
+  color: #016d1c;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Fehleranzeige */
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+/* Media Query für kleinere Bildschirme */
+@media (max-width: 700px) {
+  .auth-container {
+    max-width: 90%; /* Formular nimmt mehr Platz auf mobilen Geräten ein */
+    padding: 2rem 1.5rem;
+    margin-top: 1.5rem; /* Etwas weniger Abstand von oben */
+  }
+
+  h2 {
+    font-size: 1.4rem; /* Kleinere Schriftgröße für den Titel */
+  }
+
+  .logo1 img {
+    height: 40px; /* Kleinere Logo-Größe auf mobilen Geräten */
+  }
+
+  .switch-auth {
+    font-size: 0.9rem; /* Kleinere Schriftgröße für den "Registrieren"-Link */
+  }
+}
+/* --- Mitglieder-GRID und Cards --- */
+.headline {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #394933;
+}
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 2rem;
+}
+.user-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px #a2ad8885;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow .25s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.user-card:hover {
+  box-shadow: 0 4px 24px #a2ad8870;
+}
+.avatar {
+  background: #b4beae;
+  color: #fff;
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .7rem;
+}
+.username {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #394933;
+  margin-bottom: .2rem;
+}
+.user-strikes {
+  color: #888;
+  font-size: .97rem;
+  margin-bottom: .9rem;
+}
+.see-penalties-btn {
+  background: #78866b;
+  color: #fff;
+  border: none;
+  border-radius: .7rem;
+  padding: .5rem 1.3rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .22s;
+}
+.see-penalties-btn:hover {
+  background: #394933;
+}
+
+/* --- MODAL Styles --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.12);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-window {
+  background: #fff;
+  border-radius: 1.4rem;
+  box-shadow: 0 8px 48px #0002;
+  min-width: 310px;
+  max-width: 97vw;
+  padding: 2rem;
+  position: relative;
+  animation: fadeIn .2s;
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:scale(.97);}
+  to { opacity:1; transform:scale(1);}
+}
+.modal-header {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #394933;
+  margin-bottom: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  color: #78866b;
+  cursor: pointer;
+}
+.penalties-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.penalties-table th,
+.penalties-table td {
+  border-bottom: 1px solid #dbe4c6;
+  padding: .5rem .2rem;
+  text-align: left;
+}
+.penalties-table th {
+  color: #394933;
+  font-weight: 700;
+  background: #e4e7dc;
+}
+.penalties-table td:last-child,
+.penalties-table th:last-child {
+  text-align: right;
+}
+.sum-row td {
+  border-top: 2px solid #b4beae;
+  font-weight: bold;
+}
+@media (max-width: 600px) {
+  .users-grid { grid-template-columns: 1fr; }
+  .modal-window { min-width:unset; padding:1rem; }
+}
+/* --- Mobile-Optimierung für dich (alles wird kompakter!) --- */
+@media (max-width: 700px) {
+  body {
+    font-size: 15.3px; /* Die Schriftgröße wird auf kleinen Geräten handlicher */
+  }
+  .container {
+    padding: 0.5rem 0.18rem; /* Weniger Rand – mehr Platz für den Inhalt */
+  }
+  h1, h2, h3 {
+    font-size: 1.08rem; /* Überschriften werden mobiler und übersichtlicher */
+    margin-bottom: 0.6rem;
+  }
+  .headline { font-size: 1.18rem; margin-bottom: 1rem; }
+  .btn, button, .btn-small {
+    padding: 0.29rem 0.75rem !important; /* Buttons auf dem Handy griffig, aber nicht zu fett */
+    font-size: 0.95rem !important;
+    border-radius: 13px !important;
+  }
+  .dashboard-card,
+  .penalty-card,
+  .user-card {
+    padding: 0.68em 0.6em !important; /* Cards kleiner – du siehst mehr Inhalt ohne zu scrollen */
+    font-size: 0.97em !important;
+    gap: 0.33em !important;
+  }
+  .dashboard-row,
+  .penalty-row,
+  .user-card-row {
+    padding-bottom: 0.08em !important;
+    font-size: 0.91em !important;
+  }
+  .dashboard-card.total-card {
+    padding: 0.36em 0.6em !important;
+    font-size: 0.99em !important;
+  }
+  .penalty-actions .btn,
+  .penalty-actions .btn-small {
+    min-width: 0 !important;
+    padding: 0.13em 0.41em !important;
+    font-size: 0.87em !important;
+    border-radius: 10px !important;
+  }
+  th, td {
+    padding: 0.5em 0.25em !important; /* Tabellenzellen kompakter, besser für unterwegs */
+  }
+  /* Modal für dich auf Handy weniger ausladend */
+  .modal-window {
+    padding: 0.65em !important;
+    min-width: unset !important;
+  }
+  /* Cards rücken enger zusammen – mehr Übersicht auf einen Blick */
+  .penalty-cards,
+  .dashboard-cards {
+    gap: 0.6em !important;
+    margin-top: 0.5em !important;
+  }
 }
