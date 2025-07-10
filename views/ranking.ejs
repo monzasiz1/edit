@@ -1,10 +1,10 @@
-<h2 class="ranking-title">Ranking der Benutzer</h2>
+<h2 class="ranking-title">Strafen-Ranking</h2>
 <table class="ranking-table">
   <thead>
     <tr>
       <th>Platz</th>
       <th>Benutzername</th>
-      <th>Betrag</th>
+      <th>Strafen</th>
     </tr>
   </thead>
   <tbody>
@@ -13,17 +13,20 @@
         <tr class="highlight-user">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.total_penalty_amount && !isNaN(user.total_penalty_amount) ? user.total_penalty_amount.toFixed(2) : '0.00' %></td>
+          <td><%= user.penalty_count %></td>
         </tr>
       <% } else { %> <!-- Alle anderen Benutzer werden abgeblendet -->
         <tr class="blurred">
           <td><%= index + 1 %></td>
           <td><%= user.username %></td>
-          <td><%= user.total_penalty_amount && !isNaN(user.total_penalty_amount) ? user.total_penalty_amount.toFixed(2) : '0.00' %></td>
+          <td><%= user.penalty_count %></td>
         </tr>
       <% } %>
     <% }); %>
   </tbody>
 </table>
 
-<a href="/ranking" class="btn btn-small">Zurück zum Dashboard</a>
+<!-- Button zurück zum Dashboard -->
+<div class="back-button-container">
+  <a href="/dashboard" class="btn btn-small">Zurück zum Dashboard</a>
+</div>

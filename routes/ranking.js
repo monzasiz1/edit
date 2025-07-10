@@ -4,16 +4,15 @@ const db = require('../db'); // Deine DB-Verbindung
 
 router.get('/', async (req, res) => {
   try {
-    // Alle Benutzer und deren Strafen zählen
+    // Deine Abfrage und Logik hier
     const users = await db.query(`
-      SELECT u.id, u.username, COALESCE(SUM(p.amount), 0) AS total_penalty_amount
+      SELECT u.id, u.username, COUNT(p.id) AS penalty_count
       FROM users u
       LEFT JOIN penalties p ON u.id = p.user_id
       GROUP BY u.id
-      ORDER BY total_penalty_amount DESC
+      ORDER BY penalty_count DESC
     `);
 
-    // Aktuell eingeloggten Benutzer und Adminrechte überprüfen
     const isAdmin = req.session.user && req.session.user.is_admin;
     const userId = req.session.user ? req.session.user.id : null;
 
@@ -24,4 +23,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;  // Achte darauf, dass du den Router exportierst!
