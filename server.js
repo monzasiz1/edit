@@ -7,6 +7,7 @@ const ejsLayouts = require('express-ejs-layouts');
 
 // Routen-Imports
 const rankingRoutes = require('./routes/ranking');
+const exportRoutes = require('./routes/export');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
