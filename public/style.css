@@ -687,7 +687,6 @@ td:last-child  { border-bottom-right-radius: 14px; }
   }
 }
 
-}
 
 @media (min-width: 701px) {
   .only-mobile { display: none !important; }
@@ -1153,7 +1152,7 @@ h2 {
 }
 
 /* --- Mobile-Optimierung für dich (alles wird kompakter!) --- */
-@media (max-width: 700px) {
+@media (max-width: 700px) {}
   body {
     font-size: 15.3px; /* Die Schriftgröße wird auf kleinen Geräten handlicher */
   }
@@ -1215,112 +1214,95 @@ h2 {
     padding: 0.5em 0.25em !important; /* Tabellenzellen kompakter, besser für unterwegs */
   }
 
-  /* Modal für dich auf Handy weniger ausladend */
-  .modal-window {
-    padding: 0.65em !important;
-    min-width: unset !important;
-  }
-
-  /* Cards rücken enger zusammen – mehr Übersicht auf einen Blick */
-  .penalty-cards,
-  .dashboard-cards {
-    gap: 0.6em !important;
-    margin-top: 0.5em !important;
-  }
-}
-
-/* Modal Window für mobile Geräte */
+ /* --- Mobile-Optimierung für Modal --- */
 @media (max-width: 700px) {
+  /* Das gesamte Modal kleiner machen */
   .modal-window {
-    padding: 0.7em !important;
-    max-width: 99vw;
-    font-size: 0.96em;
+    padding: 1.2rem !important;
+    min-width: unset !important;
+    font-size: 0.9em; /* Kleinere Schriftgröße im Modal */
   }
 
-  .penalties-table-mobile th,
-  .penalties-table-mobile td {
-    padding: 0.29em 0.15em !important;
-    font-size: 0.93em !important;
-    white-space: nowrap;
+  /* Die Modal-Header Schriftgröße verkleinern */
+  .modal-header {
+    font-size: 1.05rem !important;
   }
 
-  .penalties-table-mobile td.actions-cell {
-    min-width: 74px;
-    text-align: right;
-    padding-right: 0 !important;
-  }
-
-  .btn.btn-xxs,
-  .btn-xxs {
-    font-size: 0.95em !important;
-    padding: 0.22em 0.42em !important;
-    border-radius: 11px !important;
-    margin: 0 1px;
-    min-width: 0;
+  /* Die Buttons (Bearbeiten, Löschen, etc.) im Modal kompakter machen */
+  .penalties-table .btn,
+  .penalties-table .btn-small,
+  .penalties-table .btn-xxs {
+    font-size: 0.85em !important;  /* Kleinere Buttons */
+    padding: 0.2em 0.45em !important; /* Weniger Abstand in den Buttons */
+    min-width: 0 !important;
+    border-radius: 9px !important;
+    margin-right: 2px;
+    margin-bottom: 1px;
     display: inline-block;
     vertical-align: middle;
   }
 
-  .btn.btn-xxs.btn-delete {
-    background: #e8ebef;
-    color: #253053;
+  /* Text innerhalb der Tabelle und Zeilen kleiner und kompakter */
+  .penalties-table th,
+  .penalties-table td {
+    font-size: 0.9em !important; /* Kleinere Schrift in der Tabelle */
+    padding: 0.4em 0.25em !important;
   }
 
-  .btn.btn-xxs.btn-delete:hover {
-    background: #cfd8db;
-    color: #016d1c;
+  .penalties-table td:last-child {
+    text-align: right;
+    padding-right: 0.1em !important;
   }
 
-  .modal-header {
-    font-size: 1em !important;
+  /* Bearbeiten und Löschen Buttons auf mobilen Geräten */
+  .penalties-table .btn-delete {
+    padding: 0.15em 0.35em !important;
+    font-size: 0.85em !important;
   }
-}
 
-@media (max-width: 400px) {
+  /* Gesamt-Schriftgröße auf kleinere Schrift anpassen */
+  #addPenaltyBtn {
+    font-size: 0.85rem !important;  /* Kleinere Schrift für den "Strafe hinzufügen" Button */
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* Modale Hintergrund und Textausrichtung optimieren */
+  .modal-backdrop {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.12);
+  }
+
+  /* Die Höhe und das Layout des Modal-Backdrops für mobile Geräte optimieren */
   .modal-window {
-    font-size: 0.88em;
+    max-width: 90% !important; /* Weniger Platz einnehmen */
+    max-height: 80vh;  /* Höhe des Modals begrenzen */
+    overflow-y: auto;  /* Wenn nötig scrollbar */
   }
 
-  .penalties-table-mobile th,
-  .penalties-table-mobile td {
-    font-size: 0.9em !important;
-  }
-}
-
-/* Verbesserung der Action Buttons (Bearbeiten/Löschen) */
-@media (max-width: 700px) {
-  .penalty-card {
-    position: relative;
-    padding-bottom: 3em; /* Platz für Aktionsbuttons unten */
+  /* Überschriften im Modal anpassen */
+  .modal-header span {
+    font-size: 1rem !important;  /* Kleinere Schrift für den Modal Header */
   }
 
+  /* Icons für Bearbeiten und Löschen */
+  .icon-btn {
+    font-size: 1.1em !important; /* Weniger Platz für die Icons */
+    padding: 0.3em 0.35em !important;
+  }
+
+  /* Modal-Buttons nach dem Bearbeiten und Löschen weiter anpassen */
   .penalty-actions-bottomright {
     position: absolute;
     right: 1em;
     bottom: 1em;
     display: flex;
-    gap: 0.5em;
+    gap: 0.4em;
     z-index: 10;
-    background: yellow; /* nur zum Testen */
-  }
-
-  .icon-btn {
-    background: #e9ecf4;
-    color: #46695c;
-    border: none;
-    border-radius: 50%;
-    padding: 0.3em 0.35em;
-    font-size: 1.1em;
-    cursor: pointer;
-    box-shadow: 0 1px 4px #b7e7c60c;
-    transition: background 0.17s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .icon-btn:hover {
     background: #d2d6db;
     color: #059221;
-  }
-}
+  }}

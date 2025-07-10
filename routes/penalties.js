@@ -103,7 +103,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
       'UPDATE penalties SET user_id=$1, type=$2, event=$3, amount=$4, date=$5 WHERE id=$6',
       [user_id, type, event, amount, date, penaltyId]
     );
-    res.redirect('/penalties/admin');
+    res.redirect('/penalties/all');
   } catch (e) {
     const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
     const penaltyRes = await db.query('SELECT * FROM penalties WHERE id = $1', [penaltyId]);
