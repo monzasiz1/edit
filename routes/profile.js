@@ -30,8 +30,8 @@ router.post('/name', async (req, res) => {
     return res.render('profil', { user: req.session.user, nameMsg: null, nameErr: "Name darf nicht leer sein.", pwMsg: null, pwErr: null });
   }
   try {
-    await pool.query('UPDATE users SET name = $1 WHERE id = $2', [neuerName, req.session.user.id]);
-    req.session.user.name = neuerName;
+    await pool.query('UPDATE users SET username = $1 WHERE id = $2', [neuerName, req.session.user.id]);
+req.session.user.username = neuerName;
     res.render('profil', { user: req.session.user, nameMsg: "Name wurde erfolgreich geändert.", nameErr: null, pwMsg: null, pwErr: null });
   } catch (err) {
     console.error(err);
