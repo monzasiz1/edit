@@ -3,7 +3,8 @@ const router = express.Router();
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 
-const pool = new Pool(); // .env wird verwendet
+const pool = require('../db'); // nutzt jetzt die zentrale DB-Verbindung
+
 
 // Profilseite anzeigen
 // Profilseite anzeigen
