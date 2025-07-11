@@ -1,82 +1,83 @@
-<h2 class="headline">Alle Strafen (Tabellenansicht)</h2>
-<a href="/penalties/add" class="btn btn-add">➕ Neue Strafe vergeben</a>
+<div class="penalties-export">
+  <h2 class="headline">Alle Strafen (Tabellenansicht)</h2>
+  <a href="/penalties/add" class="btn btn-add">➕ Neue Strafe vergeben</a>
 
-<div class="only-desktop">
-  <table class="responsive-table penalties-table">
-    <thead>
-      <tr>
-        <th>👤 Nutzer</th>
-        <th>📆 Datum</th>
-        <th>🎯 Grund</th>
-        <th>🎉 Veranstaltung</th>
-        <th>💶 Betrag</th>
-        <th>⚙️ Aktion</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% let sum = 0; %>
-      <% penalties.forEach(p => { sum += parseFloat(p.amount) || 0; %>
+  <div class="only-desktop">
+    <table class="responsive-table penalties-table">
+      <thead>
         <tr>
-          <td data-label="Nutzer"><%= p.username %></td>
-          <td data-label="Datum">
+          <th>👤 Nutzer</th>
+          <th>📆 Datum</th>
+          <th>🎯 Grund</th>
+          <th>🎉 Veranstaltung</th>
+          <th>💶 Betrag</th>
+          <th>⚙️ Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let sum = 0; %>
+        <% penalties.forEach(p => { sum += parseFloat(p.amount) || 0; %>
+          <tr>
+            <td data-label="Nutzer"><%= p.username %></td>
+            <td data-label="Datum">
+              <%= p.date
+                ? (typeof p.date === 'string'
+                    ? new Date(p.date).toLocaleDateString('de-DE')
+                    : p.date.toLocaleDateString('de-DE'))
+                : '' %>
+            </td>
+            <td data-label="Grund"><%= p.type %></td>
+            <td data-label="Veranstaltung"><%= p.event %></td>
+            <td data-label="Betrag" style="text-align:right;"><%= Number(p.amount).toFixed(2) %> €</td>
+            <td data-label="Aktion">
+              <a href="/penalties/edit/<%= p.id %>" class="btn btn-small">✏️ Bearbeiten</a>
+              <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
+                <button class="btn btn-small btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        <tr class="sum-row">
+          <td colspan="4" style="text-align:right; font-weight:bold;">Summe</td>
+          <td style="text-align:right; font-weight:bold;"><%= sum.toFixed(2) %> €</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card Ansicht -->
+  <div class="penalty-cards only-mobile">
+    <a href="/penalties/add" class="btn btn-add" style="margin-bottom: 1em;">➕ Neue Strafe</a>
+    <% let mobileSum = 0; %>
+    <% penalties.forEach(p => { mobileSum += parseFloat(p.amount) || 0; %>
+      <div class="penalty-card penalty-card-mobile">
+        <div class="penalty-row"><span class="penalty-label">👤</span><span><%= p.username %></span></div>
+        <div class="penalty-row"><span class="penalty-label">📆</span>
+          <span>
             <%= p.date
               ? (typeof p.date === 'string'
                   ? new Date(p.date).toLocaleDateString('de-DE')
                   : p.date.toLocaleDateString('de-DE'))
               : '' %>
-          </td>
-          <td data-label="Grund"><%= p.type %></td>
-          <td data-label="Veranstaltung"><%= p.event %></td>
-          <td data-label="Betrag" style="text-align:right;"><%= Number(p.amount).toFixed(2) %> €</td>
-          <td data-label="Aktion">
-            <a href="/penalties/edit/<%= p.id %>" class="btn btn-small">✏️ Bearbeiten</a>
-            <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
-              <button class="btn btn-small btn-delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
-            </form>
-          </td>
-        </tr>
-      <% }) %>
-      <tr class="sum-row">
-        <td colspan="4" style="text-align:right; font-weight:bold;">Summe</td>
-        <td style="text-align:right; font-weight:bold;"><%= sum.toFixed(2) %> €</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Mobile Card Ansicht -->
-<div class="penalty-cards only-mobile">
-  <a href="/penalties/add" class="btn btn-add" style="margin-bottom: 1em;">➕ Neue Strafe</a>
-  <% let mobileSum = 0; %>
-  <% penalties.forEach(p => { mobileSum += parseFloat(p.amount) || 0; %>
-    <div class="penalty-card penalty-card-mobile">
-      <div class="penalty-row"><span class="penalty-label">👤</span><span><%= p.username %></span></div>
-      <div class="penalty-row"><span class="penalty-label">📆</span>
-        <span>
-          <%= p.date
-            ? (typeof p.date === 'string'
-                ? new Date(p.date).toLocaleDateString('de-DE')
-                : p.date.toLocaleDateString('de-DE'))
-            : '' %>
-        </span>
+          </span>
+        </div>
+        <div class="penalty-row"><span class="penalty-label">🎯</span><span><%= p.type %></span></div>
+        <div class="penalty-row"><span class="penalty-label">🎉</span><span><%= p.event %></span></div>
+        <div class="penalty-row"><span class="penalty-label">💶</span><span><%= Number(p.amount).toFixed(2) %> €</span></div>
+        <div class="penalty-actions-bottomright">
+          <a href="/penalties/edit/<%= p.id %>" class="icon-btn" title="Bearbeiten"><span>✏️</span></a>
+          <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
+            <button class="icon-btn" title="Löschen" onclick="return confirm('Wirklich löschen?')"><span>🗑️</span></button>
+          </form>
+        </div>
       </div>
-      <div class="penalty-row"><span class="penalty-label">🎯</span><span><%= p.type %></span></div>
-      <div class="penalty-row"><span class="penalty-label">🎉</span><span><%= p.event %></span></div>
-      <div class="penalty-row"><span class="penalty-label">💶</span><span><%= Number(p.amount).toFixed(2) %> €</span></div>
-      <div class="penalty-actions-bottomright">
-        <a href="/penalties/edit/<%= p.id %>" class="icon-btn" title="Bearbeiten"><span>✏️</span></a>
-        <form action="/penalties/delete/<%= p.id %>" method="POST" style="display:inline">
-          <button class="icon-btn" title="Löschen" onclick="return confirm('Wirklich löschen?')"><span>🗑️</span></button>
-        </form>
+    <% }) %>
+    <div class="penalty-card sum-row" style="background:#e4e7dc;">
+      <div class="penalty-row" style="font-weight:bold; justify-content:space-between;">
+        <span>Gesamtsumme</span>
+        <span><%= mobileSum.toFixed(2) %> €</span>
       </div>
-    </div>
-  <% }) %>
-  <div class="penalty-card sum-row" style="background:#e4e7dc;">
-    <div class="penalty-row" style="font-weight:bold;justify-content:space-between;">
-      <span>Gesamtsumme</span>
-      <span><%= mobileSum.toFixed(2) %> €</span>
     </div>
   </div>
 </div>
-

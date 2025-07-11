@@ -33,6 +33,7 @@
           <li><a href="/users">Nutzer</a></li>
            
         <% } %>
+        <li><a href="/profil">Profil</a></li>
         <li><a href="/ranking">Ranking</a></li> 
         <li><a href="/export">Export</a></li>
         <li><a href="/strafenkatalog.pdf" target="_blank" rel="noopener">📄 Strafenkatalog</a></li>
@@ -46,9 +47,17 @@
     <% } %>
   </nav>
 
+  <% if (typeof noContainer !== 'undefined' && noContainer) { %>
+  <main>
+    <%- body %>
+  </main>
+<% } else { %>
   <main class="container">
     <%- body %>
   </main>
+<% } %>
+
+
   <script src="/menu.js"></script>
   <footer class="footer">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
