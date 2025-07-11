@@ -1,73 +1,84 @@
-<h2 class="headline">Dashboard</h2>
 
-<!-- Desktop Tabelle -->
-<div class="only-desktop">
-  <table class="responsive-table penalties-table">
-    <thead>
-      <tr>
-        <th>Datum</th>
-        <th>Event</th>
-        <th>Grund</th>
-        <th>Betrag (€)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% penalties.forEach(p => { %>
-        <tr>
-          <td>
-            <%= p.date
-              ? (typeof p.date === 'string'
-                  ? new Date(p.date).toLocaleDateString('de-DE')
-                  : p.date.toLocaleDateString('de-DE'))
-              : '' %>
-          </td>
-          <td><%= p.event %></td>
-          <td><%= p.type %></td>
-          <td style="text-align:right;"><%= Number(p.amount).toFixed(2) %></td>
-        </tr>
-        
-      <% }) %>
+<h2>Dashboard</h2>
+<p class="dashboard-greeting">Hallo <%= user.username %>!</p>
 
-      
-    </tbody>
-    
-  </table>
-</div>
-
-<!-- Mobile Kartenansicht -->
-<div class="only-mobile dashboard-cards">
-  <% penalties.forEach((p, index) => { %>
-    <div class="dashboard-card <%= index === 0 ? 'latest' : '' %>">
-      <% if (p.admin) { %>
-        <div class="admin-tag-mobile">von <%= p.admin %></div>
-      <% } %>
-      <div style="font-size: 1.5em; margin-bottom: 0.12em;">
-        <%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %>
+<% if (penalties) { %>
+  <section>
+    <h3>Meine Strafen</h3>
+    <% if (penalties.length === 0) { %>
+      <p>Keine Strafen vorhanden! 🎉</p>
+    <% } else { %>
+      <!-- Desktop/Table Ansicht -->
+      <div class="only-desktop">
+        <table class="responsive-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Veranstaltung</th>
+              <th>Grund</th>
+              <th>Betrag (€)</th>
+              <th>Spieß</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% let total = 0; %>
+            <% penalties.forEach(p => { %>
+              <tr>
+                <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
+                <td data-label="Veranstaltung"><%= p.event %></td>
+                <td data-label="Grund"><%= p.type %></td>
+                <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
+                <td data-label="Admin">
+                  <% if (p.admin) { %>
+                    <span class="admin-tag-desktop">von <%= p.admin %></span>
+                  <% } else { %>
+                    <span class="admin-tag-desktop">Kein Spieß</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% total += Number(p.amount); %>
+            <% }) %>
+          </tbody>
+        </table>
+        <p class="dashboard-total">
+          Gesamtbetrag: <%= total.toFixed(2) %> €
+        </p>
       </div>
-      <div class="dashboard-row">
-        <span class="dashboard-label">📅 Datum</span>
-        <span class="dashboard-value"><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
+      <!-- Mobile/Card Ansicht -->
+      <div class="dashboard-cards only-mobile">
+        <% let totalMobile = 0; %>
+        <% penalties.forEach(p => { %>
+          <div class="dashboard-card">
+            <% if (p.admin) { %>
+              <div class="admin-tag-mobile">von <%= p.admin %></div>
+            <% } %>
+            <div style="font-size: 1.5em; margin-bottom: 0.12em;">
+              <%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %>
+            </div>
+            <div class="dashboard-row">
+              <span class="dashboard-label">📅 Datum</span>
+              <span class="dashboard-value"><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
+            </div>
+            <div class="dashboard-row">
+              <span class="dashboard-label">🎉 Event</span>
+              <span class="dashboard-value"><%= p.event %></span>
+            </div>
+            <div class="dashboard-row">
+              <span class="dashboard-label">🎯 Grund</span>
+              <span class="dashboard-value"><%= p.type %></span>
+            </div>
+            <div class="dashboard-row amount">
+              <span class="dashboard-label">💶 Betrag</span>
+              <span class="dashboard-value"><%= Number(p.amount).toFixed(2) %> €</span>
+            </div>
+          </div>
+          <% totalMobile += Number(p.amount); %>
+        <% }) %>
+        <div class="dashboard-card total-card">
+          <span class="dashboard-label">Gesamtbetrag</span>
+          <span class="dashboard-value"><%= totalMobile.toFixed(2) %> €</span>
+        </div>
       </div>
-      <div class="dashboard-row">
-        <span class="dashboard-label">🎉 Event</span>
-        <span class="dashboard-value"><%= p.event %></span>
-      </div>
-      <div class="dashboard-row">
-        <span class="dashboard-label">🎯 Grund</span>
-        <span class="dashboard-value"><%= p.type %></span>
-      </div>
-      <div class="dashboard-row amount">
-        <span class="dashboard-label">💶 Betrag</span>
-        <span class="dashboard-value"><%= Number(p.amount).toFixed(2) %> €</span>
-      </div>
-    </div>
-  <% }) %>
-
-   <% 
-    let totalAmount = 0; 
-    penalties.forEach(p => { totalAmount += parseFloat(p.amount) || 0; });
-  %>
-  <div class="dashboard-total">
-    <strong>Gesamtstrafe:</strong> <%= totalAmount.toFixed(2) %> €
-  </div>
-</div>
+    <% } %>
+  </section>
+<% } %>
