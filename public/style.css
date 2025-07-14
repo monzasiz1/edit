@@ -82,7 +82,8 @@ nav.main-nav .logo {
 nav.main-nav .logo img {
   height: 60px;
   width: auto;
-  margin-right: 11px;
+  
+  margin-right: 15px;
   border-radius: 7px;
   box-shadow: 0 1px 6px rgba(41,51,91,0.08);
   object-fit: contain;
@@ -240,7 +241,7 @@ a.btn-delete:hover, .btn.btn-delete:hover {
   font-size: 0.93rem;
   padding: 0.34rem 1rem;
   border-radius: 18px;
-  margin-right: 0.3rem;
+  
 }
 @media (max-width: 600px) {
   button, a.btn, .btn {
@@ -259,7 +260,7 @@ a.btn-delete:hover, .btn.btn-delete:hover {
 ---------------------------- */
 form {
   max-width: 510px;
-  margin-top: 1.4rem;
+ 
 }
 .form-card {
   background: #fff;
@@ -851,7 +852,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
   display: inline-block;
   padding: 0.5rem 1.7rem;
   text-align: center;
-  background-color: #4CAF50;
+  background-color: #5a0e18;
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -2005,4 +2006,26 @@ body {
     color: #394933;
     justify-content: space-between;
   }
+}
+.only-mobile .dashboard-card.latest {
+  position: relative;
+  padding-top: 1.2em; /* Platz für den Balken mit Text */
+}
+
+.only-mobile .dashboard-card.latest::before {
+  content: "Neu";
+  position: absolute;
+  top: -0.5em;
+  right: 0.5em;
+  width: 3.5em;
+  height: 1em;
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8em;
+  line-height: 1em;
+  text-align: center;
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
+  pointer-events: none;
 }
