@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const PDFDocument = require('pdfkit');
 const { Parser } = require('json2csv');
-
+const createTable = require('pdfkit-table').default; // pdfkit-table v2
 
 // Middleware für Login
 function requireLogin(req, res, next) {
@@ -18,18 +18,16 @@ router.get('/', requireLogin, async (req, res) => {
 
 // --- PDF-/CSV-Export für EIGENE Strafen ---
 router.get('/meine-pdf', requireLogin, async (req, res) => {
-  console.log("ROUTE: /export/meine-pdf wurde aufgerufen. User:", req.session.user);
   try {
     const userId = req.session.user.id;
     const userName = req.session.user.username;
     const { rows: penalties } = await db.query(
-      `SELECT p.*, a.username AS admin
+      `SELECT p.date, p.event, p.type, p.amount, a.username AS admin
        FROM penalties p
        LEFT JOIN users a ON p.admin_id = a.id
        WHERE p.user_id = $1
        ORDER BY p.date DESC`, [userId]
     );
-    // PDF-Generierung
     const doc = new PDFDocument({ margin: 35, size: 'A4' });
     res.setHeader('Content-Disposition', `attachment; filename=Strafen_${userName.replace(/\s/g, "_")}.pdf`);
     res.setHeader('Content-Type', 'application/pdf');
@@ -37,30 +35,43 @@ router.get('/meine-pdf', requireLogin, async (req, res) => {
 
     doc.fontSize(18).text(`Strafenübersicht für ${userName}`, { align: 'center' });
     doc.moveDown();
-    if (penalties.length === 0) {
+
+    if (!penalties.length) {
       doc.fontSize(13).text("Keine Strafen vorhanden. 🎉");
-    } else {
-      doc.fontSize(13).text(`Gesamtanzahl: ${penalties.length}`);
-      doc.moveDown(0.6);
-      doc.font('Helvetica-Bold').text('Datum', 60, doc.y, { continued: true })
-         .text('Event', 130, doc.y, { continued: true })
-         .text('Grund', 230, doc.y, { continued: true })
-         .text('Betrag (€)', 330, doc.y, { continued: true })
-         .text('Spieß', 420, doc.y);
-      doc.font('Helvetica').moveDown(0.2);
-      let sum = 0;
-      penalties.forEach(p => {
-        sum += Number(p.amount);
-        doc.text(new Date(p.date).toLocaleDateString('de-DE'), 60, doc.y, { continued: true })
-           .text(p.event, 130, doc.y, { continued: true })
-           .text(p.type, 230, doc.y, { continued: true })
-           .text(Number(p.amount).toFixed(2), 330, doc.y, { continued: true })
-           .text(p.admin || '-', 420, doc.y);
-      });
-      doc.moveDown(1);
-      doc.font('Helvetica-Bold').text(`Gesamtbetrag: ${sum.toFixed(2)} €`, { align: 'right' });
+      doc.end();
+      return;
     }
+
+    let sum = 0;
+    const tableRows = penalties.map(p => {
+      sum += Number(p.amount);
+      return [
+        new Date(p.date).toLocaleDateString('de-DE'),
+        p.event,
+        p.type,
+        Number(p.amount).toFixed(2),
+        p.admin || '-'
+      ];
+    });
+
+    const table = {
+      headers: ['Datum', 'Event', 'Grund', 'Betrag (€)', 'Spieß'],
+      rows: tableRows,
+      options: {
+        width: 520,
+        columnSpacing: 6,
+        padding: 6,
+        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+        prepareRow: (row, i) => doc.font('Helvetica').fontSize(11).fillColor(i % 2 ? '#333' : '#111'),
+      }
+    };
+
+    await createTable(doc, table);
+
+    doc.moveDown(1.2);
+    doc.font('Helvetica-Bold').fontSize(13).text(`Gesamtbetrag: ${sum.toFixed(2)} €`, { align: 'right' });
     doc.end();
+
   } catch (e) {
     console.error("Fehler beim PDF-Export:", e);
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
@@ -85,8 +96,7 @@ router.get('/meine-csv', requireLogin, async (req, res) => {
     res.send(csv);
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim CSV-Export.');
-     console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
- 
+    console.error(e);
   }
 });
 
@@ -110,43 +120,50 @@ router.get('/alle-pdf', requireLogin, async (req, res) => {
 
     doc.fontSize(18).text(`Alle Strafen aller Mitglieder`, { align: 'center' });
     doc.moveDown();
-    if (penalties.length === 0) {
-      doc.fontSize(13).text("Keine Strafen vorhanden. 🎉");
-    } else {
-      doc.fontSize(13).text(`Gesamtanzahl: ${penalties.length}`);
-      doc.moveDown(0.6);
-      doc.font('Helvetica-Bold').text('Datum', 40, doc.y, { continued: true })
-        .text('Mitglied', 110, doc.y, { continued: true })
-        .text('Event', 210, doc.y, { continued: true })
-        .text('Grund', 320, doc.y, { continued: true })
-        .text('Betrag (€)', 420, doc.y, { continued: true })
-        .text('Spieß', 495, doc.y);
-      doc.font('Helvetica').moveDown(0.2);
-      let sum = 0;
-      penalties.forEach(p => {
-        sum += Number(p.amount);
-        doc.text(new Date(p.date).toLocaleDateString('de-DE'), 40, doc.y, { continued: true })
-          .text(p.mitglied, 110, doc.y, { continued: true })
-          .text(p.event, 210, doc.y, { continued: true })
-          .text(p.type, 320, doc.y, { continued: true })
-          .text(Number(p.amount).toFixed(2), 420, doc.y, { continued: true })
-          .text(p.admin || '-', 495, doc.y);
-      });
-      doc.moveDown(1);
-      doc.font('Helvetica-Bold').text(`Gesamtbetrag: ${sum.toFixed(2)} €`, { align: 'right' });
-    }
-    doc.end();
-  } catch (e) {
-    if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
-    
-  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
-  if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
-  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
-}
 
+    if (!penalties.length) {
+      doc.fontSize(13).text("Keine Strafen vorhanden. 🎉");
+      doc.end();
+      return;
+    }
+
+    let sum = 0;
+    const tableRows = penalties.map(p => {
+      sum += Number(p.amount);
+      return [
+        new Date(p.date).toLocaleDateString('de-DE'),
+        p.mitglied,
+        p.event,
+        p.type,
+        Number(p.amount).toFixed(2),
+        p.admin || '-'
+      ];
+    });
+
+    const table = {
+      headers: ['Datum', 'Mitglied', 'Event', 'Grund', 'Betrag (€)', 'Spieß'],
+      rows: tableRows,
+      options: {
+        width: 540,
+        columnSpacing: 5,
+        padding: 5,
+        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+        prepareRow: (row, i) => doc.font('Helvetica').fontSize(11).fillColor(i % 2 ? '#222' : '#111'),
+      }
+    };
+
+    await createTable(doc, table);
+
+    doc.moveDown(1.2);
+    doc.font('Helvetica-Bold').fontSize(13).text(`Gesamtbetrag: ${sum.toFixed(2)} €`, { align: 'right' });
+    doc.end();
+
+  } catch (e) {
+    console.error("Fehler beim PDF-Export:", e);
+    if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
+  }
 });
 
-// ALLE Strafen: CSV
 router.get('/alle-csv', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Nur Admins!');
   try {
@@ -164,9 +181,8 @@ router.get('/alle-csv', requireLogin, async (req, res) => {
     res.send(csv);
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim CSV-Export.');
-    console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
- 
-}
+    console.error(e);
+  }
 });
 
 // Einzeln: PDF/CSV für *beliebigen* Nutzer (Admin)
@@ -174,11 +190,11 @@ router.get('/user/:id/pdf', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Nur Admins!');
   try {
     const userId = req.params.id;
-    const userResult = await pool.query('SELECT username FROM users WHERE id = $1', [userId]);
+    const userResult = await db.query('SELECT username FROM users WHERE id = $1', [userId]);
     if (userResult.rowCount === 0) return res.status(404).send('Nutzer nicht gefunden.');
     const userName = userResult.rows[0].username;
     const { rows: penalties } = await db.query(
-      `SELECT p.*, a.username AS admin
+      `SELECT p.date, p.event, p.type, p.amount, a.username AS admin
        FROM penalties p
        LEFT JOIN users a ON p.admin_id = a.id
        WHERE p.user_id = $1
@@ -191,43 +207,54 @@ router.get('/user/:id/pdf', requireLogin, async (req, res) => {
 
     doc.fontSize(18).text(`Strafenübersicht für ${userName}`, { align: 'center' });
     doc.moveDown();
-    if (penalties.length === 0) {
+
+    if (!penalties.length) {
       doc.fontSize(13).text("Keine Strafen vorhanden. 🎉");
-    } else {
-      doc.fontSize(13).text(`Gesamtanzahl: ${penalties.length}`);
-      doc.moveDown(0.6);
-      doc.font('Helvetica-Bold').text('Datum', 60, doc.y, { continued: true })
-        .text('Event', 130, doc.y, { continued: true })
-        .text('Grund', 230, doc.y, { continued: true })
-        .text('Betrag (€)', 330, doc.y, { continued: true })
-        .text('Spieß', 420, doc.y);
-      doc.font('Helvetica').moveDown(0.2);
-      let sum = 0;
-      penalties.forEach(p => {
-        sum += Number(p.amount);
-        doc.text(new Date(p.date).toLocaleDateString('de-DE'), 60, doc.y, { continued: true })
-          .text(p.event, 130, doc.y, { continued: true })
-          .text(p.type, 230, doc.y, { continued: true })
-          .text(Number(p.amount).toFixed(2), 330, doc.y, { continued: true })
-          .text(p.admin || '-', 420, doc.y);
-      });
-      doc.moveDown(1);
-      doc.font('Helvetica-Bold').text(`Gesamtbetrag: ${sum.toFixed(2)} €`, { align: 'right' });
+      doc.end();
+      return;
     }
+
+    let sum = 0;
+    const tableRows = penalties.map(p => {
+      sum += Number(p.amount);
+      return [
+        new Date(p.date).toLocaleDateString('de-DE'),
+        p.event,
+        p.type,
+        Number(p.amount).toFixed(2),
+        p.admin || '-'
+      ];
+    });
+
+    const table = {
+      headers: ['Datum', 'Event', 'Grund', 'Betrag (€)', 'Spieß'],
+      rows: tableRows,
+      options: {
+        width: 520,
+        columnSpacing: 6,
+        padding: 6,
+        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+        prepareRow: (row, i) => doc.font('Helvetica').fontSize(11).fillColor(i % 2 ? '#333' : '#111'),
+      }
+    };
+
+    await createTable(doc, table);
+
+    doc.moveDown(1.2);
+    doc.font('Helvetica-Bold').fontSize(13).text(`Gesamtbetrag: ${sum.toFixed(2)} €`, { align: 'right' });
     doc.end();
+
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
-  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
-  
-}
-
+    console.error(e);
+  }
 });
 
 router.get('/user/:id/csv', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Nur Admins!');
   try {
     const userId = req.params.id;
-    const userResult = await pool.query('SELECT username FROM users WHERE id = $1', [userId]);
+    const userResult = await db.query('SELECT username FROM users WHERE id = $1', [userId]);
     if (userResult.rowCount === 0) return res.status(404).send('Nutzer nicht gefunden.');
     const userName = userResult.rows[0].username;
     const { rows: penalties } = await db.query(
@@ -242,13 +269,10 @@ router.get('/user/:id/csv', requireLogin, async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename=Strafen_${userName.replace(/\s/g, "_")}.csv`);
     res.set('Content-Type', 'text/csv');
     res.send(csv);
-    console.error(e);
-
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim CSV-Export.');
-  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
-}
-
+    console.error(e);
+  }
 });
 
 module.exports = router;
