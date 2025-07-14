@@ -12,6 +12,7 @@ function requireAdmin(req, res, next) {
 // Nutzer-Übersicht
 router.get('/', requireAdmin, async (req, res) => {
   const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
+  users.forEach(u => u.is_admin = !!u.is_admin);
   res.render('users', { user: req.session.user, users });
 });
 
@@ -19,6 +20,7 @@ router.get('/', requireAdmin, async (req, res) => {
 router.get('/edit/:id', requireAdmin, async (req, res) => {
   const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
   const userToEdit = result.rows[0];
+  userToEdit.is_admin = !!userToEdit.is_admin;
   res.render('users_edit', { user: req.session.user, userToEdit, error: null });
 });
 
@@ -30,6 +32,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (error) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userToEdit = result.rows[0];
+    userToEdit.is_admin = !!userToEdit.is_admin;
     return res.render('users_edit', { user: req.session.user, userToEdit, error });
   }
   if (password) {
@@ -48,7 +51,9 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   // --- SESSION AKTUALISIEREN, falls Admin sich selbst ändert!
   if (req.session.user && req.session.user.id == req.params.id) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
-    req.session.user = result.rows[0];
+    const userRow = result.rows[0];
+    userRow.is_admin = !!userRow.is_admin;
+    req.session.user = userRow;
   }
   // ---
 
