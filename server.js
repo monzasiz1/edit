@@ -30,6 +30,22 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+
+// Admin-Bool immer normalisieren, falls User eingeloggt
+app.use((req, res, next) => {
+  if (req.session.user) {
+    let a = req.session.user.is_admin;
+    req.session.user.is_admin = (
+      a === true ||
+      a === 1 ||
+      a === "1" ||
+      a === "true" ||
+      a === "on"
+    );
+  }
+  next();
+});
+
 // User global verfügbar
 app.use((req, res, next) => {
   res.locals.user = req.session.user;

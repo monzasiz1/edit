@@ -5,18 +5,27 @@ const bcrypt = require('bcryptjs');
 
 // Korrigierte Middleware: akzeptiert 1, true, 'true'
 function requireAdmin(req, res, next) {
+  // Aus Session ALLES abfangen was als "admin" gelten könnte:
+  // true, 1, "1", "true", ggf. auch Buffer (bei Boolean in PG)
+  let admin = req.session.user && req.session.user.is_admin;
+  // PostgreSQL gibt bool als true/false zurück, MySQL manchmal als 0/1, andere als String
   if (
-    !req.session.user ||
-    !(
-      req.session.user.is_admin === true ||
-      req.session.user.is_admin === 1 ||
-      req.session.user.is_admin === 'true'
-    )
+    admin === true ||
+    admin === 1 ||
+    admin === "1" ||
+    admin === "true"
   ) {
-    return res.redirect('/login');
+    return next();
   }
-  next();
+  // Noch: explizit Boolean umwandeln falls "on" (aus dem Formular)
+  if (admin === "on") {
+    req.session.user.is_admin = true;
+    return next();
+  }
+  // Alles andere ist kein Admin!
+  return res.redirect('/login');
 }
+
 
 // Nutzer-Übersicht
 router.get('/', requireAdmin, async (req, res) => {
