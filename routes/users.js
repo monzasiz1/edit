@@ -43,6 +43,7 @@ router.get('/edit/:id', requireAdmin, async (req, res) => {
 });
 
 // Nutzer bearbeiten (POST)
+// Nutzer bearbeiten (POST)
 router.post('/edit/:id', requireAdmin, async (req, res) => {
   const { username, password, is_admin } = req.body;
   let error = null;
@@ -50,7 +51,13 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (error) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userToEdit = result.rows[0];
-    userToEdit.is_admin = userToEdit.is_admin === true || userToEdit.is_admin === 1 || userToEdit.is_admin === 'true';
+    userToEdit.is_admin = (
+      userToEdit.is_admin === true ||
+      userToEdit.is_admin === 1 ||
+      userToEdit.is_admin === "1" ||
+      userToEdit.is_admin === "true" ||
+      userToEdit.is_admin === "on"
+    );
     return res.render('users_edit', { user: req.session.user, userToEdit, error });
   }
   if (password) {
@@ -70,13 +77,20 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (req.session.user && req.session.user.id == req.params.id) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userRow = result.rows[0];
-    userRow.is_admin = userRow.is_admin === true || userRow.is_admin === 1 || userRow.is_admin === 'true';
+    userRow.is_admin = (
+      userRow.is_admin === true ||
+      userRow.is_admin === 1 ||
+      userRow.is_admin === "1" ||
+      userRow.is_admin === "true" ||
+      userRow.is_admin === "on"
+    );
     req.session.user = userRow;
   }
   // ---
 
   res.redirect('/users');
 });
+
 
 // Nutzer löschen
 router.post('/delete/:id', requireAdmin, async (req, res) => {
