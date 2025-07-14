@@ -65,6 +65,7 @@ router.post('/delete/:id', requireAdmin, async (req, res) => {
 router.get('/add', requireAdmin, (req, res) => {
   res.render('users_add', { user: req.session.user, error: null });
 });
+
 // Nutzer hinzufügen (Formular absenden)
 router.post('/add', requireAdmin, async (req, res) => {
   const { username, password, is_admin } = req.body;
