@@ -1174,6 +1174,33 @@ h2 {
     margin-bottom: 1rem;
   }
 
+  .btn-reg {
+  display: inline-block;
+  padding: 0.39rem 1.22rem;
+  font-size: 1.07rem;
+  border-radius: 2em;
+  background: linear-gradient(90deg, #0e5f14 0%, #0f6d23 100%);
+  color: #fff !important;
+  border: none;
+  outline: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 10px rgba(40,70,40,0.13);
+  cursor: pointer;
+  transition: 
+    background 0.2s cubic-bezier(.35,.95,.66,1),
+    box-shadow 0.15s, 
+    transform 0.14s;
+}
+
+.btn-reg:hover, .btn-reg:focus {
+  filter: brightness(1.14) saturate(1.16);
+  background: linear-gradient(90deg, #3b4d2e 0%, #566c47 100%);
+  transform: translateY(-2px) scale(1.07);
+  box-shadow: 0 5px 22px rgba(86,108,71,0.23);
+}
+
+
 .btn-logout.btn-icon {
   display: inline-flex;
   align-items: center;
