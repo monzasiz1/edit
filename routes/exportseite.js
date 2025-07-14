@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { Pool } = require('pg');
+const db = require('../db');
 const PDFDocument = require('pdfkit');
 const { Parser } = require('json2csv');
 
-const pool = new Pool(); // nutzt .env
 
 // Middleware für Login
 function requireLogin(req, res, next) {
@@ -23,7 +22,7 @@ router.get('/meine-pdf', requireLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
     const userName = req.session.user.username;
-    const { rows: penalties } = await pool.query(
+    const { rows: penalties } = await db.query(
       `SELECT p.*, a.username AS admin
        FROM penalties p
        LEFT JOIN users a ON p.admin_id = a.id
@@ -72,7 +71,7 @@ router.get('/meine-csv', requireLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
     const userName = req.session.user.username;
-    const { rows: penalties } = await pool.query(
+    const { rows: penalties } = await db.query(
       `SELECT p.date, p.event, p.type, p.amount, a.username AS admin
        FROM penalties p
        LEFT JOIN users a ON p.admin_id = a.id
@@ -97,7 +96,7 @@ router.get('/meine-csv', requireLogin, async (req, res) => {
 router.get('/alle-pdf', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Nur Admins!');
   try {
-    const { rows: penalties } = await pool.query(
+    const { rows: penalties } = await db.query(
       `SELECT p.date, u.username AS mitglied, p.event, p.type, p.amount, a.username AS admin
        FROM penalties p
        LEFT JOIN users u ON p.user_id = u.id
@@ -151,7 +150,7 @@ router.get('/alle-pdf', requireLogin, async (req, res) => {
 router.get('/alle-csv', requireLogin, async (req, res) => {
   if (!req.session.user.is_admin) return res.status(403).send('Nur Admins!');
   try {
-    const { rows: penalties } = await pool.query(
+    const { rows: penalties } = await db.query(
       `SELECT p.date, u.username AS mitglied, p.event, p.type, p.amount, a.username AS admin
        FROM penalties p
        LEFT JOIN users u ON p.user_id = u.id
@@ -178,7 +177,7 @@ router.get('/user/:id/pdf', requireLogin, async (req, res) => {
     const userResult = await pool.query('SELECT username FROM users WHERE id = $1', [userId]);
     if (userResult.rowCount === 0) return res.status(404).send('Nutzer nicht gefunden.');
     const userName = userResult.rows[0].username;
-    const { rows: penalties } = await pool.query(
+    const { rows: penalties } = await db.query(
       `SELECT p.*, a.username AS admin
        FROM penalties p
        LEFT JOIN users a ON p.admin_id = a.id
@@ -231,7 +230,7 @@ router.get('/user/:id/csv', requireLogin, async (req, res) => {
     const userResult = await pool.query('SELECT username FROM users WHERE id = $1', [userId]);
     if (userResult.rowCount === 0) return res.status(404).send('Nutzer nicht gefunden.');
     const userName = userResult.rows[0].username;
-    const { rows: penalties } = await pool.query(
+    const { rows: penalties } = await db.query(
       `SELECT p.date, p.event, p.type, p.amount, a.username AS admin
        FROM penalties p
        LEFT JOIN users a ON p.admin_id = a.id
