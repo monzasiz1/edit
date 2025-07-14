@@ -7,7 +7,7 @@ const ejsLayouts = require('express-ejs-layouts');
 
 // Routen-Imports
 const rankingRoutes = require('./routes/ranking');
-const exportRoutes = require('./routes/export');
+const exportRoutes = require('./routes/exportseite');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,9 +41,13 @@ app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users', require('./routes/users'));
-app.use('/ranking', rankingRoutes);  // Ranking Route einbinden!
-app.use('/export', exportRoutes);  // Export Route einbinden!
+app.use('/ranking', rankingRoutes);
+app.use('/export', require('./routes/exportseite'));
 app.use('/logout', require('./routes/logout'));
+app.use('/profil', require('./routes/profile'));
+
+
+
 
 // 404
 app.use((req, res) => {

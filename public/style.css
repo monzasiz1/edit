@@ -82,7 +82,8 @@ nav.main-nav .logo {
 nav.main-nav .logo img {
   height: 60px;
   width: auto;
-  margin-right: 11px;
+  
+  margin-right: 15px;
   border-radius: 7px;
   box-shadow: 0 1px 6px rgba(41,51,91,0.08);
   object-fit: contain;
@@ -240,7 +241,7 @@ a.btn-delete:hover, .btn.btn-delete:hover {
   font-size: 0.93rem;
   padding: 0.34rem 1rem;
   border-radius: 18px;
-  margin-right: 0.3rem;
+  
 }
 @media (max-width: 600px) {
   button, a.btn, .btn {
@@ -259,7 +260,7 @@ a.btn-delete:hover, .btn.btn-delete:hover {
 ---------------------------- */
 form {
   max-width: 510px;
-  margin-top: 1.4rem;
+ 
 }
 .form-card {
   background: #fff;
@@ -851,7 +852,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
   display: inline-block;
   padding: 0.5rem 1.7rem;
   text-align: center;
-  background-color: #4CAF50;
+  background-color: #5a0e18;
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -1173,13 +1174,108 @@ h2 {
     margin-bottom: 1rem;
   }
 
-  .btn,
-  button,
-  .btn-small {
-    padding: 0.29rem 0.75rem !important; /* Buttons auf dem Handy griffig, aber nicht zu fett */
-    font-size: 0.95rem !important;
-    border-radius: 13px !important;
-  }
+  .btn-reg {
+  display: inline-block;
+  padding: 0.39rem 1.22rem;
+  font-size: 1.07rem;
+  border-radius: 2em;
+  background: linear-gradient(90deg, #0e5f14 0%, #0f6d23 100%);
+  color: #fff !important;
+  border: none;
+  outline: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 10px rgba(40,70,40,0.13);
+  cursor: pointer;
+  transition: 
+    background 0.2s cubic-bezier(.35,.95,.66,1),
+    box-shadow 0.15s, 
+    transform 0.14s;
+}
+
+.btn-reg:hover, .btn-reg:focus {
+  filter: brightness(1.14) saturate(1.16);
+  background: linear-gradient(90deg, #3b4d2e 0%, #566c47 100%);
+  transform: translateY(-2px) scale(1.07);
+  box-shadow: 0 5px 22px rgba(86,108,71,0.23);
+}
+
+
+.btn-logout.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.32rem 0.53rem;
+  font-size: 1.28rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fd7d54 0%, #f4a684 100%);
+  color: #fff !important;
+  border: none;
+  outline: none;
+  box-shadow: 0 2px 10px rgba(230,70,30,0.11);
+  cursor: pointer;
+  transition: background 0.19s, box-shadow 0.17s, transform 0.15s;
+}
+.btn-logout.btn-icon:hover, .btn-logout.btn-icon:focus {
+  filter: brightness(1.14) saturate(1.15);
+  background: linear-gradient(135deg, #e65100 0%, #fd7d54 100%);
+  transform: scale(1.13) rotate(-8deg);
+  box-shadow: 0 4px 16px rgba(230,70,30,0.18);
+}
+.btn-logout.btn-icon svg {
+  display: block;
+  stroke: currentColor;
+  width: 1.3em;
+  height: 1.3em;
+}
+
+
+.btn, button, .btn-small {
+  display: inline-block;
+  padding: 0.37rem 1.15rem !important;
+  font-size: 1.03rem !important;
+  border-radius: 2em !important;
+  background: linear-gradient(90deg, #8a9a5b 0%, #b9bc93 100%);
+  color: #fff !important;
+  border: none;
+  outline: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px rgba(100, 120, 70, 0.08);
+  cursor: pointer;
+  transition: 
+    background 0.22s cubic-bezier(.35,.95,.66,1),
+    box-shadow 0.16s, 
+    transform 0.14s;
+}
+
+.btn-small {
+  padding: 0.24rem 0.8rem !important;
+  font-size: 0.95rem !important;
+}
+
+/* Export-Buttons leicht grünlich */
+.btn-export {
+  background: linear-gradient(90deg, #7fa985 0%, #b7d1b2 100%);
+  color: #fcfcfc !important;
+}
+
+.btn-cancel {
+  background: linear-gradient(90deg, #c43e3e 0%, #ff7272 100%);
+  color: #fff !important;
+}
+
+.btn:hover, button:hover, .btn-small:hover, .btn-export:hover {
+  filter: brightness(1.11);
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 4px 20px rgba(25, 26, 25, 0.11);
+}
+
+.btn-cancel:hover {
+  filter: brightness(1.08) saturate(1.2);
+  transform: translateY(-2px) scale(1.06) rotate(-2deg);
+  box-shadow: 0 2px 14px rgba(230,60,60,0.19);
+}
 
   .dashboard-card,
   .penalty-card,
@@ -1545,4 +1641,486 @@ body {
 
 .back-to-dashboard .btn:hover {
   background-color: #059221;  /* Hover-Farbe */
+}
+/* Modernes Overlay für das Profil-Fenster */
+.profil-overlay-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(88,96,74,0.60) 0%, rgba(142,153,117,0.45) 100%);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100dvh;
+  min-width: 100vw;
+  backdrop-filter: blur(2px);
+}
+.profil-card {
+  background: #eceee7;
+  border-radius: 2.2rem;
+  box-shadow: 0 8px 48px 0 rgba(44, 57, 39, 0.20), 0 1.5px 6px 0 rgba(30,34,29,0.10);
+  padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.7rem;
+  animation: fade-in 0.8s cubic-bezier(.44,.99,.47,.99);
+  position: relative;
+}
+@media (max-width: 600px) {
+  .profil-card { padding: 1.3rem 0.5rem; max-width: 96vw; }
+}
+.profil-card h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1.1em 0;
+  color: #384137;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.profil-card label {
+  font-size: 1.08rem;
+  color: #384137;
+  font-weight: 500;
+  margin-bottom: 0.22em;
+  display: block;
+}
+.profil-card input[type="text"], .profil-card input[type="password"] {
+  width: 100%;
+  padding: 0.83em 1.1em;
+  border-radius: 1.1rem;
+  border: 1.5px solid #b6bdb1;
+  font-size: 1.13rem;
+  margin-bottom: 1em;
+  background: #f7f8f4;
+  transition: border-color 0.18s;
+}
+.profil-card input:focus {
+  border-color: #8e9975;
+  outline: none;
+}
+.profil-card button {
+  width: 100%;
+  background: #8e9975;
+  color: #fff;
+  font-size: 1.13rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 1.1rem;
+  padding: 0.83em 0;
+  margin-top: 0.3em;
+  margin-bottom: 0.6em;
+  box-shadow: 0 1.5px 5px 0 rgba(88,96,74,0.12);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.profil-card button:hover {
+  background: #697257;
+}
+.profil-card hr {
+  margin: 1.5em 0;
+  border: none;
+  border-top: 1.5px solid #cfd4c8;
+}
+.profil-card .msg-success { color: #417944; margin-bottom: 1em; text-align: center; }
+.profil-card .msg-error { color: #a0403a; margin-bottom: 1em; text-align: center; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.profil-close-btn {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.5rem;
+  font-size: 2.2rem;
+  color: #8e9975;
+  text-decoration: none;
+  z-index: 1101;
+  transition: color 0.15s;
+  opacity: 0.72;
+  line-height: 1;
+  padding: 0 0.2em;
+}
+.profil-close-btn:hover {
+  color: #384137;
+  opacity: 1;
+  text-shadow: 0 2px 10px rgba(44,57,39,0.18);
+}
+/* Export Seite Styling */
+.export-container {
+  max-width: 720px;
+  margin: 3rem auto;
+  background: #ffffff;
+  padding: 2.8rem 3rem;
+  border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(41, 51, 91, 0.12);
+  font-family: 'Inter', sans-serif;
+  color: #253053;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.export-container h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.8rem;
+  color: #016d1c;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.export-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid #e0e6db;
+}
+
+.export-section:last-child {
+  border-bottom: none;
+}
+
+.export-section h2, .export-section h3 {
+  font-weight: 700;
+  color: #394933;
+  margin-bottom: 0.7rem;
+}
+
+.export-section p {
+  font-size: 1rem;
+  color: #4e5c7a;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+}
+
+.btn-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.65rem 2.2rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(1, 109, 28, 0.24);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  border: none;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #016d1c;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #045c1a;
+  box-shadow: 0 10px 24px rgba(1, 109, 28, 0.38);
+  outline: none;
+}
+
+.btn-secondary {
+  background-color: #4e5c7a;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: #394a5a;
+  box-shadow: 0 10px 24px rgba(78, 92, 122, 0.38);
+  outline: none;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2.5px solid #016d1c;
+  color: #016d1c;
+  font-weight: 700;
+  padding: 0.6rem 2rem;
+  border-radius: 50px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.btn-outline:hover,
+.btn-outline:focus {
+  background-color: #016d1c;
+  color: #fff;
+  outline: none;
+  box-shadow: 0 6px 18px rgba(1, 109, 28, 0.34);
+}
+
+.admin-section h3 {
+  margin-top: 2.2rem;
+}
+
+/* Animation fadeInUp */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .export-container {
+    padding: 2rem 1.4rem;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .btn, .btn-outline {
+    font-size: 1rem;
+    padding: 0.55rem 1.6rem;
+  }
+}
+/* Grund-Container */
+.penalties-export {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #253053; /* dunkles Blau */
+  background: #f9fafb; /* helles, neutrales Grau */
+  padding: 2rem 1.5rem;
+  max-width: 1100px;
+  margin: 2rem auto;
+  user-select: none;
+}
+
+/* Headline */
+.penalties-export .headline {
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: #394933; /* gedecktes Schilfgrün */
+  margin-bottom: 1.8rem;
+  letter-spacing: 0.03em;
+}
+
+/* Button Style */
+.penalties-export .btn-add {
+  background-color: #016d1c;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  padding: 0.7rem 1.7rem;
+  box-shadow: 0 4px 15px rgba(1,109,28,0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+.penalties-export .btn-add:hover,
+.penalties-export .btn-add:focus {
+  background-color: #045c1a;
+  box-shadow: 0 6px 20px rgba(1,109,28,0.45);
+  outline: none;
+}
+
+/* Tabelle */
+.penalties-export table.responsive-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 1rem;
+  font-size: 1.05rem;
+  background: transparent;
+  box-shadow: none;
+  user-select: text;
+}
+
+/* Table header */
+.penalties-export table thead tr th {
+  background-color: #394933; /* dunkles Schilfgrün */
+  color: #fff;
+  font-weight: 700;
+  padding: 1rem 1.3rem;
+  border-radius: 14px 14px 0 0;
+  text-align: left;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+/* Table rows */
+.penalties-export table tbody tr {
+  background-color: #fff;
+  box-shadow: 0 8px 26px rgba(41,51,91,0.12);
+  border-radius: 0 0 14px 14px;
+  transition: box-shadow 0.25s ease, background-color 0.25s ease;
+  cursor: default;
+}
+.penalties-export table tbody tr:hover {
+  background-color: #f6fbf7;
+  box-shadow: 0 14px 42px rgba(1,109,28,0.18);
+}
+
+/* Table cells */
+.penalties-export table tbody td {
+  padding: 1rem 1.3rem;
+  vertical-align: middle;
+  color: #253053;
+}
+
+/* Betrag rechtsbündig */
+.penalties-export table tbody td[data-label="Betrag"],
+.penalties-export table tbody td:nth-child(5) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #016d1c;
+}
+
+/* Aktion Buttons */
+.penalties-export table tbody td[data-label="Aktion"] {
+  text-align: center;
+}
+
+/* Kleine Buttons in Tabelle */
+.penalties-export .btn-small {
+  background-color: #016d1c;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.38rem 0.9rem;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(1,109,28,0.25);
+  transition: background-color 0.3s ease;
+  margin-right: 0.35rem;
+}
+.penalties-export .btn-small.btn-delete {
+  background-color: #b80000;
+  box-shadow: 0 3px 12px rgba(184,0,0,0.25);
+}
+.penalties-export .btn-small:hover {
+  background-color: #059221;
+}
+.penalties-export .btn-small.btn-delete:hover {
+  background-color: #7a0000;
+}
+
+/* Summen-Zeile */
+.penalties-export tr.sum-row td {
+  font-weight: 700;
+  font-size: 1.15rem;
+  background-color: #e4e7dc;
+  color: #394933;
+  text-align: right;
+  border-top: 2px solid #3e5da1;
+  user-select: none;
+}
+.penalties-export tr.sum-row td:first-child {
+  text-align: right;
+  padding-right: 1.3rem;
+}
+
+/* Mobile Cards */
+.penalties-export .penalty-cards.only-mobile {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  /* Desktop-Tabelle ausblenden */
+  .penalties-export .only-desktop {
+    display: none !important;
+  }
+  /* Mobile Cards zeigen */
+  .penalties-export .penalty-cards.only-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-top: 1.3rem;
+  }
+  .penalties-export .btn-add {
+    margin-bottom: 1rem;
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+  }
+  .penalties-export .penalty-card.penalty-card-mobile {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(41,51,91,0.12);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .penalties-export .penalty-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #253053;
+    border-bottom: 1px solid #e3e8dc;
+    padding-bottom: 0.3rem;
+  }
+  .penalties-export .penalty-row:last-child {
+    border-bottom: none;
+  }
+  .penalties-export .penalty-label {
+    font-weight: 600;
+    color: #46695c;
+    min-width: 90px;
+  }
+  .penalties-export .penalty-actions-bottomright {
+    display: flex;
+    gap: 0.6em;
+    justify-content: flex-end;
+  }
+  .penalties-export .icon-btn {
+    font-size: 1.2rem;
+    background: #e9ecf4;
+    color: #46695c;
+    padding: 0.3em 0.45em;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .penalties-export .icon-btn:hover {
+    background: #d2d6db;
+    color: #059221;
+  }
+  .penalties-export .penalty-card.sum-row {
+    background: #e4e7dc;
+    padding: 0.7em 1.2em;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #394933;
+    justify-content: space-between;
+  }
+}
+.only-mobile .dashboard-card.latest {
+  position: relative;
+  padding-top: 1.2em; /* Platz für den Balken mit Text */
+}
+
+.only-mobile .dashboard-card.latest::before {
+  content: "Neu";
+  position: absolute;
+  top: -0.5em;
+  right: 0.5em;
+  width: 3.5em;
+  height: 1em;
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8em;
+  line-height: 1em;
+  text-align: center;
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
+  pointer-events: none;
 }

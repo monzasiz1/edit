@@ -1,0 +1,29 @@
+<section class="export-container">
+  <h1>Exportfunktionen</h1>
+
+  <div class="export-section">
+    <h2>Meine Strafen exportieren</h2>
+    <p>Exportiere deine eigenen Strafen als PDF oder CSV.</p>
+    <div class="btn-group">
+      <a href="/export/meine-pdf" class="btn btn-primary">PDF herunterladen</a>
+      <a href="/export/meine-csv" class="btn btn-secondary">CSV herunterladen</a>
+    </div>
+  </div>
+
+  <% if (user && user.is_admin) { %>
+  <div class="export-section admin-section">
+    <h2>Alle Strafen exportieren (Admin)</h2>
+    <p>Exportiere alle Strafen aller Mitglieder als PDF oder CSV.</p>
+    <div class="btn-group">
+      <a href="/export/alle-pdf" class="btn btn-primary">PDF (Alle Mitglieder)</a>
+      <a href="/export/alle-csv" class="btn btn-secondary">CSV (Alle Mitglieder)</a>
+    </div>
+
+    <h3>Einzelne Mitglieder exportieren</h3>
+    <p>Für einen einzelnen Nutzer Strafen exportieren.</p>
+    <form action="/users" method="get">
+      <button type="submit" class="btn-reg">Zur Nutzerverwaltung</button>
+    </form>
+  </div>
+  <% } %>
+</section>
