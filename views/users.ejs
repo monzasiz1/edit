@@ -26,6 +26,8 @@
           <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
             <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️</button>
           </form>
+                    <a href="/export/user/<%= u.id %>/pdf" class="btn btn-small btn-export" title="PDF-Export" target="_blank">📄 PDF</a>
+          <a href="/export/user/<%= u.id %>/csv" class="btn btn-small btn-export" title="CSV-Export" target="_blank">📑 CSV</a>
         </td>
       </tr>
     <% }) %>
