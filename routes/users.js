@@ -44,6 +44,14 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
       [username, is_admin === 'on', req.params.id]
     );
   }
+
+  // --- SESSION AKTUALISIEREN, falls Admin sich selbst ändert!
+  if (req.session.user && req.session.user.id == req.params.id) {
+    const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
+    req.session.user = result.rows[0];
+  }
+  // ---
+
   res.redirect('/users');
 });
 
@@ -52,7 +60,6 @@ router.post('/delete/:id', requireAdmin, async (req, res) => {
   await db.query('DELETE FROM users WHERE id = $1', [req.params.id]);
   res.redirect('/users');
 });
-
 
 // Nutzer hinzufügen (Formular anzeigen)
 router.get('/add', requireAdmin, (req, res) => {
