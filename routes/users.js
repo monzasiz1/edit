@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 
 // Middleware: Nur Admins dürfen hierhin
 function requireAdmin(req, res, next) {
+  // LOGGING!
+  console.log('Session user:', req.session.user);
   if (!req.session.user || !req.session.user.is_admin) return res.redirect('/login');
   next();
 }
@@ -52,7 +54,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (req.session.user && req.session.user.id == req.params.id) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userRow = result.rows[0];
-    userRow.is_admin = !!userRow.is_admin;
+    userRow.is_admin = !!userRow.is_admin; // <<< cast zu Boolean!
     req.session.user = userRow;
   }
   // ---
