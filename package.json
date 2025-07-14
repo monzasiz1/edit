@@ -20,7 +20,6 @@
     "json2csv": "^5.0.7",
     "method-override": "^3.0.0",
     "pdfkit": "^0.17.1",
-    "pdfkit-table": "^0.1.99",
     "pg": "^8.11.3",
     "wkhtmltopdf": "^0.4.0",
     "xlsx": "^0.17.0"
