@@ -4,7 +4,7 @@ const db = require('../db');
 const PDFDocument = require('pdfkit');
 const { Parser } = require('json2csv');
 
-// Middleware für Login
+// Middleware
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
@@ -19,11 +19,12 @@ router.get('/', requireLogin, (req, res) => {
   res.render('exportseite', { title: "Export" });
 });
 
-// =================== USER-PDF ===================
+// Eigene Strafen als PDF
 router.get('/meine-pdf', requireLogin, async (req, res) => {
   await userPenaltiesPDF(req, res, req.session.user.id, req.session.user.username, false);
 });
-// =================== USER-CSV ===================
+
+// Eigene Strafen als CSV
 router.get('/meine-csv', requireLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -33,6 +34,10 @@ router.get('/meine-csv', requireLogin, async (req, res) => {
        FROM penalties p LEFT JOIN users a ON p.admin_id = a.id
        WHERE p.user_id = $1 ORDER BY p.date DESC`, [userId]
     );
+    // Feldinhalte als einfache Strings ohne Umbrüche:
+    rows.forEach(r => {
+      Object.keys(r).forEach(k => r[k] = typeof r[k] === 'string' ? r[k].replace(/\r?\n|\r/g, ' ') : r[k]);
+    });
     const parser = new Parser({ fields: ['date', 'event', 'type', 'amount', 'admin'] });
     res.setHeader('Content-Disposition', `attachment; filename=Strafen_${userName.replace(/\s/g, "_")}.csv`);
     res.set('Content-Type', 'text/csv');
@@ -43,7 +48,7 @@ router.get('/meine-csv', requireLogin, async (req, res) => {
   }
 });
 
-// =================== ADMIN-GESAMT-PDF ===================
+// Admin: Alle Strafen als PDF
 router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -67,7 +72,6 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
       return;
     }
 
-    // Tabelle
     await drawTable(doc, rows, [
       { label: "Datum",    prop: "date",     width: 70 },
       { label: "Mitglied", prop: "mitglied", width: 90 },
@@ -87,7 +91,8 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
     console.error(e);
   }
 });
-// =================== ADMIN-GESAMT-CSV ===================
+
+// Admin: Alle Strafen als CSV
 router.get('/alle-csv', requireLogin, requireAdmin, async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -97,6 +102,9 @@ router.get('/alle-csv', requireLogin, requireAdmin, async (req, res) => {
        LEFT JOIN users a ON p.admin_id = a.id
        ORDER BY p.date DESC`
     );
+    rows.forEach(r => {
+      Object.keys(r).forEach(k => r[k] = typeof r[k] === 'string' ? r[k].replace(/\r?\n|\r/g, ' ') : r[k]);
+    });
     const parser = new Parser({ fields: ['date', 'mitglied', 'event', 'type', 'amount', 'admin'] });
     res.setHeader('Content-Disposition', 'attachment; filename=Strafen_Gesamt.csv');
     res.set('Content-Type', 'text/csv');
@@ -107,7 +115,7 @@ router.get('/alle-csv', requireLogin, requireAdmin, async (req, res) => {
   }
 });
 
-// =================== ADMIN-EINZEL-PDF ===================
+// Admin: Einzeluser als PDF
 router.get('/user/:id/pdf', requireLogin, requireAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
@@ -120,7 +128,8 @@ router.get('/user/:id/pdf', requireLogin, requireAdmin, async (req, res) => {
     console.error(e);
   }
 });
-// =================== ADMIN-EINZEL-CSV ===================
+
+// Admin: Einzeluser als CSV
 router.get('/user/:id/csv', requireLogin, requireAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
@@ -133,6 +142,9 @@ router.get('/user/:id/csv', requireLogin, requireAdmin, async (req, res) => {
        LEFT JOIN users a ON p.admin_id = a.id
        WHERE p.user_id = $1 ORDER BY p.date DESC`, [userId]
     );
+    rows.forEach(r => {
+      Object.keys(r).forEach(k => r[k] = typeof r[k] === 'string' ? r[k].replace(/\r?\n|\r/g, ' ') : r[k]);
+    });
     const parser = new Parser({ fields: ['date', 'event', 'type', 'amount', 'admin'] });
     res.setHeader('Content-Disposition', `attachment; filename=Strafen_${userName.replace(/\s/g, "_")}.csv`);
     res.set('Content-Type', 'text/csv');
@@ -143,7 +155,7 @@ router.get('/user/:id/csv', requireLogin, requireAdmin, async (req, res) => {
   }
 });
 
-// ============ Zentrale Tabellenfunktion ===========
+// ======= User/Einzel-PDF-Export (mit automatischem Umbruch) =========
 async function userPenaltiesPDF(req, res, userId, userName, isAdminView) {
   try {
     const { rows: penalties } = await db.query(
@@ -186,32 +198,49 @@ async function userPenaltiesPDF(req, res, userId, userName, isAdminView) {
   }
 }
 
-// ========== UNIVERSAL: PDFKit-Tabelle (ohne Modul!) ==========
+// =========== Tabellen-Renderer mit automatischem Umbruch ==============
+function getTextHeight(doc, text, width, options = {}) {
+  const savedY = doc.y;
+  const h = doc.heightOfString(text, { width, ...options });
+  doc.y = savedY;
+  return h;
+}
+
 async function drawTable(doc, rows, columns) {
   const tableTop = doc.y + 10;
-  const rowHeight = 24;
+  const minRowHeight = 24;
   const colX = [35];
   for (const col of columns) colX.push(colX[colX.length-1] + col.width);
 
-  // Kopfzeile
   function header(y) {
     doc.font('Helvetica-Bold').fontSize(12).fillColor('#111');
     columns.forEach((col, i) => {
       doc.text(col.label, colX[i], y, { width: col.width, align: col.align || 'left' });
     });
-    doc.moveTo(colX[0], y + rowHeight - 8).lineTo(colX[columns.length], y + rowHeight - 8).stroke();
+    doc.moveTo(colX[0], y + minRowHeight - 8).lineTo(colX[columns.length], y + minRowHeight - 8).stroke();
     doc.font('Helvetica').fontSize(11);
   }
 
   let y = tableTop;
-  header(y); y += rowHeight;
+  header(y); y += minRowHeight;
 
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    // Seitenumbruch & Header auf neuer Seite
+
+    // Spaltenhöhen ermitteln für den höchsten Feldtext
+    let rowHeights = columns.map((col, j) => {
+      let val = r[col.prop];
+      if (col.prop === "date") val = new Date(val).toLocaleDateString('de-DE');
+      if (col.prop === "amount") val = Number(val).toFixed(2);
+      return getTextHeight(doc, val ? String(val) : "-", col.width) + 8;
+    });
+    let rowHeight = Math.max(minRowHeight, ...rowHeights);
+
+    // Seitenumbruch bei Bedarf
     if (y + rowHeight > doc.page.height - 60) {
-      doc.addPage(); y = 50; header(y); y += rowHeight;
+      doc.addPage(); y = 50; header(y); y += minRowHeight;
     }
+
     // Zebra-Style
     if (i % 2 === 1) {
       doc.rect(colX[0], y - 3, colX[columns.length] - colX[0], rowHeight).fill('#e7f3e6').fillColor('#111');
@@ -221,7 +250,7 @@ async function drawTable(doc, rows, columns) {
       let val = r[col.prop];
       if (col.prop === "date") val = new Date(val).toLocaleDateString('de-DE');
       if (col.prop === "amount") val = Number(val).toFixed(2);
-      doc.fillColor('#111').text(val || "-", colX[j], y, { width: col.width, align: col.align || 'left' });
+      doc.fillColor('#111').text(val ? String(val) : "-", colX[j], y, { width: col.width, align: col.align || 'left' });
     });
     y += rowHeight;
   }
