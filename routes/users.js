@@ -3,18 +3,25 @@ const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 
-// Middleware: Nur Admins dürfen hierhin
+// Korrigierte Middleware: akzeptiert 1, true, 'true'
 function requireAdmin(req, res, next) {
-  // LOGGING!
-  console.log('Session user:', req.session.user);
-  if (!req.session.user || !req.session.user.is_admin) return res.redirect('/login');
+  if (
+    !req.session.user ||
+    !(
+      req.session.user.is_admin === true ||
+      req.session.user.is_admin === 1 ||
+      req.session.user.is_admin === 'true'
+    )
+  ) {
+    return res.redirect('/login');
+  }
   next();
 }
 
 // Nutzer-Übersicht
 router.get('/', requireAdmin, async (req, res) => {
   const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
-  users.forEach(u => u.is_admin = !!u.is_admin);
+  users.forEach(u => u.is_admin = u.is_admin === true || u.is_admin === 1 || u.is_admin === 'true');
   res.render('users', { user: req.session.user, users });
 });
 
@@ -22,7 +29,7 @@ router.get('/', requireAdmin, async (req, res) => {
 router.get('/edit/:id', requireAdmin, async (req, res) => {
   const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
   const userToEdit = result.rows[0];
-  userToEdit.is_admin = !!userToEdit.is_admin;
+  userToEdit.is_admin = userToEdit.is_admin === true || userToEdit.is_admin === 1 || userToEdit.is_admin === 'true';
   res.render('users_edit', { user: req.session.user, userToEdit, error: null });
 });
 
@@ -34,7 +41,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (error) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userToEdit = result.rows[0];
-    userToEdit.is_admin = !!userToEdit.is_admin;
+    userToEdit.is_admin = userToEdit.is_admin === true || userToEdit.is_admin === 1 || userToEdit.is_admin === 'true';
     return res.render('users_edit', { user: req.session.user, userToEdit, error });
   }
   if (password) {
@@ -54,7 +61,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (req.session.user && req.session.user.id == req.params.id) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userRow = result.rows[0];
-    userRow.is_admin = !!userRow.is_admin; // <<< cast zu Boolean!
+    userRow.is_admin = userRow.is_admin === true || userRow.is_admin === 1 || userRow.is_admin === 'true';
     req.session.user = userRow;
   }
   // ---
