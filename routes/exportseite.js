@@ -19,6 +19,7 @@ router.get('/', requireLogin, async (req, res) => {
 
 // --- PDF-/CSV-Export für EIGENE Strafen ---
 router.get('/meine-pdf', requireLogin, async (req, res) => {
+  console.log("ROUTE: /export/meine-pdf wurde aufgerufen. User:", req.session.user);
   try {
     const userId = req.session.user.id;
     const userName = req.session.user.username;
@@ -62,6 +63,7 @@ router.get('/meine-pdf', requireLogin, async (req, res) => {
     }
     doc.end();
   } catch (e) {
+    console.error("Fehler beim PDF-Export:", e);
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
   }
 });
@@ -84,6 +86,8 @@ router.get('/meine-csv', requireLogin, async (req, res) => {
     res.send(csv);
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim CSV-Export.');
+     console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
+ 
   }
 });
 
@@ -135,7 +139,12 @@ router.get('/alle-pdf', requireLogin, async (req, res) => {
     doc.end();
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
-  }
+    
+  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
+  if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
+  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
+}
+
 });
 
 // ALLE Strafen: CSV
@@ -156,7 +165,9 @@ router.get('/alle-csv', requireLogin, async (req, res) => {
     res.send(csv);
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim CSV-Export.');
-  }
+    console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
+ 
+}
 });
 
 // Einzeln: PDF/CSV für *beliebigen* Nutzer (Admin)
@@ -207,7 +218,10 @@ router.get('/user/:id/pdf', requireLogin, async (req, res) => {
     doc.end();
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
-  }
+  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
+  
+}
+
 });
 
 router.get('/user/:id/csv', requireLogin, async (req, res) => {
@@ -233,7 +247,9 @@ router.get('/user/:id/csv', requireLogin, async (req, res) => {
 
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim CSV-Export.');
-  }
+  console.error(e);  // Das zeigt dir den echten Fehler im Server-Log!
+}
+
 });
 
 module.exports = router;
