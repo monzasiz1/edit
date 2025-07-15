@@ -8,8 +8,17 @@ function requireLogin(req, res, next) {
   next();
 }
 function requireAdmin(req, res, next) {
-  if (!req.session.user || !req.session.user.is_admin) return res.redirect('/login');
-  next();
+  const a = req.session.user && req.session.user.is_admin;
+  if (
+    a === true ||
+    a === 1 ||
+    a === "1" ||
+    a === "true" ||
+    a === "on"
+  ) {
+    return next();
+  }
+  return res.redirect('/login');
 }
 
 // /penalties leitet auf /penalties/all weiter
@@ -117,13 +126,11 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
 });
 
 // Strafe löschen
-// Strafe löschen
 router.post('/delete/:id', requireAdmin, async (req, res) => {
   const id = req.params.id;
   await db.query('DELETE FROM penalties WHERE id = $1', [id]);
   res.redirect('/penalties/all');
 });
-
 
 // --- GANZ ZUM SCHLUSS! ---
 module.exports = router;
