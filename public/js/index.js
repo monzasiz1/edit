@@ -1,7 +1,7 @@
 // Überprüfe, ob der Browser Service Worker und Push API unterstützt
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   // Service Worker registrieren
-  navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+  navigator.serviceWorker.register('public/service-worker.js').then(function(registration) {
     console.log('Service Worker erfolgreich registriert:', registration);
 
     // Anfrage nach Berechtigung für Push-Benachrichtigungen
