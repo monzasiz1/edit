@@ -5,7 +5,6 @@
   <!-- Manifest für Android & moderne Browser -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#ffffff">
-
 <!-- iOS: Home‑Screen‑Icon + Status‑Bar -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -20,6 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
   <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/hamburger.css">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -32,9 +32,12 @@
     </a>
 
     <% if (user) { %>
-      <button class="menu-toggle" id="menu-toggle" aria-label="Menü öffnen">
-        <span></span><span></span><span></span>
-      </button>
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
       <ul id="main-menu">
         <li><a href="/dashboard">Dashboard</a></li>
         <% if (user.is_admin) { %>
