@@ -2,14 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+const pool = require('../db');
 
-const pool = require('../db'); // nutzt jetzt die zentrale DB-Verbindung
-
-
-// Profilseite anzeigen
 // Profilseite anzeigen
 router.get('/', (req, res) => {
-    console.log("Profilseite aufgerufen!", req.session.user);
+    console.log("Profilseite aufgerufen!", req.session);
     if (!req.session.user) return res.redirect('/login');
     res.render('profil', {
         user: req.session.user,
@@ -17,13 +14,13 @@ router.get('/', (req, res) => {
         nameErr: null,
         pwMsg: null,
         pwErr: null,
-        noContainer: true // <-- das ist wichtig!
+        noContainer: true
     });
 });
 
-
 // Name ändern
 router.post('/name', async (req, res) => {
+  console.log("Name-ändern-POST:", req.session);
   if (!req.session.user) return res.redirect('/login');
   const neuerName = req.body.name?.trim();
   if (!neuerName) {
@@ -31,16 +28,17 @@ router.post('/name', async (req, res) => {
   }
   try {
     await pool.query('UPDATE users SET username = $1 WHERE id = $2', [neuerName, req.session.user.id]);
-req.session.user.username = neuerName;
+    req.session.user.username = neuerName;
     res.render('profil', { user: req.session.user, nameMsg: "Name wurde erfolgreich geändert.", nameErr: null, pwMsg: null, pwErr: null });
   } catch (err) {
-    console.error(err);
+    console.error("DB-FEHLER beim Namen ändern:", err);
     res.render('profil', { user: req.session.user, nameMsg: null, nameErr: "Fehler beim Ändern des Namens.", pwMsg: null, pwErr: null });
   }
 });
 
 // Passwort ändern
 router.post('/passwort', async (req, res) => {
+  console.log("Passwort-ändern-POST:", req.session);
   if (!req.session.user) return res.redirect('/login');
   const { oldpw, newpw } = req.body;
   if (!oldpw || !newpw) {
@@ -57,7 +55,7 @@ router.post('/passwort', async (req, res) => {
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hash, req.session.user.id]);
     res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: "Passwort wurde geändert!", pwErr: null });
   } catch (err) {
-    console.error(err);
+    console.error("DB-FEHLER beim Passwort ändern:", err);
     res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: null, pwErr: "Fehler beim Passwort-Ändern." });
   }
 });
