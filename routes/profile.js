@@ -1,12 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { Pool } = require('pg');
-const bcrypt = require('bcrypt');
 const pool = require('../db');
+const bcrypt = require('bcrypt');
 
-// Profilseite anzeigen
 router.get('/', (req, res) => {
-    console.log("Profilseite GET! Session:", req.session);
     if (!req.session.user) return res.redirect('/login');
     res.render('profil', {
         user: req.session.user,
@@ -27,13 +24,23 @@ router.post('/name', async (req, res) => {
     }
     try {
         await pool.query('UPDATE users SET username = $1 WHERE id = $2', [neuerName, req.session.user.id]);
-        // Logging vorher
-        console.log("Vor Änderung:", req.session);
-        req.session.user.username = neuerName;
-        req.session.save((err) => {
-            // Logging nachher
-            if (err) console.error("Session speichern fehlgeschlagen!", err);
-            console.log("Nach Änderung:", req.session);
+        // User-Objekt frisch aus DB holen und komplett setzen!
+        const dbRes = await pool.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.session.user.id]);
+        if (dbRes.rows.length) {
+            const userRow = dbRes.rows[0];
+            req.session.user = {
+                id: userRow.id,
+                username: userRow.username,
+                is_admin: !!(
+                    userRow.is_admin === true ||
+                    userRow.is_admin === 1 ||
+                    userRow.is_admin === "1" ||
+                    userRow.is_admin === "true" ||
+                    userRow.is_admin === "on"
+                )
+            };
+        }
+        req.session.save(() => {
             res.render('profil', { user: req.session.user, nameMsg: "Name wurde erfolgreich geändert.", nameErr: null, pwMsg: null, pwErr: null });
         });
     } catch (err) {
@@ -58,11 +65,23 @@ router.post('/passwort', async (req, res) => {
         }
         const hash = await bcrypt.hash(newpw, 10);
         await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hash, req.session.user.id]);
-        // Logging vorher
-        console.log("Vor Passwortänderung:", req.session);
-        req.session.save((err) => {
-            if (err) console.error("Session speichern fehlgeschlagen (Passwort)!", err);
-            console.log("Nach Passwortänderung:", req.session);
+        // Nach Änderung: User wieder aus DB neu laden!
+        const dbRes = await pool.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.session.user.id]);
+        if (dbRes.rows.length) {
+            const userRow = dbRes.rows[0];
+            req.session.user = {
+                id: userRow.id,
+                username: userRow.username,
+                is_admin: !!(
+                    userRow.is_admin === true ||
+                    userRow.is_admin === 1 ||
+                    userRow.is_admin === "1" ||
+                    userRow.is_admin === "true" ||
+                    userRow.is_admin === "on"
+                )
+            };
+        }
+        req.session.save(() => {
             res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: "Passwort wurde geändert!", pwErr: null });
         });
     } catch (err) {

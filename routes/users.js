@@ -3,27 +3,29 @@ const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 
-// Korrigierte Middleware für Admin
 function requireAdmin(req, res, next) {
-  const a = req.session.user && req.session.user.is_admin;
+  let admin = req.session.user && req.session.user.is_admin;
   if (
-    a === true ||
-    a === 1 ||
-    a === "1" ||
-    a === "true" ||
-    a === "on"
+    admin === true ||
+    admin === 1 ||
+    admin === "1" ||
+    admin === "true" ||
+    admin === "on"
   ) {
     return next();
   }
   return res.redirect('/login');
 }
 
-// Nutzer-Übersicht
 router.get('/', requireAdmin, async (req, res) => {
   const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
-  users.forEach(u => {
-    u.is_admin = (u.is_admin === true || u.is_admin === 1 || u.is_admin === "1" || u.is_admin === "true" || u.is_admin === "on");
-  });
+  users.forEach(u => u.is_admin = !!(
+    u.is_admin === true ||
+    u.is_admin === 1 ||
+    u.is_admin === "1" ||
+    u.is_admin === "true" ||
+    u.is_admin === "on"
+  ));
   res.render('users', { user: req.session.user, users });
 });
 
@@ -31,7 +33,7 @@ router.get('/', requireAdmin, async (req, res) => {
 router.get('/edit/:id', requireAdmin, async (req, res) => {
   const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
   const userToEdit = result.rows[0];
-  userToEdit.is_admin = (
+  userToEdit.is_admin = !!(
     userToEdit.is_admin === true ||
     userToEdit.is_admin === 1 ||
     userToEdit.is_admin === "1" ||
@@ -49,7 +51,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
   if (error) {
     const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     const userToEdit = result.rows[0];
-    userToEdit.is_admin = (
+    userToEdit.is_admin = !!(
       userToEdit.is_admin === true ||
       userToEdit.is_admin === 1 ||
       userToEdit.is_admin === "1" ||
@@ -71,7 +73,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
     );
   }
 
-  // --- SESSION NACH BEARBEITUNG (wichtig für ausgeloggte Nutzer!) ---
+  // SESSION AKTUALISIEREN, falls Admin sich selbst ändert!
   if (req.session.user && String(req.session.user.id) === String(req.params.id)) {
     const { rows } = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
     if (rows.length) {
@@ -79,7 +81,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
       req.session.user = {
         id: userRow.id,
         username: userRow.username,
-        is_admin: (
+        is_admin: !!(
           userRow.is_admin === true ||
           userRow.is_admin === 1 ||
           userRow.is_admin === "1" ||
@@ -87,10 +89,9 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
           userRow.is_admin === "on"
         )
       };
+      await new Promise(resolve => req.session.save(resolve));
     }
   }
-  // ---
-
   res.redirect('/users');
 });
 
@@ -113,7 +114,6 @@ router.post('/add', requireAdmin, async (req, res) => {
     error = 'Benutzername und Passwort dürfen nicht leer sein!';
     return res.render('users_add', { user: req.session.user, error });
   }
-  // Prüfen, ob Name schon existiert
   const exists = (await db.query('SELECT 1 FROM users WHERE username = $1', [username])).rowCount > 0;
   if (exists) {
     error = 'Benutzername existiert bereits!';
