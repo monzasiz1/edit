@@ -1,31 +1,33 @@
-<div class="profile-container">
-  <h2>Profil bearbeiten</h2>
-
-  <% if (nameErr) { %>
-    <div class="error"><%= nameErr %></div>
-  <% } %>
-  <% if (nameMsg) { %>
-    <div class="success"><%= nameMsg %></div>
-  <% } %>
-  <form action="/profil/name" method="POST">
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" value="<%= user.username %>" required />
-    <button type="submit">Name ändern</button>
-  </form>
-
-  <hr/>
-
-  <% if (pwErr) { %>
-    <div class="error"><%= pwErr %></div>
-  <% } %>
-  <% if (pwMsg) { %>
-    <div class="success"><%= pwMsg %></div>
-  <% } %>
-  <form action="/profil/passwort" method="POST">
-    <label for="oldpw">Altes Passwort</label>
-    <input type="password" id="oldpw" name="oldpw" required />
-    <label for="newpw">Neues Passwort</label>
-    <input type="password" id="newpw" name="newpw" required />
-    <button type="submit">Passwort ändern</button>
-  </form>
+<div class="profil-overlay-bg">
+  <div class="profil-card">
+    <a href="/dashboard" class="profil-close-btn" title="Schließen">&times;</a>
+    <h2>Profil</h2>
+    <!-- Name ändern -->
+    <form action="/profil/name" method="POST">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" value="<%= user.name %>" required>
+      <% if (nameMsg) { %>
+        <div class="msg-success"><%= nameMsg %></div>
+      <% } %>
+      <% if (nameErr) { %>
+        <div class="msg-error"><%= nameErr %></div>
+      <% } %>
+      <button type="submit">Name speichern</button>
+    </form>
+    <hr>
+    <!-- Passwort ändern -->
+    <form action="/profil/passwort" method="POST" autocomplete="off">
+      <label for="oldpw">Altes Passwort:</label>
+      <input type="password" id="oldpw" name="oldpw" required>
+      <label for="newpw">Neues Passwort:</label>
+      <input type="password" id="newpw" name="newpw" minlength="6" required>
+      <% if (pwMsg) { %>
+        <div class="msg-success"><%= pwMsg %></div>
+      <% } %>
+      <% if (pwErr) { %>
+        <div class="msg-error"><%= pwErr %></div>
+      <% } %>
+      <button type="submit">Passwort ändern</button>
+    </form>
+  </div>
 </div>
