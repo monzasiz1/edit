@@ -1,20 +1,13 @@
-// public/menu.js
-document.addEventListener('DOMContentLoaded', () => {
-  const toggle = document.getElementById('menu-toggle');
-  const menu   = document.getElementById('main-menu');
+const btn = document.getElementById('hamburger-btn');
+const nav = document.querySelector('nav.main-nav ul');
 
-  toggle.addEventListener('click', () => {
-    toggle.classList.toggle('open');
-    menu.classList.toggle('active');
-  });
+btn.addEventListener('click', () => {
+  btn.classList.toggle('active');
+  nav.classList.toggle('active');
 
-  // Schließe Mobil‑Menü beim Klick auf einen Link
-  menu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      if (menu.classList.contains('active')) {
-        toggle.classList.remove('open');
-        menu.classList.remove('active');
-      }
-    });
-  });
+  // ARIA‑Label wechseln
+  btn.setAttribute(
+    'aria-label',
+    btn.classList.contains('active') ? 'Menü schließen' : 'Menü öffnen'
+  );
 });
