@@ -1,21 +1,20 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const menuToggle = document.getElementById("menu-toggle");
-  const mainMenu = document.getElementById("main-menu");
+// public/menu.js
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('menu-toggle');
+  const menu   = document.getElementById('main-menu');
 
-  if (menuToggle && mainMenu) {
-    menuToggle.addEventListener("click", () => {
-      const isActive = mainMenu.classList.toggle("active");
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('open');
+    menu.classList.toggle('active');
+  });
 
-      // ARIA Attribute zur Barrierefreiheit anpassen
-      menuToggle.setAttribute("aria-expanded", isActive ? "true" : "false");
+  // Schließe Mobil‑Menü beim Klick auf einen Link
+  menu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (menu.classList.contains('active')) {
+        toggle.classList.remove('open');
+        menu.classList.remove('active');
+      }
     });
-
-    // Menü schließt bei Klick auf Link oder Button (mobile usability)
-    mainMenu.querySelectorAll("a, button").forEach(el => {
-      el.addEventListener("click", () => {
-        mainMenu.classList.remove("active");
-        menuToggle.setAttribute("aria-expanded", "false");
-      });
-    });
-  }
+  });
 });
