@@ -12,7 +12,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
         // Nachdem die Berechtigung erteilt wurde, registriere den Nutzer für Push-Benachrichtigungen
         return registration.pushManager.subscribe({
           userVisibleOnly: true,  // Push-Nachrichten müssen für den Benutzer sichtbar sein
-          applicationServerKey: urlB64ToUint8Array('DEIN_PUBLIC_KEY')  // VAPID Public Key
+          applicationServerKey: urlB64ToUint8Array('BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA')  // VAPID Public Key
         }).then(function(subscription) {
           console.log('Push-Subscription erhalten', subscription);
 
