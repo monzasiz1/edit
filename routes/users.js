@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 
+// ADMIN-Middleware wie gehabt
 function requireAdmin(req, res, next) {
   let admin = req.session.user && req.session.user.is_admin;
   if (
@@ -17,6 +18,7 @@ function requireAdmin(req, res, next) {
   return res.redirect('/login');
 }
 
+// Nutzer-Übersicht
 router.get('/', requireAdmin, async (req, res) => {
   const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
   users.forEach(u => u.is_admin = !!(
@@ -89,6 +91,7 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
           userRow.is_admin === "on"
         )
       };
+      // GANZ WICHTIG: Session speichern!
       await new Promise(resolve => req.session.save(resolve));
     }
   }
