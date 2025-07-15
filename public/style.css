@@ -82,12 +82,11 @@ nav.main-nav .logo {
 nav.main-nav .logo img {
   height: 60px;
   width: auto;
-  
   margin-right: 15px;
-  border-radius: 7px;
+  
   box-shadow: 0 1px 6px rgba(41,51,91,0.08);
   object-fit: contain;
-  background: var(--color-white);
+  
 }
 nav.main-nav ul {
   display: flex;
@@ -118,6 +117,9 @@ nav.main-nav ul li button:focus {
   border-bottom-color: var(--color-accent);
   outline: none;
 }
+
+
+
 
 /* Hamburger Menu - Mobile */
 .menu-toggle {
@@ -211,11 +213,7 @@ button, a.btn, .btn {
   display: inline-block;
   margin: 0.18rem 0;
 }
-button:hover, a.btn:hover, .btn:hover,
-button:focus, a.btn:focus, .btn:focus {
-  background: #059221;
-  box-shadow: 0 4px 16px rgba(1,109,28,0.14);
-}
+
 a.btn-delete, .btn.btn-delete {
   background: #e8ebef;
   color: #2b3445;
@@ -709,7 +707,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
     display: flex;
     flex-direction: column;
     transition: box-shadow 0.19s, transform 0.17s;
-    gap: 0.4em;
+    gap: 0.5em;
     animation: fadeInUp 0.7s cubic-bezier(.33,.77,.63,1.11);
     font-size: 1.06em;
     position: relative;
@@ -1232,7 +1230,7 @@ h2 {
 
 .btn, button, .btn-small {
   display: inline-block;
-  padding: 0.37rem 1.15rem !important;
+  
   font-size: 1.03rem !important;
   border-radius: 2em !important;
   background: linear-gradient(90deg, #8a9a5b 0%, #b9bc93 100%);
@@ -2119,6 +2117,7 @@ body {
   font-weight: bold;
   font-size: 0.8em;
   line-height: 1em;
+
   text-align: center;
   border-radius: 3px;
   box-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
