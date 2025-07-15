@@ -2126,18 +2126,3 @@ body {
 
 }
 
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #121212;
-    --color-primary: #e0e0e0;
-    --color-secondary: #cfd8e3;
-    --color-accent: #4ea8de;
-    --color-white: #1e1e1e;
-    --color-muted: #555;
-    --color-error: #ff6b6b;
-    --color-success: #61e786;
-    /* Falls du Schlagschatten anpassen möchtest: */
-    --shadow: 0 6px 28px rgba(0,0,0,0.5);
-  }
-}
