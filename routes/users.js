@@ -3,34 +3,27 @@ const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 
-// Korrigierte Middleware: akzeptiert 1, true, 'true'
+// Korrigierte Middleware für Admin
 function requireAdmin(req, res, next) {
-  // Aus Session ALLES abfangen was als "admin" gelten könnte:
-  // true, 1, "1", "true", ggf. auch Buffer (bei Boolean in PG)
-  let admin = req.session.user && req.session.user.is_admin;
-  // PostgreSQL gibt bool als true/false zurück, MySQL manchmal als 0/1, andere als String
+  const a = req.session.user && req.session.user.is_admin;
   if (
-    admin === true ||
-    admin === 1 ||
-    admin === "1" ||
-    admin === "true"
+    a === true ||
+    a === 1 ||
+    a === "1" ||
+    a === "true" ||
+    a === "on"
   ) {
     return next();
   }
-  // Noch: explizit Boolean umwandeln falls "on" (aus dem Formular)
-  if (admin === "on") {
-    req.session.user.is_admin = true;
-    return next();
-  }
-  // Alles andere ist kein Admin!
   return res.redirect('/login');
 }
-
 
 // Nutzer-Übersicht
 router.get('/', requireAdmin, async (req, res) => {
   const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
-  users.forEach(u => u.is_admin = u.is_admin === true || u.is_admin === 1 || u.is_admin === 'true');
+  users.forEach(u => {
+    u.is_admin = (u.is_admin === true || u.is_admin === 1 || u.is_admin === "1" || u.is_admin === "true" || u.is_admin === "on");
+  });
   res.render('users', { user: req.session.user, users });
 });
 
@@ -38,11 +31,16 @@ router.get('/', requireAdmin, async (req, res) => {
 router.get('/edit/:id', requireAdmin, async (req, res) => {
   const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
   const userToEdit = result.rows[0];
-  userToEdit.is_admin = userToEdit.is_admin === true || userToEdit.is_admin === 1 || userToEdit.is_admin === 'true';
+  userToEdit.is_admin = (
+    userToEdit.is_admin === true ||
+    userToEdit.is_admin === 1 ||
+    userToEdit.is_admin === "1" ||
+    userToEdit.is_admin === "true" ||
+    userToEdit.is_admin === "on"
+  );
   res.render('users_edit', { user: req.session.user, userToEdit, error: null });
 });
 
-// Nutzer bearbeiten (POST)
 // Nutzer bearbeiten (POST)
 router.post('/edit/:id', requireAdmin, async (req, res) => {
   const { username, password, is_admin } = req.body;
@@ -73,24 +71,28 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
     );
   }
 
-  // --- SESSION AKTUALISIEREN, falls Admin sich selbst ändert!
-  if (req.session.user && req.session.user.id == req.params.id) {
-    const result = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
-    const userRow = result.rows[0];
-    userRow.is_admin = (
-      userRow.is_admin === true ||
-      userRow.is_admin === 1 ||
-      userRow.is_admin === "1" ||
-      userRow.is_admin === "true" ||
-      userRow.is_admin === "on"
-    );
-    req.session.user = userRow;
+  // --- SESSION NACH BEARBEITUNG (wichtig für ausgeloggte Nutzer!) ---
+  if (req.session.user && String(req.session.user.id) === String(req.params.id)) {
+    const { rows } = await db.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.params.id]);
+    if (rows.length) {
+      const userRow = rows[0];
+      req.session.user = {
+        id: userRow.id,
+        username: userRow.username,
+        is_admin: (
+          userRow.is_admin === true ||
+          userRow.is_admin === 1 ||
+          userRow.is_admin === "1" ||
+          userRow.is_admin === "true" ||
+          userRow.is_admin === "on"
+        )
+      };
+    }
   }
   // ---
 
   res.redirect('/users');
 });
-
 
 // Nutzer löschen
 router.post('/delete/:id', requireAdmin, async (req, res) => {
