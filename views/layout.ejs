@@ -2,8 +2,20 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#2c3e50">
+  <!-- Manifest für Android & moderne Browser -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2d7a2d">
+
+<!-- iOS: Home‑Screen‑Icon + Status‑Bar -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Spießbuch">
+<link rel="apple-touch-icon" href="/icons/logo-192.png">
+
+<!-- Optional: Splash Screens für iOS (verschiedene Gerätegrößen) -->
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-2048x2732.png" media="(device-width:…)" />
+<!-- … weitere für all deine Zielgeräte … -->
+
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
@@ -68,5 +80,13 @@
   <footer class="footer">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
   </footer>
+  <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('public/service-worker.js')
+    .then(() => console.log('SW registriert'))
+    .catch(err => console.error('SW-Fehler', err));
+}
+</script>
+
 </body>
 </html>

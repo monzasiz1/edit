@@ -1,12 +1,13 @@
-const CACHE_NAME = 'spiessbuch-cache-v1';
+const CACHE_NAME = 'Spiessbuch v1';
 const urlsToCache = [
   '/',
   '/style.css',
   '/manifest.json',
-  // Hier weitere Seiten/Assets eintragen!
+  '/icons/logo-192.png',
+  '/icons/logo-512.png'
+  // hier ggfs. noch weitere Assets/Seiten
 ];
 
-// Installations-Event
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -14,21 +15,20 @@ self.addEventListener('install', event => {
   );
 });
 
-// Aktivierungs-Event
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME)
+            .map(k => caches.delete(k))
       )
     )
   );
 });
 
-// Fetch-Event
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
-      .then(response => response || fetch(event.request))
+      .then(resp => resp || fetch(event.request))
   );
 });
