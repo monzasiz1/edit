@@ -1,16 +1,17 @@
 const express = require('express');
-const router  = express.Router();
-const pool    = require('../db');
-const bcrypt  = require('bcrypt');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const pool = require('../db');
 
-// Profilseite anzeigen
+// Profilseite
 router.get('/', (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   res.render('profil', {
     user: req.session.user,
-    nameMsg: null, nameErr: null,
-    pwMsg: null,    pwErr: null,
-    noContainer: true
+    nameMsg: null,
+    nameErr: null,
+    pwMsg: null,
+    pwErr: null
   });
 });
 
@@ -19,35 +20,18 @@ router.post('/name', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   const neuerName = (req.body.name || '').trim();
   if (!neuerName) {
-    return res.render('profil', { 
-      user: req.session.user,
-      nameMsg: null, nameErr: 'Name darf nicht leer sein.',
-      pwMsg: null,    pwErr: null,
-      noContainer: true
-    });
+    return res.render('profil', { user: req.session.user, nameMsg: null, nameErr: 'Name darf nicht leer sein.', pwMsg: null, pwErr: null });
   }
-  await pool.query('UPDATE users SET username = $1 WHERE id = $2', [neuerName, req.session.user.id]);
-
-  // Session neu anlegen, damit Username sofort greift und nicht ausgeloggt wird
-  const { rows } = await pool.query('SELECT id, username, is_admin FROM users WHERE id = $1', [req.session.user.id]);
-  const userRow = rows[0];
-  req.session.regenerate(err => {
-    if (err) console.error('Session.regenerate-Fehler:', err);
-    req.session.user = {
-      id:       userRow.id,
-      username: userRow.username,
-      is_admin: userRow.is_admin
-    };
-    req.session.save(err => {
-      if (err) console.error('Session.save-Fehler:', err);
-      res.render('profil', {
-        user: req.session.user,
-        nameMsg: 'Name wurde erfolgreich geändert.',
-        nameErr: null, pwMsg: null, pwErr: null,
-        noContainer: true
-      });
-    });
-  });
+  try {
+    await pool.query('UPDATE users SET username=$1 WHERE id=$2', [neuerName, req.session.user.id]);
+    // Session updaten
+    req.session.user.username = neuerName;
+    await new Promise(r => req.session.save(r));
+    res.render('profil', { user: req.session.user, nameMsg: 'Name wurde erfolgreich geändert.', nameErr: null, pwMsg: null, pwErr: null });
+  } catch (err) {
+    console.error(err);
+    res.render('profil', { user: req.session.user, nameMsg: null, nameErr: 'Fehler beim Ändern des Namens.', pwMsg: null, pwErr: null });
+  }
 });
 
 // Passwort ändern
@@ -55,31 +39,21 @@ router.post('/passwort', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   const { oldpw, newpw } = req.body;
   if (!oldpw || !newpw) {
-    return res.render('profil', {
-      user: req.session.user,
-      nameMsg: null, nameErr: null,
-      pwMsg: null, pwErr: 'Bitte alle Felder ausfüllen.',
-      noContainer: true
-    });
+    return res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: null, pwErr: 'Bitte alle Felder ausfüllen.' });
   }
-  const { rows } = await pool.query('SELECT password FROM users WHERE id = $1', [req.session.user.id]);
-  if (!rows[0] || !(await bcrypt.compare(oldpw, rows[0].password))) {
-    return res.render('profil', {
-      user: req.session.user,
-      nameMsg: null, nameErr: null,
-      pwMsg: null, pwErr: 'Altes Passwort stimmt nicht.',
-      noContainer: true
-    });
+  try {
+    const { rows } = await pool.query('SELECT password FROM users WHERE id=$1', [req.session.user.id]);
+    if (!rows[0] || !await bcrypt.compare(oldpw, rows[0].password)) {
+      return res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: null, pwErr: 'Altes Passwort stimmt nicht.' });
+    }
+    const hash = await bcrypt.hash(newpw, 10);
+    await pool.query('UPDATE users SET password=$1 WHERE id=$2', [hash, req.session.user.id]);
+    await new Promise(r => req.session.save(r));
+    res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: 'Passwort wurde geändert!', pwErr: null });
+  } catch (err) {
+    console.error(err);
+    res.render('profil', { user: req.session.user, nameMsg: null, nameErr: null, pwMsg: null, pwErr: 'Fehler beim Passwort-Ändern.' });
   }
-  const hash = await bcrypt.hash(newpw, 10);
-  await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hash, req.session.user.id]);
-  res.render('profil', {
-    user: req.session.user,
-    nameMsg: null, nameErr: null,
-    pwMsg: 'Passwort wurde geändert!',
-    pwErr: null,
-    noContainer: true
-  });
 });
 
 module.exports = router;

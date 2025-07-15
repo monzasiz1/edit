@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const PGStore = require('connect-pg-simple')(session);
+const PgSession = require('connect-pg-simple')(session);
 const methodOverride = require('method-override');
 const path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
-const pool = require('./db');
+const db = require('./db'); // Dein PG-Pool
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,44 +21,39 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session-Store in Postgres
+// ─── Session mit PG-Store ────────────────────────────────────────────────
 app.use(session({
-  store: new PGStore({
-    pool,                // deine pg-Pool-Instanz
-    tableName: 'session' // die Tabelle legst du mit `CREATE TABLE session (…)` an
+  store: new PgSession({
+    pool: db,                   // PG-Pool
+    tableName: 'session',       // Tabelle für Sitzungen
+    createTableIfMissing: true, // automatisch anlegen
   }),
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { 
-    secure: false,       // in Produktion auf true setzen, wenn HTTPS
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 Tage
+  cookie: {
+    secure: false,              // auf true, wenn HTTPS
+    maxAge: 24 * 60 * 60 * 1000 // 1 Tag
   }
 }));
 
-// Admin-Flag immer als Boolean normalisieren
+// Admin-Flag stets Boolean
 app.use((req, res, next) => {
   if (req.session.user) {
     const a = req.session.user.is_admin;
-    req.session.user.is_admin = (
-      a === true ||
-      a === 1 ||
-      a === '1' ||
-      a === 'true' ||
-      a === 'on'
-    );
+    req.session.user.is_admin = [true,1,'1','true','on'].includes(a);
   }
   next();
 });
 
-// Session‑User in alle Views injizieren
+// User in EJS verfügbar machen
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
 
-// Deine Routen
-app.use('/',       require('./routes/auth'));
+// ─── Deine Routen ────────────────────────────────────────────────────────
+app.use('/',      require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users',     require('./routes/users'));
