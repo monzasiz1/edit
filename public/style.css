@@ -225,16 +225,7 @@ a.btn-delete:hover, .btn.btn-delete:hover {
   background: #d2d6db;
   color: #253053;
 }
-.btn-cancel {
-  background: #e9ecf4;
-  color: #2b3445;
-  border: 1.5px solid #b80000;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-cancel:hover {
-  background: #b80000;
-  color: #fff;
-}
+
 .btn-small {
   font-size: 0.93rem;
   padding: 0.34rem 1rem;
@@ -1114,7 +1105,7 @@ h2 {
 }
 
 .modal-close {
-  background: transparent;
+  
   border: none;
   font-size: 1.6rem;
   color: #477f96;
@@ -1233,7 +1224,7 @@ h2 {
   
   font-size: 1.03rem !important;
   border-radius: 2em !important;
-  background: linear-gradient(90deg, #8a9a5b 0%, #b9bc93 100%);
+  background: linear-gradient(90deg, #0a532b 0%, #16682f 100%);
   color: #fff !important;
   border: none;
   outline: none;
@@ -1258,10 +1249,7 @@ h2 {
   color: #fcfcfc !important;
 }
 
-.btn-cancel {
-  background: linear-gradient(90deg, #c43e3e 0%, #ff7272 100%);
-  color: #fff !important;
-}
+
 
 .btn:hover, button:hover, .btn-small:hover, .btn-export:hover {
   filter: brightness(1.11);
@@ -1482,11 +1470,7 @@ h2 {
     padding: 0.3em 0.35em !important;
   }
 
-  /* Optional: Schließen-Button weiter anpassen */
-  .modal-close {
-    font-size: 1.4rem !important;
-    padding: 0.2rem 0.4rem;
-  }
+  
 
   .penalty-actions-bottomright {
     flex-direction: column; /* Icons vertikal anordnen auf kleinen Geräten */
@@ -1886,7 +1870,7 @@ body {
 
   .btn, .btn-outline {
     font-size: 1rem;
-    padding: 0.55rem 1.6rem;
+    padding: 0.38rem 1.08rem;
   }
 }
 /* Grund-Container */
