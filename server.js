@@ -5,10 +5,6 @@ const methodOverride = require('method-override');
 const path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
 
-// Wichtig: Persistenter Session-Store!
-const pgSession = require('connect-pg-simple')(session);
-const db = require('./db'); // Deine zentrale Pool-Connection
-
 // Routen-Imports
 const rankingRoutes = require('./routes/ranking');
 const exportRoutes = require('./routes/exportseite');
@@ -27,20 +23,13 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// SESSION STORE: Jetzt persistent!
 app.use(session({
-  store: new pgSession({
-    pool: db,
-    tableName: 'session'
-  }),
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // Auf Render: true!
-    maxAge: 24 * 60 * 60 * 1000 // 24h gültig
-  }
+  cookie: { secure: false }
 }));
+
 
 // Admin-Bool immer normalisieren, falls User eingeloggt
 app.use((req, res, next) => {
@@ -72,6 +61,9 @@ app.use('/ranking', rankingRoutes);
 app.use('/export', require('./routes/exportseite'));
 app.use('/logout', require('./routes/logout'));
 app.use('/profil', require('./routes/profile'));
+
+
+
 
 // 404
 app.use((req, res) => {
