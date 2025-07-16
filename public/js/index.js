@@ -8,31 +8,47 @@ const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
 const isStandalone = ('standalone' in navigator) && navigator.standalone;
 
 if (isIos && !isStandalone) {
-  alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere diese App über „Teilen“ > „Zum Home-Bildschirm“.');
+  alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über „Teilen“ > „Zum Home-Bildschirm“.');
 }
 
-// Warte auf Button-Click
-document.addEventListener('DOMContentLoaded', async () => {
-  const button = document.getElementById('enablePush');
-  if (!button) return;
+// Service Worker registrieren
+let swRegistration;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(reg => {
+      swRegistration = reg;
+      console.log('✅ Service Worker registriert:', reg);
+      createPushButton();
+    })
+    .catch(err => console.error('❌ Fehler bei der SW-Registrierung:', err));
+} else {
+  console.warn('⚠️ Service Worker wird nicht unterstützt.');
+}
 
-  button.addEventListener('click', async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      alert('❌ Push API wird nicht unterstützt.');
+// PUSH BUTTON einfügen
+function createPushButton() {
+  if (!('PushManager' in window)) return;
+
+  const btn = document.createElement('button');
+  btn.textContent = '🔔 Push-Benachrichtigungen aktivieren';
+  btn.className = 'btn btn-push';
+  btn.style = 'margin: 1rem auto; display: block;';
+  document.querySelector('main')?.appendChild(btn);
+
+  btn.addEventListener('click', async () => {
+    if (Notification.permission === 'granted') {
+      alert('✅ Du hast Push bereits aktiviert.');
       return;
     }
 
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      alert('🔕 Push wurde nicht erlaubt.');
+      alert('❌ Push nicht erlaubt.');
       return;
     }
 
     try {
-      const registration = await navigator.serviceWorker.register('/service-worker.js');
-      console.log('✅ Service Worker registriert:', registration);
-
-      const sub = await registration.pushManager.getSubscription() || await registration.pushManager.subscribe({
+      const subscription = await swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
       });
@@ -40,25 +56,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch('/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sub)
+        body: JSON.stringify(subscription)
       });
 
       if (response.ok) {
-        alert('🔔 Push aktiviert!');
+        alert('🔐 Push aktiviert und gespeichert!');
       } else {
-        console.error('❌ Fehler beim Senden der Subscription:', response.statusText);
         alert('❌ Fehler beim Speichern der Subscription.');
       }
     } catch (err) {
-      console.error('❌ Fehler bei Push:', err);
-      alert('❌ Push-Fehler: ' + err.message);
+      console.error('❌ Fehler bei Push-Subscription:', err);
     }
   });
-});
+}
 
+// Hilfsfunktion
 function urlB64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
+  const rawData = atob(base64);
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 }
