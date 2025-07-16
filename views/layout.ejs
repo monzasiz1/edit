@@ -202,6 +202,52 @@
   </script>
 <% } %>
 
+<% if (user && typeof path !== 'undefined' && path === '/dashboard') { %>
+  <button id="push-button" class="push-button" title="Push aktivieren">
+    🔔
+    <span class="tooltip">Push aktivieren</span>
+  </button>
+<% } %>
+
+<script>
+  // Animation beim Einblenden
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('push-button');
+    if (btn) btn.classList.add('visible');
+  });
+
+  // Push aktivieren bei Klick
+  document.addEventListener('click', async e => {
+    if (e.target.closest('#push-button')) {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return alert('Push abgelehnt.');
+
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        const newSub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlB64ToUint8Array('<%= process.env.VAPID_PUBLIC_KEY || "" %>')
+        });
+
+        await fetch('/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newSub)
+        });
+
+        alert('Push aktiviert 🎉');
+      }
+    }
+  });
+
+  function urlB64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+  }
+</script>
 
 </body>
 </html>
