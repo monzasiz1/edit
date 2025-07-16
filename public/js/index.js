@@ -11,63 +11,51 @@ if (isIos && !isStandalone) {
   alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere diese App über „Teilen“ > „Zum Home-Bildschirm“.');
 }
 
-// Haupt-Logik für Push
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(async function (registration) {
+// Warte auf Button-Click
+document.addEventListener('DOMContentLoaded', async () => {
+  const button = document.getElementById('enablePush');
+  if (!button) return;
+
+  button.addEventListener('click', async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert('❌ Push API wird nicht unterstützt.');
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      alert('🔕 Push wurde nicht erlaubt.');
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.register('/service-worker.js');
       console.log('✅ Service Worker registriert:', registration);
 
-      // Warten bis aktiv (besonders bei iOS wichtig)
-      if (!registration.active) {
-        await new Promise(resolve => {
-          const interval = setInterval(() => {
-            if (registration.active) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 100);
-        });
-      }
+      const sub = await registration.pushManager.getSubscription() || await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
+      });
 
-      // Push-Freigabe anfordern, falls noch nicht erfolgt
-      if (Notification.permission !== 'granted') {
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-          console.warn('🔕 Push nicht erlaubt vom Benutzer.');
-          return;
-        }
-      }
+      const response = await fetch('/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub)
+      });
 
-      const existingSubscription = await registration.pushManager.getSubscription();
-      if (!existingSubscription) {
-        const newSub = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-        });
-
-        const response = await fetch('/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newSub)
-        });
-
-        if (response.ok) {
-          console.log('🔐 Push-Subscription gesendet und gespeichert.');
-        } else {
-          console.error('❌ Fehler beim Senden der Subscription:', response.statusText);
-        }
+      if (response.ok) {
+        alert('🔔 Push aktiviert!');
       } else {
-        console.log('📬 Benutzer ist bereits für Push abonniert.');
+        console.error('❌ Fehler beim Senden der Subscription:', response.statusText);
+        alert('❌ Fehler beim Speichern der Subscription.');
       }
-    })
-    .catch(function (error) {
-      console.error('❌ SW-Fehler:', error);
-    });
-} else {
-  console.warn('⚠️ Service Worker oder Push API wird nicht unterstützt.');
-}
+    } catch (err) {
+      console.error('❌ Fehler bei Push:', err);
+      alert('❌ Push-Fehler: ' + err.message);
+    }
+  });
+});
 
-// Hilfsfunktion
 function urlB64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');

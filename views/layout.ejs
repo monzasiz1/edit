@@ -2,27 +2,22 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <!-- Manifest für Android & moderne Browser -->
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffffff">
-<!-- iOS: Home‑Screen‑Icon + Status‑Bar -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Spießbuch">
-<link rel="apple-touch-icon" href="/icons/logo-192.png">
-
-<!-- Optional: Splash Screens für iOS (verschiedene Gerätegrößen) -->
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-2048x2732.png" media="(device-width:…)" />
-<!-- … weitere für all deine Zielgeräte … -->
-
-
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
-  <link rel="stylesheet" href="/style.css" />
-  <link rel="stylesheet" href="/hamburger.css">
+
+  <!-- Manifest & PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Spießbuch">
+  <link rel="apple-touch-icon" href="/icons/logo-192.png">
   <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-2048x2732.png" media="(device-width:…)" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/hamburger.css">
   <style> html { scroll-behavior: smooth; } </style>
 </head>
 <body>
@@ -33,10 +28,10 @@
 
     <% if (user) { %>
       <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen">
-  <span></span>
-  <span></span>
-  <span></span>
-</button>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
       <ul id="main-menu">
         <li><a href="/dashboard">Dashboard</a></li>
@@ -48,7 +43,9 @@
         <li><a href="/ranking">Ranking</a></li>
         <li><a href="/export">Export</a></li>
         <li><a href="/strafenkatalog.pdf" target="_blank" rel="noopener">📄 Strafenkatalog</a></li>
-        <!-- Korrigierter Logout-Button -->
+        <li>
+          <button id="enablePush" class="btn">🔔 Push aktivieren</button>
+        </li>
         <li>
           <form action="/logout" method="POST" style="display:inline; margin:0;">
             <button
@@ -83,11 +80,65 @@
   <footer class="footer">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
   </footer>
+
   <script>
-if ('serviceWorker' in navigator) {
+const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
+
+const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+const isStandalone = ('standalone' in navigator) && navigator.standalone;
+if (isIos && !isStandalone) {
+  alert('📱 Für Push bitte über „Teilen“ > „Zum Home-Bildschirm“ installieren.');
+}
+
+if ('serviceWorker' in navigator && 'PushManager' in window) {
   navigator.serviceWorker.register('/service-worker.js')
-    .then(() => console.log('SW registriert'))
-    .catch(err => console.error('SW-Fehler', err));
+    .then(async registration => {
+      console.log('✅ Service Worker registriert');
+
+      if (Notification.permission === 'default') {
+        document.getElementById('push-snackbar').style.display = 'block';
+      }
+
+      document.getElementById('push-allow-btn').addEventListener('click', async () => {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('🚫 Benachrichtigungen wurden abgelehnt.');
+          return;
+        }
+
+        const existingSubscription = await registration.pushManager.getSubscription();
+        if (!existingSubscription) {
+          const newSub = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
+          });
+
+          const response = await fetch('/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSub)
+          });
+
+          if (response.ok) {
+            alert('🔔 Du erhältst nun Push-Benachrichtigungen!');
+          } else {
+            console.error('❌ Fehler bei Subscription:', response.statusText);
+          }
+        }
+
+        document.getElementById('push-snackbar').style.display = 'none';
+      });
+    })
+    .catch(err => console.error('SW-Fehler:', err));
+} else {
+  console.warn('⚠️ Push oder SW nicht unterstützt.');
+}
+
+function urlB64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 }
 </script>
 
