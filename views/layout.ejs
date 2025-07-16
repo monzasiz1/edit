@@ -72,86 +72,50 @@
   <script src="/menu.js"></script>
 
   <% if (user) { %>
-    <script>
-      const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
+   
+  <script>
+    if (window.location.pathname === '/dashboard') {
+      navigator.serviceWorker.ready.then(async reg => {
+        const sub = await reg.pushManager.getSubscription();
 
-      if (window.location.pathname === '/dashboard') {
-        const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-        const isStandalone = ('standalone' in navigator) && navigator.standalone;
+        if (!sub) {
+          const btn = document.createElement('button');
+          btn.className = 'push-button';
+          btn.innerHTML = '🔔<span class="tooltip">Push aktivieren</span>';
+          btn.title = 'Push aktivieren';
 
-        if (isIos && !isStandalone) {
-          alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über "Teilen" > "Zum Home-Bildschirm".');
-        }
+          btn.addEventListener('click', async () => {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') return alert('Push abgelehnt');
 
-        function urlB64ToUint8Array(base64String) {
-          const padding = '='.repeat((4 - base64String.length % 4) % 4);
-          const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-          const rawData = window.atob(base64);
-          return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-        }
-
-        navigator.serviceWorker.ready.then(async reg => {
-          const sub = await reg.pushManager.getSubscription();
-
-          if (!sub) {
-            const btn = document.createElement('button');
-            btn.textContent = '🔔 Push aktivieren';
-            btn.className = 'btn';
-            btn.style.position = 'fixed';
-            btn.style.bottom = '1rem';
-            btn.style.right = '1rem';
-            btn.style.zIndex = '9999';
-            btn.style.padding = '0.7em 1em';
-            btn.style.borderRadius = '1em';
-            btn.style.background = 'var(--accent, #607848)';
-            btn.style.color = 'white';
-            btn.style.border = 'none';
-            btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-            btn.style.cursor = 'pointer';
-
-            btn.addEventListener('click', async () => {
-              try {
-                const permission = await Notification.requestPermission();
-                if (permission !== 'granted') {
-                  alert('Benachrichtigungen wurden nicht erlaubt.');
-                  return;
-                }
-
-                const newSub = await reg.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-                });
-
-                const res = await fetch('/subscribe', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(newSub)
-                });
-
-                if (res.ok) {
-                  alert('✅ Push erfolgreich aktiviert!');
-                  btn.remove();
-                } else {
-                  alert('❌ Fehler beim Speichern der Subscription.');
-                }
-              } catch (err) {
-                console.error('Push-Aktivierung fehlgeschlagen:', err);
-                alert('❌ Push konnte nicht aktiviert werden.');
-              }
+            const newSub = await reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlB64ToUint8Array('<%= process.env.VAPID_PUBLIC_KEY || "" %>')
             });
 
-            document.body.appendChild(btn);
-          } else {
-            // Bereits abonniert → erneut senden
             await fetch('/subscribe', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(sub)
+              body: JSON.stringify(newSub)
             });
-          }
-        });
+
+            alert('✅ Push aktiviert!');
+            btn.remove();
+          });
+
+          document.body.appendChild(btn);
+        }
+      });
+
+      function urlB64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
       }
-    </script>
-  <% } %>
+    }
+  </script>
+<% } %>
+
 </body>
 </html>

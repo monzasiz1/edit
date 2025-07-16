@@ -2108,3 +2108,49 @@ body {
   pointer-events: none;
 
 }
+
+  .push-button {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background-color: #607848;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s, opacity 0.3s;
+    opacity: 0.85;
+  }
+
+  .push-button:hover {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+
+  .push-button .tooltip {
+    position: absolute;
+    bottom: 125%;
+    right: 50%;
+    transform: translateX(50%);
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .push-button:hover .tooltip {
+    opacity: 1;
+  }
