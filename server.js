@@ -35,6 +35,7 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Session mit PG-Store ────────────────────────────────────────────────
+// ─── Session mit PG-Store ────────────────────────────────────────────────
 app.use(session({
   store: new PgSession({
     pool: db,                   // PG-Pool
@@ -45,10 +46,21 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,              // auf true, wenn HTTPS
+    secure: process.env.NODE_ENV === 'production', // sicher bei HTTPS
     maxAge: 24 * 60 * 60 * 1000 // 1 Tag
   }
 }));
+
+// 🔐 HTTPS erzwingen (nur in Produktion)
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      return res.redirect('https://' + req.headers.host + req.url);
+    }
+    next();
+  });
+}
+
 
 // Admin-Flag stets Boolean
 app.use((req, res, next) => {
