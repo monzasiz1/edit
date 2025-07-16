@@ -19,21 +19,49 @@
   <link rel="stylesheet" href="/hamburger.css">
   <style>
     html { scroll-behavior: smooth; }
-    .btn-push {
-      background-color: var(--green-dark, #7a8450);
+    .push-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #556b2f;
       color: white;
-      font-weight: bold;
-      padding: 0.6rem 1.2rem;
       border: none;
-      border-radius: 10px;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 18px;
       cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-      display: inline-block;
-      margin: 1rem auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      z-index: 1000;
     }
-    .btn-push:hover {
-      background-color: #64703e;
+
+    .push-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .push-button .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 120%;
+      right: 50%;
+      transform: translateX(50%);
+      background-color: #333;
+      color: #fff;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 5px;
+      white-space: nowrap;
+      transition: opacity 0.3s;
+    }
+
+    .push-button:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
     }
   </style>
 </head>
@@ -86,162 +114,51 @@
   </footer>
 
   <script src="/menu.js"></script>
-  
-  <% if (user) { %>
-  <script>
-    const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
 
-    // Nur auf Dashboard anzeigen
-    if (window.location.pathname === '/dashboard') {
-      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      const isStandalone = ('standalone' in navigator) && navigator.standalone;
+  <% if (user && path === '/dashboard') { %>
+    <button id="push-button" class="push-button" title="Push aktivieren">
+      🔔<span class="tooltip">Push aktivieren</span>
+    </button>
 
-      if (isIos && !isStandalone) {
-        alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über "Teilen" > "Zum Home-Bildschirm".');
-      }
+    <script>
+      const PUBLIC_VAPID_KEY = '<%= process.env.VAPID_PUBLIC_KEY || "" %>';
 
-      // Funktion zum Umwandeln des VAPID-Keys
+      window.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('push-button');
+        if (btn) btn.classList.add('visible');
+      });
+
+      document.addEventListener('click', async e => {
+        if (e.target.closest('#push-button')) {
+          const permission = await Notification.requestPermission();
+          if (permission !== 'granted') return alert('Push abgelehnt.');
+
+          const reg = await navigator.serviceWorker.ready;
+          const sub = await reg.pushManager.getSubscription();
+          if (!sub) {
+            const newSub = await reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
+            });
+
+            await fetch('/subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newSub)
+            });
+
+            alert('Push aktiviert 🎉');
+          }
+        }
+      });
+
       function urlB64ToUint8Array(base64String) {
         const padding = '='.repeat((4 - base64String.length % 4) % 4);
         const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
         const rawData = window.atob(base64);
         return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
       }
-
-      navigator.serviceWorker.ready.then(async reg => {
-        const sub = await reg.pushManager.getSubscription();
-
-        if (!sub) {
-          // Button erzeugen
-          const btn = document.createElement('button');
-          btn.innerHTML = '🔔<span class="text"> Push aktivieren</span>';
-          btn.className = 'push-btn';
-          document.body.appendChild(btn);
-
-          // CSS direkt einfügen
-          const style = document.createElement('style');
-          style.textContent = `
-            .push-btn {
-              position: fixed;
-              bottom: 1rem;
-              right: 1rem;
-              padding: 0.6em 1.2em;
-              font-size: 0.9rem;
-              background: #607848;
-              color: white;
-              border: none;
-              border-radius: 2rem;
-              cursor: pointer;
-              opacity: 0.7;
-              z-index: 1000;
-              transition: all 0.3s ease;
-              box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            }
-            .push-btn:hover {
-              opacity: 1;
-              transform: scale(1.03);
-            }
-            .push-btn .text {
-              margin-left: 0.4em;
-              font-weight: 500;
-              opacity: 0;
-              transition: opacity 0.3s ease;
-            }
-            .push-btn:hover .text {
-              opacity: 1;
-            }
-            @media (max-width: 500px) {
-              .push-btn .text {
-                display: none;
-              }
-            }
-          `;
-          document.head.appendChild(style);
-
-          // Klick → Subscribe
-          btn.addEventListener('click', async () => {
-            try {
-              const permission = await Notification.requestPermission();
-              if (permission !== 'granted') {
-                alert('🔕 Push-Benachrichtigungen wurden blockiert.');
-                return;
-              }
-
-              const newSub = await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-              });
-
-              const res = await fetch('/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newSub)
-              });
-
-              if (res.ok) {
-                btn.remove();
-                alert('✅ Push erfolgreich aktiviert.');
-              } else {
-                alert('❌ Fehler beim Speichern.');
-              }
-            } catch (err) {
-              console.error('Push-Fehler:', err);
-              alert('❌ Push-Aktivierung fehlgeschlagen.');
-            }
-          });
-        } else {
-          // Bereits abonniert → still erneut senden
-          await fetch('/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub)
-          });
-        }
-      });
-    }
-  </script>
-<% } %>
-
-
-<script>
-  // Animation beim Einblenden
-  window.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('push-button');
-    if (btn) btn.classList.add('visible');
-  });
-
-  // Push aktivieren bei Klick
-  document.addEventListener('click', async e => {
-    if (e.target.closest('#push-button')) {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') return alert('Push abgelehnt.');
-
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (!sub) {
-        const newSub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlB64ToUint8Array('<%= process.env.VAPID_PUBLIC_KEY || "" %>')
-        });
-
-        await fetch('/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newSub)
-        });
-
-        alert('Push aktiviert 🎉');
-      }
-    }
-  });
-
-  function urlB64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
-  }
-</script>
-
+    </script>
+  <% } %>
 </body>
 </html>
