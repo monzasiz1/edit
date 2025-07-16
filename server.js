@@ -16,7 +16,7 @@ const vapidKeys = {
   publicKey: 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA',
   privateKey: 'ykcxE-Qb14LxNI0WDxBZf8gVnX3Lkz0qWxNF4Ia4v1s',
 };
-webPush.setVapidDetails('mailto:vorsitzender@gutschlag.de', vapidKeys.publicKey, vapidKeys.privateKey); (test)
+webPush.setVapidDetails('mailto:vorsitzender@gutschlag.de', vapidKeys.publicKey, vapidKeys.privateKey);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -54,6 +54,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Pfad für EJS verfügbar machen (z. B. für Push-Button im Layout)
+app.use((req, res, next) => {
+  res.locals.path = req.path;
+  next();
+});
+
 // Routen
 app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
@@ -77,6 +83,7 @@ app.post('/subscribe', (req, res) => {
     });
 });
 
+// Push-Nachricht senden
 async function sendPushNotification(userId, title, message) {
   try {
     const result = await db.query('SELECT push_subscription FROM users WHERE id = $1', [userId]);
@@ -84,13 +91,17 @@ async function sendPushNotification(userId, title, message) {
     if (!pushSubscription) return;
 
     await webPush.sendNotification(pushSubscription, JSON.stringify({
-      title, body: message, icon: '/icons/logo-192.png', badge: '/icons/logo-192.png'
+      title,
+      body: message,
+      icon: '/icons/logo-192.png',
+      badge: '/icons/logo-192.png'
     }));
   } catch (err) {
     console.error('Push Fehler:', err);
   }
 }
 
+// Strafe hinzufügen + Push senden
 app.post('/add-penalty', async (req, res) => {
   const { userId, amount, event } = req.body;
   await db.query('INSERT INTO penalties (user_id, amount, event) VALUES ($1, $2, $3)', [userId, amount, event]);
@@ -98,6 +109,8 @@ app.post('/add-penalty', async (req, res) => {
   res.status(200).send('Strafe + Push');
 });
 
+// 404 Seite
 app.use((req, res) => res.status(404).render('404', { title: 'Seite nicht gefunden' }));
 
+// Serverstart
 app.listen(PORT, () => console.log(`✅ Server läuft auf http://localhost:${PORT}`));
