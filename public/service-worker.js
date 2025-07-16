@@ -1,4 +1,3 @@
-// service-worker.js
 const CACHE_NAME = 'Spiessbuch-v1';
 const urlsToCache = [
   '/',
@@ -11,7 +10,11 @@ const urlsToCache = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    }).then(() => self.skipWaiting()).catch(err => {
+      console.error('❌ Fehler beim Caching:', err);
+    })
   );
 });
 
@@ -25,12 +28,11 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request)).catch(() => caches.match('/offline.html'))
+    caches.match(event.request).then(response => response || fetch(event.request)).catch(() => caches.match('/offline.html'))
   );
 });
 
-// 💬 PUSH erhalten und anzeigen
-self.addEventListener('push', function(event) {
+self.addEventListener('push', event => {
   const data = event.data?.json() || {};
   const title = data.title || 'Neue Benachrichtigung';
   const options = {
@@ -39,16 +41,14 @@ self.addEventListener('push', function(event) {
     badge: '/icons/logo-192.png',
     data: { url: data.url || '/' }
   };
-
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// 💡 Bei Klick → richtige Seite öffnen
-self.addEventListener('notificationclick', function(event) {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(clientList => {
-      for (const client of clientList) {
+    clients.matchAll({ type: 'window' }).then(clientsArr => {
+      for (const client of clientsArr) {
         if (client.url.includes(event.notification.data.url)) {
           return client.focus();
         }
