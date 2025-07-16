@@ -16,7 +16,7 @@ const vapidKeys = {
   publicKey: 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA',
   privateKey: 'ykcxE-Qb14LxNI0WDxBZf8gVnX3Lkz0qWxNF4Ia4v1s',
 };
-webPush.setVapidDetails('mailto:vorsitzender@gutschlag.de', vapidKeys.publicKey, vapidKeys.privateKey);
+webPush.setVapidDetails('mailto:vorsitzender@gutschlag.de', vapidKeys.publicKey, vapidKeys.privateKey); (test)
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
