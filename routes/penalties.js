@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+const webpush = require('web-push');
+
 // Middleware
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
