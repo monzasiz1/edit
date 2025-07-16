@@ -24,17 +24,17 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
         if (response.ok) {
           console.log('🔐 Push-Subscription gesendet');
         } else {
-          console.error('❌ Fehler beim Senden der Subscription:', response.statusText);
+          console.error('❌ Fehler beim Senden:', response.statusText);
         }
       } else {
-        console.log('📬 Benutzer ist bereits für Push abonniert.');
+        console.log('📬 Bereits abonniert.');
       }
     })
-    .catch(function (error) {
-      console.error('❌ Fehler bei der Service Worker-Registrierung:', error);
+    .catch(error => {
+      console.error('❌ SW-Fehler:', error);
     });
 } else {
-  console.warn('⚠️ Service Worker oder Push API wird nicht unterstützt.');
+  console.warn('⚠️ Kein SW oder PushManager.');
 }
 
 function urlB64ToUint8Array(base64String) {

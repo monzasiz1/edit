@@ -5,25 +5,19 @@ const PgSession = require('connect-pg-simple')(session);
 const methodOverride = require('method-override');
 const path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
-const db = require('./db'); // Dein PG-Pool für PostgreSQL
+const db = require('./db');
 const webPush = require('web-push');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
 
-// VAPID-Schlüssel für Push-Benachrichtigungen
 const vapidKeys = {
-  publicKey: 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA',  // Ersetze dies mit deinem VAPID Public Key
-  privateKey: 'ykcxE-Qb14LxNI0WDxBZf8gVnX3Lkz0qWxNF4Ia4v1s', // Ersetze dies mit deinem VAPID Private Key
+  publicKey: 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA',
+  privateKey: 'ykcxE-Qb14LxNI0WDxBZf8gVnX3Lkz0qWxNF4Ia4v1s',
 };
-webPush.setVapidDetails(
-  'mailto:vorsitzender@gutschlag.de',  // Deine E-Mail-Adresse
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
-);
+webPush.setVapidDetails('mailto:vorsitzender@gutschlag.de', vapidKeys.publicKey, vapidKeys.privateKey);
 
-// Setzt EJS als View Engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(ejsLayouts);
@@ -34,125 +28,76 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Session mit PG-Store ────────────────────────────────────────────────
-// ─── Session mit PG-Store ────────────────────────────────────────────────
+// Weiterleitung: / → /login
+app.get('/', (req, res) => res.redirect('/login'));
+
+// Sessions
 app.use(session({
-  store: new PgSession({
-    pool: db,                   // PG-Pool
-    tableName: 'session',       // Tabelle für Sitzungen
-    createTableIfMissing: true, // automatisch anlegen
-  }),
+  store: new PgSession({ pool: db, tableName: 'session', createTableIfMissing: true }),
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // sicher bei HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 1 Tag
-  }
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// 🔐 HTTPS erzwingen (nur in Produktion)
-if (process.env.NODE_ENV === 'production') {
-  app.use((req, res, next) => {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-      return res.redirect('https://' + req.headers.host + req.url);
-    }
-    next();
-  });
-}
-
-
-// Admin-Flag stets Boolean
+// Admin flag normalisieren
 app.use((req, res, next) => {
   if (req.session.user) {
-    const a = req.session.user.is_admin;
-    req.session.user.is_admin = [true,1,'1','true','on'].includes(a);
+    req.session.user.is_admin = [true, 1, '1', 'true', 'on'].includes(req.session.user.is_admin);
   }
   next();
 });
 
-// User in EJS verfügbar machen
+// User für Views verfügbar
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
 
-// ─── Deine Routen ────────────────────────────────────────────────────────
-app.get('/', (req, res) => {
-  res.redirect('/login');
-});
+// Routen
 app.use('/', require('./routes/auth'));
-
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
-app.use('/users',     require('./routes/users'));
-app.use('/ranking',   require('./routes/ranking'));
-app.use('/export',    require('./routes/exportseite'));
-app.use('/logout',    require('./routes/logout'));
-app.use('/profil',    require('./routes/profile'));
+app.use('/users', require('./routes/users'));
+app.use('/ranking', require('./routes/ranking'));
+app.use('/export', require('./routes/exportseite'));
+app.use('/logout', require('./routes/logout'));
+app.use('/profil', require('./routes/profile'));
 
-// 404
-app.use((req, res) => {
-  res.status(404).render('404', { title: 'Seite nicht gefunden' });
-});
-
-// Route zum Speichern der Push-Subscription
-app.post('/save-push-subscription', (req, res) => {
+// Push-Subscription speichern
+app.post('/subscribe', (req, res) => {
   const subscription = req.body;
+  if (!req.session.user) return res.status(403).send('Nicht eingeloggt');
 
-  // Speichern der Push-Subscription in der DB (z. B. in der Tabelle 'users')
   db.query('UPDATE users SET push_subscription = $1 WHERE id = $2', [subscription, req.session.user.id])
-    .then(() => res.status(200).send('Push-Subscription gespeichert'))
+    .then(() => res.status(200).send('Push gespeichert'))
     .catch(err => {
-      console.error('Fehler beim Speichern der Subscription', err);
-      res.status(500).send('Fehler beim Speichern der Subscription');
+      console.error('Fehler beim Speichern', err);
+      res.status(500).send('Fehler beim Speichern');
     });
 });
 
-// Funktion zum Senden einer Push-Nachricht
 async function sendPushNotification(userId, title, message) {
   try {
-    // Hole die Push-Subscription des Nutzers aus der DB
-    const user = await db.query('SELECT push_subscription FROM users WHERE id = $1', [userId]);
-    const pushSubscription = user.rows[0].push_subscription;
+    const result = await db.query('SELECT push_subscription FROM users WHERE id = $1', [userId]);
+    const pushSubscription = result.rows[0]?.push_subscription;
+    if (!pushSubscription) return;
 
-    if (!pushSubscription) {
-      console.log('Kein Push-Abonnement gefunden');
-      return;
-    }
-
-    // Payload für die Push-Nachricht
-    const notificationPayload = JSON.stringify({
-      title: title,
-      body: message,
-      icon: '/icons/logo-192.png',
-      badge: '/icons/logo-192.png'
-    });
-
-    // Sende die Push-Nachricht
-    await webPush.sendNotification(pushSubscription, notificationPayload);
-    console.log('Push-Nachricht erfolgreich gesendet');
+    await webPush.sendNotification(pushSubscription, JSON.stringify({
+      title, body: message, icon: '/icons/logo-192.png', badge: '/icons/logo-192.png'
+    }));
   } catch (err) {
-    console.error('Fehler beim Senden der Push-Nachricht', err);
+    console.error('Push Fehler:', err);
   }
 }
 
-// Beispiel: Route für das Hinzufügen einer Strafe
 app.post('/add-penalty', async (req, res) => {
   const { userId, amount, event } = req.body;
-
-  // Füge die Strafe zur Datenbank hinzu
   await db.query('INSERT INTO penalties (user_id, amount, event) VALUES ($1, $2, $3)', [userId, amount, event]);
-
-  // Sende eine Push-Benachrichtigung an den Nutzer
-  const title = 'Neue Strafe erhalten';
-  const message = `Du hast eine Strafe von €${amount} für das Event "${event}" erhalten.`;
-
-  await sendPushNotification(userId, title, message);
-
-  res.status(200).send('Strafe hinzugefügt und Benachrichtigung gesendet');
+  await sendPushNotification(userId, 'Neue Strafe erhalten', `Du hast €${amount} für "${event}" bekommen.`);
+  res.status(200).send('Strafe + Push');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
-});
+app.use((req, res) => res.status(404).render('404', { title: 'Seite nicht gefunden' }));
+
+app.listen(PORT, () => console.log(`✅ Server läuft auf http://localhost:${PORT}`));
