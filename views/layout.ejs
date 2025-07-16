@@ -86,92 +86,122 @@
   </footer>
 
   <script src="/menu.js"></script>
+  
   <% if (user) { %>
   <script>
     const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
 
-    // Nur im Dashboard anzeigen
+    // Nur auf Dashboard anzeigen
     if (window.location.pathname === '/dashboard') {
       const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
       const isStandalone = ('standalone' in navigator) && navigator.standalone;
 
-      // iOS-Hinweis
       if (isIos && !isStandalone) {
-        alert('📱 Für Benachrichtigungen: "Zum Home-Bildschirm" hinzufügen.');
+        alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über "Teilen" > "Zum Home-Bildschirm".');
       }
 
-      // Button erzeugen
-      const btn = document.createElement('button');
-      btn.textContent = '🔔 Push aktivieren';
-      btn.className = 'btn';
-      btn.style.position = 'fixed';
-      btn.style.bottom = '1rem';
-      btn.style.right = '1rem';
-      btn.style.zIndex = '9999';
-      btn.style.padding = '0.7em 1em';
-      btn.style.borderRadius = '1em';
-      btn.style.background = 'var(--accent, #607848)';
-      btn.style.color = 'white';
-      btn.style.border = 'none';
-      btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-      btn.style.cursor = 'pointer';
+      // Funktion zum Umwandeln des VAPID-Keys
+      function urlB64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+      }
 
-      document.body.appendChild(btn);
-
-      btn.addEventListener('click', async () => {
-        try {
-          const permission = await Notification.requestPermission();
-          if (permission !== 'granted') {
-            alert('Benachrichtigungen wurden nicht erlaubt.');
-            return;
-          }
-
-          const reg = await navigator.serviceWorker.ready;
-          const sub = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-          });
-
-          const res = await fetch('/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub)
-          });
-
-          if (res.ok) {
-            alert('✅ Push erfolgreich aktiviert!');
-            btn.remove();
-          } else {
-            alert('❌ Fehler beim Aktivieren');
-          }
-        } catch (err) {
-          console.error('Fehler:', err);
-          alert('❌ Push konnte nicht aktiviert werden.');
-        }
-      });
-
-      // Falls schon abonniert: automatisch /subscribe ausführen (z. B. nach Login)
       navigator.serviceWorker.ready.then(async reg => {
         const sub = await reg.pushManager.getSubscription();
-        if (sub) {
+
+        if (!sub) {
+          // Button erzeugen
+          const btn = document.createElement('button');
+          btn.innerHTML = '🔔<span class="text"> Push aktivieren</span>';
+          btn.className = 'push-btn';
+          document.body.appendChild(btn);
+
+          // CSS direkt einfügen
+          const style = document.createElement('style');
+          style.textContent = `
+            .push-btn {
+              position: fixed;
+              bottom: 1rem;
+              right: 1rem;
+              padding: 0.6em 1.2em;
+              font-size: 0.9rem;
+              background: #607848;
+              color: white;
+              border: none;
+              border-radius: 2rem;
+              cursor: pointer;
+              opacity: 0.7;
+              z-index: 1000;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            }
+            .push-btn:hover {
+              opacity: 1;
+              transform: scale(1.03);
+            }
+            .push-btn .text {
+              margin-left: 0.4em;
+              font-weight: 500;
+              opacity: 0;
+              transition: opacity 0.3s ease;
+            }
+            .push-btn:hover .text {
+              opacity: 1;
+            }
+            @media (max-width: 500px) {
+              .push-btn .text {
+                display: none;
+              }
+            }
+          `;
+          document.head.appendChild(style);
+
+          // Klick → Subscribe
+          btn.addEventListener('click', async () => {
+            try {
+              const permission = await Notification.requestPermission();
+              if (permission !== 'granted') {
+                alert('🔕 Push-Benachrichtigungen wurden blockiert.');
+                return;
+              }
+
+              const newSub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
+              });
+
+              const res = await fetch('/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newSub)
+              });
+
+              if (res.ok) {
+                btn.remove();
+                alert('✅ Push erfolgreich aktiviert.');
+              } else {
+                alert('❌ Fehler beim Speichern.');
+              }
+            } catch (err) {
+              console.error('Push-Fehler:', err);
+              alert('❌ Push-Aktivierung fehlgeschlagen.');
+            }
+          });
+        } else {
+          // Bereits abonniert → still erneut senden
           await fetch('/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(sub)
           });
-          btn.remove(); // Button nicht anzeigen, wenn schon aktiviert
         }
       });
-
-      function urlB64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
-      }
     }
   </script>
 <% } %>
+
 
 </body>
 </html>
