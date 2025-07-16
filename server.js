@@ -66,7 +66,11 @@ app.use((req, res, next) => {
 });
 
 // ─── Deine Routen ────────────────────────────────────────────────────────
-app.use('/',      require('./routes/auth'));
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+app.use('/', require('./routes/auth'));
+
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
 app.use('/users',     require('./routes/users'));
