@@ -54,12 +54,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Pfad für EJS verfügbar machen
-app.use((req, res, next) => {
-  res.locals.path = req.path;
-  next();
-});
-
 // Routen
 app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
