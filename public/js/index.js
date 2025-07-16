@@ -1,41 +1,40 @@
-// Überprüfen, ob der Browser Service Worker und Push API unterstützt
+const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
+
 if ('serviceWorker' in navigator && 'PushManager' in window) {
-  // Service Worker registrieren
-  navigator.serviceWorker.register('/public/service-worker.js', { scope: '/' })
-    .then(function(registration) {
-      console.log('Service Worker erfolgreich registriert:', registration);
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(async function (registration) {
+      console.log('✅ Service Worker registriert:', registration);
 
-      // Optional: Prüfen, ob der Service Worker bereits installiert wurde
-      if (registration.installing) {
-        console.log('Service Worker wird installiert...');
-      }
+      const existingSubscription = await registration.pushManager.getSubscription();
+      if (!existingSubscription) {
+        const newSub = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
+        });
 
-      // Optional: Informieren, wenn der Service Worker aktiv ist
-      if (registration.active) {
-        console.log('Service Worker ist aktiv.');
+        await fetch('/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newSub)
+        });
+        console.log('🔐 Push-Subscription gesendet');
+      } else {
+        console.log('📬 Benutzer ist bereits für Push abonniert.');
       }
     })
-    .catch(function(error) {
-      console.error('Fehler bei der Registrierung des Service Workers:', error);
+    .catch(function (error) {
+      console.error('❌ Fehler bei der Service Worker-Registrierung:', error);
     });
 } else {
-  // Falls Service Worker oder Push API nicht unterstützt wird
-  console.log('Service Worker oder Push API wird in diesem Browser nicht unterstützt.');
+  console.warn('⚠️ Service Worker oder Push API wird nicht unterstützt.');
 }
 
-// Hilfsfunktion, um den Public Key in das richtige Format umzuwandeln (Base64 -> Uint8Array)
 function urlB64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
+    .replace(/-/g, '+')
     .replace(/_/g, '/');
-  
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
 
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  
-  return outputArray;
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 }

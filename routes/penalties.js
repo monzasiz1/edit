@@ -66,19 +66,53 @@ router.get('/add', requireAdmin, async (req, res) => {
 });
 
 // Neue Strafe anlegen (Formular absenden)
+// Neue Strafe anlegen (Formular absenden)
 router.post('/add', requireAdmin, async (req, res) => {
   const { user_id, type, event, amount, date } = req.body;
+
   try {
+    // Strafe speichern
     await db.query(
       'INSERT INTO penalties (user_id, type, event, amount, date, admin_id) VALUES ($1, $2, $3, $4, $5, $6)',
       [user_id, type, event, amount, date, req.session.user.id]
     );
+
+    // ✅ Push an den betroffenen User senden
+    try {
+      const result = await db.query(
+  'SELECT subscription FROM push_subscriptions WHERE user_id = $1',
+  [user_id]
+);
+
+      const subscription = result.rows[0]?.subscription;
+
+      if (subscription) {
+        const payload = JSON.stringify({
+          title: 'Neue Strafe erhalten 🛑',
+          body: `Der Spieß hat dir eine neue Strafe eingetragen.`,
+          url: '/dashboard'
+        });
+
+        await webpush.sendNotification(subscription, payload);
+      }
+    } catch (err) {
+      console.error('Push fehlgeschlagen:', err.message);
+    }
+
+    // Redirect erst danach!
     res.redirect('/penalties/all');
+
   } catch (e) {
     const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
-    res.render('penalties_add', { users, user: req.session.user, error: 'Fehler beim Speichern! ' + e.message });
+    res.render('penalties_add', {
+      users,
+      user: req.session.user,
+      error: 'Fehler beim Speichern! ' + e.message
+    });
   }
 });
+
+
 
 // Strafe bearbeiten (Formular anzeigen)
 router.get('/edit/:id', requireAdmin, async (req, res) => {
