@@ -1,86 +1,157 @@
-<% if (user) { %>
-  <script>
-    const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
 
-    // Nur auf /dashboard anzeigen
-    if (window.location.pathname === '/dashboard') {
-      const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      const isStandalone = ('standalone' in navigator) && navigator.standalone;
+  <!-- Manifest + Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Spießbuch">
+  <link rel="apple-touch-icon" href="/icons/logo-192.png">
+  <link rel="apple-touch-icon" href="/logo.png">
 
-      if (isIos && !isStandalone) {
-        alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über "Teilen" > "Zum Home-Bildschirm".');
-      }
+  <!-- CSS -->
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/hamburger.css">
+  <style>
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
 
-      // Funktion zur Umwandlung des VAPID-Schlüssels
-      function urlB64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
-      }
+<body>
+  <nav class="main-nav">
+    <a href="/" class="logo logo-large">
+      <img src="/logo.png" alt="Logo" /> Spießbuch
+    </a>
 
-      // Erst wenn Service Worker ready ist
-      navigator.serviceWorker.ready.then(async reg => {
-        const sub = await reg.pushManager.getSubscription();
+    <% if (user) { %>
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen">
+        <span></span><span></span><span></span>
+      </button>
 
-        if (!sub) {
-          // Nur anzeigen, wenn NICHT abonniert
-          const btn = document.createElement('button');
-          btn.textContent = '🔔 Push aktivieren';
-          btn.className = 'btn';
-          btn.style.position = 'fixed';
-          btn.style.bottom = '1rem';
-          btn.style.right = '1rem';
-          btn.style.zIndex = '9999';
-          btn.style.padding = '0.7em 1em';
-          btn.style.borderRadius = '1em';
-          btn.style.background = 'var(--accent, #607848)';
-          btn.style.color = 'white';
-          btn.style.border = 'none';
-          btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-          btn.style.cursor = 'pointer';
+      <ul id="main-menu">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <% if (user.is_admin) { %>
+          <li><a href="/penalties">Strafen</a></li>
+          <li><a href="/users">Nutzer</a></li>
+        <% } %>
+        <li><a href="/profil">Profil</a></li>
+        <li><a href="/ranking">Ranking</a></li>
+        <li><a href="/export">Export</a></li>
+        <li><a href="/strafenkatalog.pdf" target="_blank" rel="noopener">📄 Strafenkatalog</a></li>
+        <li>
+          <form action="/logout" method="POST" style="display:inline; margin:0;">
+            <button type="submit" class="btn btn-logout btn-icon" title="Logout" style="background:none; border:none; padding:0; cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block">
+                <path d="M9 16l-1.5-1.5M9 16l1.5-1.5M9 16h7"/>
+                <path d="M16 12v-6a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v6"/>
+                <polyline points="19 16 22 12 19 8"/>
+                <line x1="22" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          </form>
+        </li>
+      </ul>
+    <% } %>
+  </nav>
 
-          btn.addEventListener('click', async () => {
-            try {
-              const permission = await Notification.requestPermission();
-              if (permission !== 'granted') {
-                alert('Benachrichtigungen wurden nicht erlaubt.');
-                return;
-              }
+  <% if (typeof noContainer !== 'undefined' && noContainer) { %>
+    <main><%- body %></main>
+  <% } else { %>
+    <main class="container"><%- body %></main>
+  <% } %>
 
-              const newSub = await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-              });
+  <footer class="footer">
+    &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
+  </footer>
 
-              const res = await fetch('/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newSub)
-              });
+  <script src="/menu.js"></script>
 
-              if (res.ok) {
-                alert('✅ Push erfolgreich aktiviert!');
-                btn.remove();
-              } else {
-                alert('❌ Fehler beim Speichern der Subscription.');
-              }
-            } catch (err) {
-              console.error('Push-Aktivierung fehlgeschlagen:', err);
-              alert('❌ Push konnte nicht aktiviert werden.');
-            }
-          });
+  <% if (user) { %>
+    <script>
+      const PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
 
-          document.body.appendChild(btn);
-        } else {
-          // Bereits abonniert → senden wir nochmal zur Sicherheit
-          await fetch('/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub)
-          });
+      if (window.location.pathname === '/dashboard') {
+        const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+        const isStandalone = ('standalone' in navigator) && navigator.standalone;
+
+        if (isIos && !isStandalone) {
+          alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über "Teilen" > "Zum Home-Bildschirm".');
         }
-      });
-    }
-  </script>
-<% } %>
+
+        function urlB64ToUint8Array(base64String) {
+          const padding = '='.repeat((4 - base64String.length % 4) % 4);
+          const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+          const rawData = window.atob(base64);
+          return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+
+        navigator.serviceWorker.ready.then(async reg => {
+          const sub = await reg.pushManager.getSubscription();
+
+          if (!sub) {
+            const btn = document.createElement('button');
+            btn.textContent = '🔔 Push aktivieren';
+            btn.className = 'btn';
+            btn.style.position = 'fixed';
+            btn.style.bottom = '1rem';
+            btn.style.right = '1rem';
+            btn.style.zIndex = '9999';
+            btn.style.padding = '0.7em 1em';
+            btn.style.borderRadius = '1em';
+            btn.style.background = 'var(--accent, #607848)';
+            btn.style.color = 'white';
+            btn.style.border = 'none';
+            btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            btn.style.cursor = 'pointer';
+
+            btn.addEventListener('click', async () => {
+              try {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                  alert('Benachrichtigungen wurden nicht erlaubt.');
+                  return;
+                }
+
+                const newSub = await reg.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
+                });
+
+                const res = await fetch('/subscribe', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(newSub)
+                });
+
+                if (res.ok) {
+                  alert('✅ Push erfolgreich aktiviert!');
+                  btn.remove();
+                } else {
+                  alert('❌ Fehler beim Speichern der Subscription.');
+                }
+              } catch (err) {
+                console.error('Push-Aktivierung fehlgeschlagen:', err);
+                alert('❌ Push konnte nicht aktiviert werden.');
+              }
+            });
+
+            document.body.appendChild(btn);
+          } else {
+            // Bereits abonniert → erneut senden
+            await fetch('/subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sub)
+            });
+          }
+        });
+      }
+    </script>
+  <% } %>
+</body>
+</html>

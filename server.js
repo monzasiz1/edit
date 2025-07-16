@@ -28,10 +28,8 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Weiterleitung: / → /login
 app.get('/', (req, res) => res.redirect('/login'));
 
-// Sessions
 app.use(session({
   store: new PgSession({ pool: db, tableName: 'session', createTableIfMissing: true }),
   secret: SESSION_SECRET,
@@ -40,7 +38,6 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// Admin flag normalisieren
 app.use((req, res, next) => {
   if (req.session.user) {
     req.session.user.is_admin = [true, 1, '1', 'true', 'on'].includes(req.session.user.is_admin);
@@ -48,19 +45,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// User für Views verfügbar
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
 
-// Pfad für EJS verfügbar machen (z. B. für Push-Button im Layout)
-app.use((req, res, next) => {
-  res.locals.path = req.path;
-  next();
-});
-
-// Routen
 app.use('/', require('./routes/auth'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/penalties', require('./routes/penalties'));
@@ -70,7 +59,6 @@ app.use('/export', require('./routes/exportseite'));
 app.use('/logout', require('./routes/logout'));
 app.use('/profil', require('./routes/profile'));
 
-// Push-Subscription speichern
 app.post('/subscribe', (req, res) => {
   const subscription = req.body;
   if (!req.session.user) return res.status(403).send('Nicht eingeloggt');
@@ -83,7 +71,6 @@ app.post('/subscribe', (req, res) => {
     });
 });
 
-// Push-Nachricht senden
 async function sendPushNotification(userId, title, message) {
   try {
     const result = await db.query('SELECT push_subscription FROM users WHERE id = $1', [userId]);
@@ -91,17 +78,13 @@ async function sendPushNotification(userId, title, message) {
     if (!pushSubscription) return;
 
     await webPush.sendNotification(pushSubscription, JSON.stringify({
-      title,
-      body: message,
-      icon: '/icons/logo-192.png',
-      badge: '/icons/logo-192.png'
+      title, body: message, icon: '/icons/logo-192.png', badge: '/icons/logo-192.png'
     }));
   } catch (err) {
     console.error('Push Fehler:', err);
   }
 }
 
-// Strafe hinzufügen + Push senden
 app.post('/add-penalty', async (req, res) => {
   const { userId, amount, event } = req.body;
   await db.query('INSERT INTO penalties (user_id, amount, event) VALUES ($1, $2, $3)', [userId, amount, event]);
@@ -109,8 +92,6 @@ app.post('/add-penalty', async (req, res) => {
   res.status(200).send('Strafe + Push');
 });
 
-// 404 Seite
 app.use((req, res) => res.status(404).render('404', { title: 'Seite nicht gefunden' }));
 
-// Serverstart
 app.listen(PORT, () => console.log(`✅ Server läuft auf http://localhost:${PORT}`));
