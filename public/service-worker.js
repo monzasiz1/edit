@@ -28,9 +28,12 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request)).catch(() => caches.match('/offline.html'))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request, { redirect: 'follow' });
+    }).catch(() => caches.match('/offline.html'))
   );
 });
+
 
 self.addEventListener('push', event => {
   const data = event.data?.json() || {};
