@@ -17,12 +17,17 @@
   <input type="text" name="event" id="event" required>
 
   <label for="amount">Betrag (€):</label>
-<input type="number" name="amount" id="amount" min="0" step="0.01" required placeholder="z.B. 3.50">
-
+  <input type="number" name="amount" id="amount" min="0" step="0.01" required placeholder="z.B. 3.50">
 
   <label for="date">Datum:</label>
   <input type="date" name="date" id="date" required>
 
-  <button type="submit" class="btn btn-cancel">➕ Eintragen</button>
+  <label for="status">Status:</label>
+  <select name="status" id="status" required>
+    <option value="offen" selected>🔴 offen</option>
+    <option value="bezahlt">🟢 bezahlt</option>
+  </select>
+
+  <button type="submit" class="btn">➕ Eintragen</button>
   <a href="/penalties" class="btn btn-cancel">Abbrechen</a>
 </form>

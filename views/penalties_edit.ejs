@@ -22,6 +22,12 @@
   <label for="date">Datum:</label>
   <input type="date" name="date" id="date" required value="<%= penalty.date ? penalty.date.toISOString ? penalty.date.toISOString().slice(0,10) : penalty.date : '' %>">
 
+  <label for="status">Status:</label>
+  <select name="status" id="status" required>
+    <option value="offen" <%= penalty.status === 'offen' ? 'selected' : '' %>>🔴 offen</option>
+    <option value="bezahlt" <%= penalty.status === 'bezahlt' ? 'selected' : '' %>>🟢 bezahlt</option>
+  </select>
+
   <button type="submit" class="btn">💾 Speichern</button>
   <a href="/penalties" class="btn btn-cancel">Abbrechen</a>
 </form>
