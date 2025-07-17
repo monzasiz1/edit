@@ -1,88 +1,311 @@
+<main class="apple-dashboard">
+  <div class="apple-dashboard-hero">
+    <div class="apple-logo-gradient"></div>
+    <h1 class="apple-welcome-head">
+      <span class="apple-welcome-emoji">👋</span>
+      Willkommen zurück,<br>
+      <strong><%= user.username %></strong>
+    </h1>
+    <div class="apple-hero-badge">Dein <span>Strafenkonto</span> im Überblick</div>
+  </div>
 
-<h2>Dashboard</h2>
-<p class="dashboard-greeting">Hallo <%= user.username %>!</p>
-
-<% if (penalties) { %>
-  <section>
-    <h3>Meine Strafen</h3>
-    <% if (penalties.length === 0) { %>
-      <p>Keine Strafen vorhanden! 🎉</p>
-    <% } else { %>
-      <!-- Desktop/Table Ansicht -->
-      <div class="only-desktop">
-        <table class="responsive-table">
-          <thead>
-            <tr>
-              <th>Datum</th>
-              <th>Veranstaltung</th>
-              <th>Grund</th>
-              <th>Betrag (€)</th>
-              <th>Spieß</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% let total = 0; %>
-            <% penalties.forEach(p => { %>
-              <tr>
-                <td data-label="Datum"><%= new Date(p.date).toLocaleDateString('de-DE') %></td>
-                <td data-label="Veranstaltung"><%= p.event %></td>
-                <td data-label="Grund"><%= p.type %></td>
-                <td data-label="Betrag (€)"><%= Number(p.amount).toFixed(2) %></td>
-                <td data-label="Admin">
-                  <% if (p.admin) { %>
-                    <span class="admin-tag-desktop">von <%= p.admin %></span>
-                  <% } else { %>
-                    <span class="admin-tag-desktop">Kein Spieß</span>
-                  <% } %>
-                </td>
-              </tr>
-              <% total += Number(p.amount); %>
-            <% }) %>
-          </tbody>
-        </table>
-        <p class="dashboard-total">
-          Gesamtbetrag: <%= total.toFixed(2) %> €
-        </p>
-      </div>
-      <!-- Mobile/Card Ansicht -->
-      <div class="dashboard-cards only-mobile">
-        <% let totalMobile = 0; %>
-        <% penalties.forEach(p => { %>
-          <div class="dashboard-card">
-            <% if (p.admin) { %>
-              <div class="admin-tag-mobile">von <%= p.admin %></div>
-            <% } %>
-            <div style="font-size: 1.5em; margin-bottom: 0.12em;">
-              <%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %>
+  <% if (!penalties || penalties.length === 0) { %>
+    <div class="apple-empty">
+      <span class="apple-empty-emoji">🎉</span>
+      <span class="apple-empty-text">Keine Strafen – alles sauber!<br>Genieß den Tag.</span>
+    </div>
+  <% } else { %>
+    <section class="apple-cards-list">
+      <% let total = 0; %>
+      <% penalties.forEach(p => { total += Number(p.amount); %>
+        <article class="apple-card <%= p.status %>">
+          <!-- Statuspunkt -->
+          <span class="apple-status-dot <%= p.status %>"></span>
+          <!-- Spieß-Chip -->
+          <% if (p.admin) { %>
+            <span class="apple-spiess-chip">
+              <span class="apple-spiess-icon">🧑‍⚖️</span>
+              <span class="apple-spiess-name"><%= p.admin %></span>
+            </span>
+          <% } %>
+          <div class="apple-card-content">
+            <div class="apple-row apple-top-row">
+              <span class="apple-card-emoji"><%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %></span>
+              <span class="apple-type"><%= p.type %></span>
             </div>
-            <div class="dashboard-row">
-              <span class="dashboard-label">📅 Datum</span>
-              <span class="dashboard-value"><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
+            <div class="apple-row">
+              <span>📅</span><span><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
             </div>
-            <div class="dashboard-row">
-              <span class="dashboard-label">🎉 Event</span>
-              <span class="dashboard-value"><%= p.event %></span>
+            <div class="apple-row">
+              <span>🎪</span><span><%= p.event %></span>
             </div>
-            <div class="dashboard-row">
-              <span class="dashboard-label">🎯 Grund</span>
-              <span class="dashboard-value"><%= p.type %></span>
-            </div>
-            <div class="dashboard-row amount">
-              <span class="dashboard-label">💶 Betrag</span>
-              <span class="dashboard-value"><%= Number(p.amount).toFixed(2) %> €</span>
+            <div class="apple-row">
+              <span>💶</span><span><%= Number(p.amount).toFixed(2) %> €</span>
             </div>
           </div>
-          <% totalMobile += Number(p.amount); %>
-        <% }) %>
-        <div class="dashboard-card total-card">
-          <span class="dashboard-label">Gesamtbetrag</span>
-          <span class="dashboard-value"><%= totalMobile.toFixed(2) %> €</span>
+        </article>
+      <% }) %>
+      <article class="apple-card total">
+        <div class="apple-total-bar">
+          <span>Gesamt</span>
+          <span><%= total.toFixed(2) %> €</span>
         </div>
-      </div>
-    <% } %>
-  </section>
-  
-  <script src="/js/index.js"></script>
+      </article>
+    </section>
+  <% } %>
+</main>
 
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
-<% } %>
+.apple-dashboard {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(111deg, #f6faf8 86%, #e7ecee 100%);
+  padding: 0;
+  margin: 0;
+}
+
+.apple-dashboard-hero {
+  padding-top: 2.9rem;
+  padding-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-bottom: 2.1rem;
+}
+
+.apple-logo-gradient {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #99bc98 18%, #c6e7c8 80%, #fff0 100%);
+  box-shadow: 0 8px 48px 0 #60ad707e, 0 0 0 0 #fff0;
+  margin-bottom: 0.35em;
+  animation: apple-logo-fadein 2.1s cubic-bezier(.6,.05,.6,1.07);
+}
+@keyframes apple-logo-fadein {
+  0% { opacity: 0; transform: scale(0.83);}
+  100% { opacity: 1; transform: scale(1);}
+}
+
+.apple-welcome-head {
+  font-size: 2.3rem;
+  font-weight: 800;
+  text-align: center;
+  color: #273e2b;
+  line-height: 1.13;
+  margin: 0 0 0.32em 0;
+  letter-spacing: -1.5px;
+}
+.apple-welcome-head strong {
+  color: #3da973;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  font-size: 1.05em;
+}
+.apple-welcome-emoji {
+  font-size: 1.25em;
+  margin-right: 0.13em;
+  display: inline-block;
+  animation: apple-hand-wave 2.3s 1;
+}
+@keyframes apple-hand-wave {
+  0%,100% { transform: rotate(0);}
+  5% { transform: rotate(19deg);}
+  15% { transform: rotate(-14deg);}
+  22% { transform: rotate(22deg);}
+  28% { transform: rotate(-8deg);}
+  36% { transform: rotate(6deg);}
+  40% { transform: rotate(0);}
+}
+.apple-hero-badge {
+  margin-top: 0.48em;
+  color: #5b7a60;
+  background: linear-gradient(90deg, #ebf7eb 70%, #e6f2e7 100%);
+  padding: 0.32em 1.19em 0.32em 1em;
+  border-radius: 2em;
+  font-weight: 700;
+  font-size: 1.13em;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 16px #a8ebc911;
+}
+
+.apple-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(111deg, #fff 95%, #c3e4bc3a 100%);
+  padding: 3em 2em 2.2em 2em;
+  border-radius: 2em;
+  margin: 1.5em auto 0 auto;
+  box-shadow: 0 8px 32px #bad6c620;
+  max-width: 420px;
+}
+.apple-empty-emoji {
+  font-size: 2.2em;
+  margin-bottom: 0.22em;
+}
+.apple-empty-text {
+  font-size: 1.25em;
+  color: #446652;
+  font-weight: 600;
+  text-align: center;
+}
+
+.apple-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.37rem;
+  max-width: 510px;
+  margin: 0 auto 1.4em auto;
+  padding: 0 0.25em;
+}
+
+.apple-card {
+  position: relative;
+  background: rgba(255,255,255,0.91);
+  border-radius: 1.32em;
+  min-height: 86px;
+  box-shadow: 0 4px 34px 0 #40665714, 0 1.5px 9px #e1f0e18e;
+  padding: 1.35em 1.18em 0.89em 1.7em;
+  border: 1.6px solid #e4ece7b0;
+  backdrop-filter: blur(3.5px);
+  transition: box-shadow 0.14s, border 0.12s;
+  overflow: visible;
+  z-index: 1;
+}
+.apple-card.bezahlt { border-left: 8px solid #37e8ad; }
+.apple-card.offen { border-left: 8px solid #ff5278; }
+
+.apple-status-dot {
+  display: block;
+  position: absolute;
+  left: -1.09em;
+  top: 1.16em;
+  width: 1.29em;
+  height: 1.29em;
+  border-radius: 50%;
+  background: #ff4461;
+  box-shadow: 0 0 16px 5px #ff89a9e6, 0 1px 12px #fff7, 0 0.5px 0 #fff6;
+  z-index: 3;
+  transition: filter 0.18s;
+  border: 3.3px solid #fff;
+}
+.apple-status-dot.bezahlt {
+  background: #2ed377;
+  box-shadow: 0 0 16px 6px #70f1c8c5, 0 2px 10px #fff7;
+  animation: none;
+}
+.apple-status-dot.offen {
+  animation: apple-dot-blink 1.19s cubic-bezier(.6,.07,1,.68) infinite alternate;
+}
+@keyframes apple-dot-blink {
+  from { filter: brightness(0.97);}
+  to   { filter: brightness(1.25) drop-shadow(0 0 12px #ff9ba8);}
+}
+
+.apple-spiess-chip {
+  position: absolute;
+  top: -1.19em;
+  right: 1.3em;
+  background: rgba(240,255,240,0.86);
+  color: #215137;
+  font-size: 0.98em;
+  font-weight: 700;
+  border-radius: 1.7em;
+  box-shadow: 0 2px 13px #b3d3b210, 0 0.5px 0 #fff3;
+  padding: 0.21em 1em 0.13em 0.65em;
+  letter-spacing: 0.04em;
+  min-width: 76px;
+  text-align: right;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 0.26em;
+  backdrop-filter: blur(3.5px);
+  border: 1.7px solid #e4eee4d9;
+}
+.apple-spiess-icon {
+  font-size: 1.07em;
+  filter: grayscale(0.07) brightness(0.98);
+  margin-right: 0.08em;
+}
+.apple-spiess-name {
+  font-size: 0.98em;
+  font-weight: 900;
+}
+
+.apple-card-content {
+  padding-top: 0.13em;
+  font-size: 1.07em;
+}
+
+.apple-top-row {
+  gap: 0.34em;
+  margin-bottom: 0.12em;
+  font-size: 1.19em;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  color: #223;
+  letter-spacing: -0.6px;
+}
+.apple-card-emoji {
+  font-size: 1.14em;
+  margin-right: 0.07em;
+  filter: grayscale(0.05);
+}
+.apple-type { color: #39502c; font-weight: 800; }
+.apple-row {
+  display: flex;
+  align-items: center;
+  gap: 0.36em;
+  margin-top: 0.16em;
+  color: #384b36;
+  font-size: 1.01em;
+}
+
+/* Gesamt */
+.apple-card.total {
+  background: rgba(234,255,239,0.94);
+  border-left: none;
+  border-radius: 1.22em;
+  box-shadow: none;
+  font-weight: 900;
+  color: #49a968;
+  padding: 0.14em 1.17em 0.19em 1.17em;
+  margin-top: 0.65em;
+  border: none;
+  z-index: 0;
+}
+.apple-total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2em;
+  font-size: 1.19em;
+  font-weight: 900;
+  color: #267643;
+  padding: 0.34em 0 0.14em 0;
+  border-top: 1.7px solid #c7ecd8;
+  margin-top: 0.7em;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .apple-dashboard-hero { padding-top: 1.4rem; padding-bottom: 1.5rem; }
+  .apple-logo-gradient { width: 53px; height: 53px;}
+  .apple-welcome-head { font-size: 1.13rem; }
+  .apple-hero-badge { font-size: 0.98em;}
+  .apple-cards-list { max-width: 99vw; padding: 0 0.01em;}
+  .apple-card { font-size: 0.97em; min-height: 60px; padding: 1em 0.6em 0.55em 1.1em;}
+  .apple-status-dot { width: 0.84em; height: 0.84em; left: -0.61em; top: 0.71em;}
+  .apple-spiess-chip { font-size: 0.81em; right: 0.22em; top: -0.7em; padding: 0.12em 0.6em 0.07em 0.38em;}
+  .apple-spiess-name { font-size: 0.88em; }
+  .apple-card-content { font-size: 0.93em;}
+  .apple-card-emoji { font-size: 0.93em;}
+  .apple-total-bar { font-size: 0.91em;}
+}
+</style>
