@@ -1,30 +1,41 @@
-<main class="users-admin-container">
-  <div class="users-header-bar">
-    <h1>👥 Benutzerübersicht</h1>
-    <a href="/users/add" class="btn-add-user">➕ Benutzer hinzufügen</a>
-  </div>
+<main class="apple2025-users">
+  <!-- GLASIGER, BLURRIGER HEADER -->
+  <section class="apple2025-glass-header">
+    <div class="apple2025-header-content">
+      <div class="glass-blur-bg"></div>
+      <div class="header-flex">
+        <div>
+          <h1 class="apple2025-section-title">Benutzerübersicht</h1>
+          <div class="apple2025-header-meta">
+            <span>Mitglieder</span>
+            <span class="apple2025-header-value"><%= users.length %></span>
+          </div>
+        </div>
+        <a href="/users/add" class="apple2025-fab-btn" title="Benutzer hinzufügen">+</a>
+      </div>
+    </div>
+  </section>
 
-  <section class="users-accordion-list">
+  <section class="apple2025-userlist">
     <% users.forEach((u, idx) => { %>
-      <div class="user-accordion-card">
-        <button class="user-accordion-header" aria-expanded="false">
-          <span class="user-avatar"><%= u.username.slice(0, 2).toUpperCase() %></span>
-          <span class="user-fullname"><%= u.username %></span>
-          <% if (u.is_admin) { %>
-            <span class="badge badge-admin" title="Admin">👑</span>
-          <% } else { %>
-            <span class="badge badge-member" title="Mitglied">👤</span>
-          <% } %>
-          <span class="chevron">&#9660;</span>
-        </button>
-        <div class="user-accordion-body">
-          <div class="user-card-actions">
-            <a href="/users/edit/<%= u.id %>" class="btn-card edit" title="Bearbeiten">✏️ Bearbeiten</a>
+      <div class="apple2025-usercard fade-in" style="--delay: <%= idx * 42 %>ms">
+        <div class="apple2025-user-row">
+          <div class="apple2025-avatar<%= u.is_admin ? ' admin' : '' %>">
+            <span><%= u.username.slice(0,2).toUpperCase() %></span>
+          </div>
+          <div class="apple2025-userdata">
+            <span class="apple2025-username"><%= u.username %></span>
+            <span class="apple2025-role <%= u.is_admin ? 'admin' : '' %>">
+              <%= u.is_admin ? 'Spieß' : 'Mitglied' %>
+            </span>
+          </div>
+          <div class="apple2025-actions">
+            <a href="/users/edit/<%= u.id %>" class="icon-btn" title="Bearbeiten">✏️</a>
             <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-              <button class="btn-card danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️ Löschen</button>
+              <button class="icon-btn danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️</button>
             </form>
-            <a href="/export/user/<%= u.id %>/pdf" class="btn-card export" title="PDF-Export" target="_blank">📄 PDF</a>
-            <a href="/export/user/<%= u.id %>/csv" class="btn-card export" title="CSV-Export" target="_blank">📑 CSV</a>
+            <a href="/export/user/<%= u.id %>/pdf" class="icon-btn" title="PDF" target="_blank">📄</a>
+            <a href="/export/user/<%= u.id %>/csv" class="icon-btn" title="CSV" target="_blank">📑</a>
           </div>
         </div>
       </div>
@@ -33,172 +44,181 @@
 </main>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap');
 :root {
-  --accent: #446652;
-  --accent-light: #f2f7f3;
-  --accent-dark: #273c2a;
-  --admin-bg: #ffd70038;
-  --member-bg: #e8ede5;
-  --avatar-bg: #607848;
+  --accent: #28543a;
+  --accent2: #c8eed4;
+  --glass-bg: rgba(255,255,255,0.35);
+  --glass-outline: rgba(100, 170, 140, 0.19);
+  --glass-blur: blur(16px);
+  --user-gradient: linear-gradient(120deg,#54dc97 15%,#458e67 90%);
+  --user-admin: linear-gradient(100deg,#ffe3af 10%,#ffe67a 90%);
+  --role-member: linear-gradient(95deg,#e7fff0 0%,#54dc97 85%);
+  --role-admin: linear-gradient(95deg,#ffefb8 10%,#ffe67a 95%);
+  --fab-glass: rgba(61, 105, 90, 0.84);
 }
-.users-admin-container {
-  max-width: 680px;
-  margin: 2rem auto 2rem auto;
-  padding: 0 0.3rem;
+body, html {
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, system-ui, sans-serif;
+  background: linear-gradient(135deg,#e7f1eb 0%,#e3f7f4 100%);
+  min-height: 100vh;
 }
-.users-header-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
+.apple2025-users {
+  max-width: 740px;
+  margin: 2.9rem auto 2rem auto;
+  padding: 0 1.3rem;
 }
-.users-header-bar h1 {
-  font-size: 1.5rem;
-  letter-spacing: -1px;
-  font-weight: 800;
-}
-.btn-add-user {
-  background: var(--accent);
-  color: #fff;
-  font-size: 1rem;
-  border: none;
-  padding: 0.7em 1.3em;
+.apple2025-glass-header {
+  margin-bottom: 2.2rem;
   border-radius: 2em;
-  font-weight: 600;
-  box-shadow: 0 2px 12px 0 #0001;
-  transition: background 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.btn-add-user:hover { background: #3a5642; box-shadow: 0 4px 20px 0 #0002; }
-.users-accordion-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.09rem;
-}
-.user-accordion-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 14px #44665210;
-  background: #fff;
-  transition: box-shadow 0.22s;
-  overflow: hidden;
-  border: 1.5px solid #e6ebea;
-  margin-bottom: 0;
-}
-.user-accordion-card.open { box-shadow: 0 4px 22px #44665218; border-color: var(--accent);}
-.user-accordion-header {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 0.6rem;
-  padding: 1rem 1.09rem;
-  background: none;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  font-size: 1.11rem;
-  font-weight: 700;
-  color: var(--accent-dark);
-  transition: background 0.18s;
   position: relative;
-}
-.user-accordion-header:hover,
-.user-accordion-card.open .user-accordion-header {
-  background: var(--accent-light);
-}
-.user-avatar {
-  background: var(--avatar-bg);
-  color: #fff;
-  width: 2.1em; height: 2.1em;
-  display: flex;
-  align-items: center; justify-content: center;
-  border-radius: 50%;
-  font-weight: 900;
-  font-size: 1.07em;
-  margin-right: 0.6em;
-  letter-spacing: 0.5px;
-}
-.user-fullname {
-  flex: 1;
-  font-size: 1.05em;
-  font-weight: 700;
-  color: #223;
-  letter-spacing: -0.5px;
-}
-.badge {
-  background: var(--member-bg);
-  padding: 0.18em 0.83em;
-  border-radius: 1em;
-  font-size: 0.99em;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin-right: 0.8em;
-  display: inline-block;
-}
-.badge-admin { background: var(--admin-bg); color: #c48f00; }
-.badge-member { background: var(--member-bg); color: #3a5642; }
-.chevron {
-  font-size: 1.23em;
-  transition: transform 0.32s cubic-bezier(.7,.3,0,1.4);
-}
-.user-accordion-card.open .chevron {
-  transform: rotate(180deg);
-}
-.user-accordion-body {
-  max-height: 0;
   overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.5s cubic-bezier(.7,.3,0,1.4), opacity 0.22s;
-  background: #f8fafd;
-  border-top: 1px solid #e6ebea;
-  padding: 0 1.1rem;
+  background: transparent;
+  min-height: 126px;
 }
-.user-accordion-card.open .user-accordion-body {
-  max-height: 240px;
-  opacity: 1;
-  padding: 0.5em 1.1em 1.1em 1.1em;
+.apple2025-header-content {
+  position: relative;
+  z-index: 2;
+  padding: 2.1rem 2.2rem 1.1rem 2.2rem;
 }
-.user-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.48em;
-  margin-top: 0.7em;
-}
-.btn-card {
-  border: none;
-  background: none;
-  font-size: 1em;
-  cursor: pointer;
+.glass-blur-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--glass-bg);
+  box-shadow: 0 6px 32px #c9eed877, 0 1.5px 14px #54dc9737;
   border-radius: 2em;
-  padding: 0.21em 0.81em;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.13s, color 0.13s;
+  border: 1.2px solid var(--glass-outline);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  z-index: 1;
+  transition: background 0.22s, box-shadow 0.22s;
+  pointer-events: none;
 }
-.btn-card.edit { color: #1e5fa2; }
-.btn-card.edit:hover { background: #e9f1fa; color: #2973d7; }
-.btn-card.danger { color: #c33232; }
-.btn-card.danger:hover { background: #fae0e0; }
-.btn-card.export { color: #446652; }
-.btn-card.export:hover { background: #f3f9f4; }
-@media (max-width: 700px) {
-  .users-header-bar h1 { font-size: 1.05rem; }
-  .btn-add-user { font-size: 0.93rem; padding: 0.38em 0.82em;}
-  .user-accordion-header { font-size: 0.97rem; padding: 0.81rem 0.67rem;}
-  .user-avatar { width: 1.25em; height: 1.25em; font-size: 0.91em; }
-  .badge { font-size: 0.76em; padding: 0.09em 0.43em; }
+.header-flex {
+  display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 2.1rem; position: relative; z-index: 2;
 }
-</style>
+.apple2025-section-title {
+  font-size: 2.15rem;
+  font-weight: 900;
+  color: #17432b;
+  letter-spacing: -1.2px;
+  margin: 0 0 0.15em 0;
+  background: linear-gradient(91deg, #28543a 60%, #a2ffe2 120%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 1px 10px #c9eed877);
+  text-shadow: 0 2px 5px #c8eed48c;
+}
+.apple2025-header-meta {
+  display: flex; gap: 0.7em; align-items: baseline; font-size: 1.17em; margin-top: 0.25em; font-weight: 600; color: #2fa770; letter-spacing: 0.01em; opacity: .83;
+}
+.apple2025-header-value {
+  font-size: 1.75em; font-weight: 900; color: #1b4d34; letter-spacing: -0.04em; margin-left: 0.12em; filter: drop-shadow(0 0 5px #a8eed4ad);
+}
+.apple2025-fab-btn {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--fab-glass);
+  color: #fff; font-size: 2.09rem; font-weight: 800;
+  border-radius: 50%; width: 54px; height: 54px;
+  box-shadow: 0 8px 22px #a4edc944;
+  border: none; transition: background 0.13s, box-shadow 0.13s;
+  text-decoration: none; position: relative; z-index: 5;
+  outline: none; cursor: pointer;
+}
+.apple2025-fab-btn:hover { background: #327a56; box-shadow: 0 13px 24px #b4f7d2bb; }
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.user-accordion-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const card = header.closest('.user-accordion-card');
-      const isOpen = card.classList.contains('open');
-      document.querySelectorAll('.user-accordion-card').forEach(c => c.classList.remove('open'));
-      if (!isOpen) card.classList.add('open');
-    });
-  });
-});
-</script>
+.apple2025-userlist {
+  display: flex; flex-direction: column; gap: 1.35rem; margin-top: 0.9rem;
+}
+.apple2025-usercard {
+  background: rgba(255,255,255,0.95);
+  border-radius: 1.25em;
+  border: 1.3px solid var(--glass-outline);
+  box-shadow: 0 7px 35px #94eecb27;
+  padding: 1.3rem 1.1rem 1.1rem 1.1rem;
+  display: flex; flex-direction: column; gap: 0.19em;
+  animation: fadein-user 0.91s both cubic-bezier(.44,.15,0,1.12);
+  animation-delay: var(--delay, 0ms);
+  opacity: 0;
+  transition: box-shadow .18s, border .12s, background .13s;
+  will-change: box-shadow, border;
+  position: relative;
+  overflow: hidden;
+}
+@keyframes fadein-user { from { opacity: 0; transform: translateY(18px);} to { opacity: 1; transform: none;} }
+.apple2025-usercard:hover {
+  box-shadow: 0 14px 44px #7ef2bc35, 0 2px 11px #b8eeb355;
+  border: 1.7px solid #9be2b8;
+  background: #f9fdfc;
+}
+.apple2025-user-row {
+  display: flex; align-items: center; gap: 1.19em;
+}
+.apple2025-avatar {
+  background: var(--user-gradient);
+  color: #fff; width: 2.39em; height: 2.39em;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-weight: 900; font-size: 1.14em;
+  box-shadow: 0 2px 11px #54dc9745;
+  letter-spacing: 0.4px; transition: box-shadow 0.17s;
+  position: relative; font-family: inherit;
+}
+.apple2025-avatar.admin {
+  background: var(--user-admin); color: #bb8f0a;
+  box-shadow: 0 2px 16px #ffe1873a;
+}
+.apple2025-userdata {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.01em;
+}
+.apple2025-username {
+  font-size: 1.08em;
+  font-weight: 900;
+  color: #1b2d21;
+  letter-spacing: -0.36px;
+  margin-bottom: 0.02em;
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, system-ui, sans-serif;
+}
+.apple2025-role {
+  font-size: 0.91em; font-weight: 700;
+  padding: 0.14em 1.08em; border-radius: 2em;
+  box-shadow: 0 1px 6px #dafae035;
+  border: 1px solid #e6efe7;
+  margin-top: 0.03em;
+  background: var(--role-member);
+  color: #21a85d;
+}
+.apple2025-role.admin {
+  background: var(--role-admin); color: #c48f0a; border-color: #ffe7b3;
+}
+.apple2025-actions {
+  display: flex; flex-wrap: wrap; gap: 0.25em; align-items: center;
+}
+.icon-btn {
+  border: none; background: none;
+  font-size: 1.04em; cursor: pointer;
+  border-radius: 2em; padding: 0.19em 0.72em;
+  font-weight: 600; text-decoration: none;
+  transition: background 0.13s, color 0.13s, box-shadow 0.12s;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-left: 0.05em;
+}
+.icon-btn.edit { color: #2270d9; }
+.icon-btn.edit:hover { background: #eaf1fd; color: #1762be; }
+.icon-btn.danger { color: #b82828; }
+.icon-btn.danger:hover { background: #ffe7e7; color: #871010;}
+.icon-btn.export { color: #26895d; }
+.icon-btn.export:hover { background: #e6fff2; color: #077d36; }
+
+@media (max-width: 700px) {
+  .apple2025-glass-header { border-radius: 1.03em; }
+  .apple2025-header-content { padding: 1.3rem 0.7rem 0.4rem 0.7rem;}
+  .header-flex { flex-direction: column; align-items: flex-start; gap: 0.61em;}
+  .apple2025-section-title { font-size: 1.13rem;}
+  .apple2025-fab-btn { font-size: 1.14rem; width: 2.05em; height: 2.05em;}
+  .apple2025-usercard { padding: 0.77rem 0.29rem 0.67rem 0.29rem; border-radius: 0.97em;}
+  .apple2025-avatar { width: 1.07em; height: 1.07em; font-size: 0.86em;}
+  .apple2025-username { font-size: 0.90em;}
+}
+.fade-in { animation: fadein-user 0.98s both; }
+</style>
