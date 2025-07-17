@@ -1135,6 +1135,31 @@ h2 {
 .penalties-table th:last-child {
   text-align: right;
 }
+.penalties-table td .offen {
+  color: #c0392b;
+  font-weight: bold;
+}
+.penalties-table td .bezahlt {
+  color: #27ae60;
+  font-weight: bold;
+}
+.status-toggle {
+  background: none;
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+}
+.status-toggle.offen { color: #c0392b; }
+.status-toggle.bezahlt { color: #27ae60; }
+.badge {
+  padding: 0.25em 0.7em;
+  border-radius: 1em;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+.badge-green { background: #3cae5b; color: #fff; }
+.badge-red { background: #d64b4b; color: #fff; }
+
 
 .sum-row td {
   border-top: 2px solid #3e5da1;
@@ -1225,7 +1250,7 @@ h2 {
   font-size: 1.03rem !important;
   border-radius: 2em !important;
   background: linear-gradient(90deg, #0a532b 0%, #16682f 100%);
-  color: #fff !important;
+  color: #383636 !important;
   border: none;
   outline: none;
   font-weight: 600;
@@ -2201,3 +2226,5 @@ body {
     transform: scale(0.9);
   }
 }
+/* Akkordeon */
+ 

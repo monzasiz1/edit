@@ -1,64 +1,204 @@
-<h2>Benutzerübersicht</h2>
+<main class="users-admin-container">
+  <div class="users-header-bar">
+    <h1>👥 Benutzerübersicht</h1>
+    <a href="/users/add" class="btn-add-user">➕ Benutzer hinzufügen</a>
+  </div>
 
-<a href="/users/add" class="btn btn-add" style="margin-bottom:1em;display:inline-block;">➕ Benutzer hinzufügen</a>
-
-<table class="user-table">
-  <thead>
-    <tr>
-      <th>Benutzername</th>
-      <th>Rolle</th>
-      <th>Aktionen</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% users.forEach(u => { %>
-      <tr>
-        <td><strong><%= u.username %></strong></td>
-        <td>
+  <section class="users-accordion-list">
+    <% users.forEach((u, idx) => { %>
+      <div class="user-accordion-card">
+        <button class="user-accordion-header" aria-expanded="false">
+          <span class="user-avatar"><%= u.username.slice(0, 2).toUpperCase() %></span>
+          <span class="user-fullname"><%= u.username %></span>
           <% if (u.is_admin) { %>
-            <span class="role role-admin">👑 Admin</span>
+            <span class="badge badge-admin" title="Admin">👑</span>
           <% } else { %>
-            <span class="role role-member">👤 Mitglied</span>
+            <span class="badge badge-member" title="Mitglied">👤</span>
           <% } %>
-        </td>
-        <td>
-          <a href="/users/edit/<%= u.id %>" class="btn btn-small">✏️ Bearbeiten</a>
-          <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-            <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️</button>
-          </form>
-                    <a href="/export/user/<%= u.id %>/pdf" class="btn btn-small btn-export" title="PDF-Export" target="_blank">📄 PDF</a>
-          <a href="/export/user/<%= u.id %>/csv" class="btn btn-small btn-export" title="CSV-Export" target="_blank">📑 CSV</a>
-        </td>
-      </tr>
-    <% }) %>
-  </tbody>
-</table>
-
-<div class="user-cards">
-  <% users.forEach(u => { %>
-    <div class="user-card">
-      <div class="user-card-row">
-        <div class="user-card-label">Benutzername:</div>
-        <div class="user-card-value"><strong><%= u.username %></strong></div>
-      </div>
-      <div class="user-card-row">
-        <div class="user-card-label">Rolle:</div>
-        <div class="user-card-value">
-          <% if (u.is_admin) { %>
-            <span class="role role-admin">👑 Admin</span>
-          <% } else { %>
-            <span class="role role-member">👤 Mitglied</span>
-          <% } %>
+          <span class="chevron">&#9660;</span>
+        </button>
+        <div class="user-accordion-body">
+          <div class="user-card-actions">
+            <a href="/users/edit/<%= u.id %>" class="btn-card edit" title="Bearbeiten">✏️ Bearbeiten</a>
+            <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
+              <button class="btn-card danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️ Löschen</button>
+            </form>
+            <a href="/export/user/<%= u.id %>/pdf" class="btn-card export" title="PDF-Export" target="_blank">📄 PDF</a>
+            <a href="/export/user/<%= u.id %>/csv" class="btn-card export" title="CSV-Export" target="_blank">📑 CSV</a>
+          </div>
         </div>
       </div>
-      <div class="user-card-row user-card-actions">
-        <a href="/users/edit/<%= u.id %>" class="btn btn-small">✏️ Bearbeiten</a>
-        <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
-          <button class="btn btn-small btn-cancel" onclick="return confirm('Wirklich löschen?')">🗑️</button>
-        </form>
-                   <a href="/export/user/<%= u.id %>/pdf" class="btn btn-small btn-export" title="PDF-Export" target="_blank">📄 PDF</a>
-          <a href="/export/user/<%= u.id %>/csv" class="btn btn-small btn-export" title="CSV-Export" target="_blank">📑 CSV</a>
-      </div>
-    </div>
-  <% }) %>
-</div>
+    <% }) %>
+  </section>
+</main>
+
+<style>
+:root {
+  --accent: #446652;
+  --accent-light: #f2f7f3;
+  --accent-dark: #273c2a;
+  --admin-bg: #ffd70038;
+  --member-bg: #e8ede5;
+  --avatar-bg: #607848;
+}
+.users-admin-container {
+  max-width: 680px;
+  margin: 2rem auto 2rem auto;
+  padding: 0 0.3rem;
+}
+.users-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.users-header-bar h1 {
+  font-size: 1.5rem;
+  letter-spacing: -1px;
+  font-weight: 800;
+}
+.btn-add-user {
+  background: var(--accent);
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  padding: 0.7em 1.3em;
+  border-radius: 2em;
+  font-weight: 600;
+  box-shadow: 0 2px 12px 0 #0001;
+  transition: background 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+}
+.btn-add-user:hover { background: #3a5642; box-shadow: 0 4px 20px 0 #0002; }
+.users-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.09rem;
+}
+.user-accordion-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 14px #44665210;
+  background: #fff;
+  transition: box-shadow 0.22s;
+  overflow: hidden;
+  border: 1.5px solid #e6ebea;
+  margin-bottom: 0;
+}
+.user-accordion-card.open { box-shadow: 0 4px 22px #44665218; border-color: var(--accent);}
+.user-accordion-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.6rem;
+  padding: 1rem 1.09rem;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1.11rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+  transition: background 0.18s;
+  position: relative;
+}
+.user-accordion-header:hover,
+.user-accordion-card.open .user-accordion-header {
+  background: var(--accent-light);
+}
+.user-avatar {
+  background: var(--avatar-bg);
+  color: #fff;
+  width: 2.1em; height: 2.1em;
+  display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 1.07em;
+  margin-right: 0.6em;
+  letter-spacing: 0.5px;
+}
+.user-fullname {
+  flex: 1;
+  font-size: 1.05em;
+  font-weight: 700;
+  color: #223;
+  letter-spacing: -0.5px;
+}
+.badge {
+  background: var(--member-bg);
+  padding: 0.18em 0.83em;
+  border-radius: 1em;
+  font-size: 0.99em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-right: 0.8em;
+  display: inline-block;
+}
+.badge-admin { background: var(--admin-bg); color: #c48f00; }
+.badge-member { background: var(--member-bg); color: #3a5642; }
+.chevron {
+  font-size: 1.23em;
+  transition: transform 0.32s cubic-bezier(.7,.3,0,1.4);
+}
+.user-accordion-card.open .chevron {
+  transform: rotate(180deg);
+}
+.user-accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s cubic-bezier(.7,.3,0,1.4), opacity 0.22s;
+  background: #f8fafd;
+  border-top: 1px solid #e6ebea;
+  padding: 0 1.1rem;
+}
+.user-accordion-card.open .user-accordion-body {
+  max-height: 240px;
+  opacity: 1;
+  padding: 0.5em 1.1em 1.1em 1.1em;
+}
+.user-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.48em;
+  margin-top: 0.7em;
+}
+.btn-card {
+  border: none;
+  background: none;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 2em;
+  padding: 0.21em 0.81em;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.13s, color 0.13s;
+}
+.btn-card.edit { color: #1e5fa2; }
+.btn-card.edit:hover { background: #e9f1fa; color: #2973d7; }
+.btn-card.danger { color: #c33232; }
+.btn-card.danger:hover { background: #fae0e0; }
+.btn-card.export { color: #446652; }
+.btn-card.export:hover { background: #f3f9f4; }
+@media (max-width: 700px) {
+  .users-header-bar h1 { font-size: 1.05rem; }
+  .btn-add-user { font-size: 0.93rem; padding: 0.38em 0.82em;}
+  .user-accordion-header { font-size: 0.97rem; padding: 0.81rem 0.67rem;}
+  .user-avatar { width: 1.25em; height: 1.25em; font-size: 0.91em; }
+  .badge { font-size: 0.76em; padding: 0.09em 0.43em; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.user-accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const card = header.closest('.user-accordion-card');
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.user-accordion-card').forEach(c => c.classList.remove('open'));
+      if (!isOpen) card.classList.add('open');
+    });
+  });
+});
+</script>
