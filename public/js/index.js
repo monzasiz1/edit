@@ -25,50 +25,6 @@ if ('serviceWorker' in navigator) {
   console.warn('⚠️ Service Worker wird nicht unterstützt.');
 }
 
-// PUSH BUTTON einfügen
-function createPushButton() {
-  if (!('PushManager' in window)) return;
-
-  const btn = document.createElement('button');
-  btn.textContent = '🔔 Push-Benachrichtigungen aktivieren';
-  btn.className = 'btn btn-push';
-  btn.style = 'margin: 1rem auto; display: block;';
-  document.querySelector('main')?.appendChild(btn);
-
-  btn.addEventListener('click', async () => {
-    if (Notification.permission === 'granted') {
-      alert('✅ Du hast Push bereits aktiviert.');
-      return;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      alert('❌ Push nicht erlaubt.');
-      return;
-    }
-
-    try {
-      const subscription = await swRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-      });
-
-      const response = await fetch('/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(subscription)
-      });
-
-      if (response.ok) {
-        alert('🔐 Push aktiviert und gespeichert!');
-      } else {
-        alert('❌ Fehler beim Speichern der Subscription.');
-      }
-    } catch (err) {
-      console.error('❌ Fehler bei Push-Subscription:', err);
-    }
-  });
-}
 
 // Hilfsfunktion
 function urlB64ToUint8Array(base64String) {
