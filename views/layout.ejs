@@ -17,7 +17,12 @@
       --blur: blur(12px);
       --accent: #a0bb8c;
     }
-    html {
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden; /* verhindert horizontalen Scroll */
+      width: 100vw;
+      box-sizing: border-box;
       font-family: var(--font);
       font-size: 17.5px;
       background: #f8fafb;
@@ -26,10 +31,11 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
     body {
-      margin: 0;
       min-height: 100dvh;
-      background: #f8fafb;
       display: flex;
       flex-direction: column;
     }
@@ -58,7 +64,6 @@
       letter-spacing: -0.025em;
       text-decoration: none;
       user-select: text;
-      text-shadow: none;
       line-height: 1;
       padding-left: 1rem;
     }
@@ -185,19 +190,21 @@
       flex: 1;
       width: 100%;
       max-width: 680px;
+      box-sizing: border-box;
       margin: 2.6rem auto 2.8rem auto;
       background: rgba(255 255 255 / 0.55);
       border-radius: var(--radius);
       box-shadow: 0 12px 40px rgba(122 142 111 / 0.14), 0 4px 16px rgba(181 198 164 / 0.09);
       padding: 2.8rem 2.3rem 2.3rem 2.3rem;
       min-height: 66dvh;
-      animation: cardIn 0.57s cubic-bezier(0.22, 0.95, 0.32, 1.05);
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       border: 1.4px solid #d4dfcfcc;
       transition: box-shadow 0.28s ease, border-color 0.28s ease;
       will-change: box-shadow;
       user-select: text;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
     main.container:focus-within,
     main.container:hover {
@@ -216,96 +223,6 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .push-popup {
-      position: fixed;
-      z-index: 201;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(70 87 58 / 0.13);
-      transition: opacity 0.33s ease;
-      backdrop-filter: blur(3.4px);
-      -webkit-backdrop-filter: blur(3.4px);
-      user-select: none;
-    }
-    .push-popup.hidden {
-      display: none;
-    }
-    .push-popup.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .push-popup-box {
-      background: #fff;
-      border-radius: 1.3em;
-      box-shadow: 0 9px 30px rgba(120 137 116 / 0.15);
-      padding: 2.2rem 1.4rem 1.5rem 1.4rem;
-      min-width: 300px;
-      max-width: 92vw;
-      text-align: center;
-      animation: cardIn 0.36s ease;
-      border: 1.3px solid #d8dfd2;
-      user-select: text;
-    }
-    .push-popup-box h2 {
-      margin: 0 0 0.54em 0;
-      font-size: 1.22rem;
-      color: var(--green-dark);
-      user-select: text;
-    }
-    .push-popup-box p {
-      margin-bottom: 1.18em;
-      color: #444b3b;
-      user-select: text;
-    }
-    .push-popup-actions {
-      display: flex;
-      gap: 0.75em;
-      justify-content: center;
-      user-select: none;
-    }
-    .push-popup .btn {
-      font-family: inherit;
-      font-size: 1.02em;
-      background: var(--green-dark);
-      color: #fff;
-      border: none;
-      border-radius: 1.1em;
-      padding: 0.62em 1.25em;
-      font-weight: 600;
-      box-shadow: 0 3px 10px -2px #758467cc;
-      cursor: pointer;
-      transition: background 0.16s ease, box-shadow 0.18s ease;
-      position: relative;
-      overflow: hidden;
-      user-select: none;
-    }
-    .push-popup .btn:hover {
-      background: #606e56;
-      box-shadow: 0 6px 22px rgba(96 110 86 / 0.75);
-    }
-    .push-popup .btn-secondary {
-      background: #f1f3f0;
-      color: var(--green-dark);
-      font-weight: 400;
-    }
-    .btn:focus-visible {
-      outline-offset: 4px;
-      outline: 3px solid #a0bb8ccc;
-      background: rgba(170 188 150 / 0.15);
-    }
-    .btn:active {
-      box-shadow: none;
-      filter: brightness(1.12);
-      transition: none;
-    }
-    input, button, select, textarea {
-      outline: none;
-    }
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -316,7 +233,7 @@
       border-radius: 8px;
     }
 
-    /*  --- MOBILE ANPASSUNGEN --- */
+    /* Responsive Mobile Anpassungen */
     @media (max-width: 680px) {
       .main-nav {
         padding: 0.58rem 0.38rem;
@@ -362,6 +279,14 @@
         margin: 1rem 0 1.5rem 0;
         color: #6d7a64;
       }
+    }
+
+    /* Verhindert horizontales Scrollen bei breiten Inhalten */
+    img, table, video, iframe, input, textarea, select {
+      max-width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
   </style>
 </head>
