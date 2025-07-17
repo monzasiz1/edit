@@ -54,9 +54,9 @@
                       <% } %>
                     </td>
                     <td>
-                      <a href="/penalties/edit/<%= strafe.id %>" class="btn-icon edit" title="Bearbeiten">✏️</a>
+                      <a href="/penalties/edit/<%= strafe.id %>" class="btn-icon edit" title="Bearbeiten"><span>✏️</span></a>
                       <form action="/penalties/delete/<%= strafe.id %>" method="POST" style="display:inline">
-                        <button type="submit" class="btn-icon danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️</button>
+                        <button type="submit" class="btn-icon danger" onclick="return confirm('Wirklich löschen?')" title="Löschen"><span>🗑️</span></button>
                       </form>
                     </td>
                   </tr>
@@ -248,6 +248,8 @@
 }
 .status-toggle.bezahlt, .status.bezahlt { color: #1ba548; background: #dcfae7; }
 .status-toggle.offen, .status.offen { color: #b62323; background: #fee7e7; }
+
+/* ICON-GRÖSSEN AUSGLEICHEN */
 .btn-icon {
   border: none;
   background: none;
@@ -255,10 +257,15 @@
   margin-right: 0.2em;
   cursor: pointer;
   transition: color 0.15s;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
-.btn-icon.edit { color: #1e5fa2; }
+.btn-icon.edit { color: #1e5fa2; font-size: 1.05em; }
 .btn-icon.edit:hover { color: #2973d7; }
-.btn-icon.danger { color: #c33232; }
+.btn-icon.danger { color: #c33232; font-size: 0.97em; padding-bottom: 0.04em; }
 .btn-icon.danger:hover { color: #e12626; }
 
 .penalties-empty-row {
@@ -281,8 +288,6 @@
   .btn-add-penalty { font-size: 0.91rem; padding: 0.38em 0.75em;}
   .btn-icon { font-size: 0.85em;}
 }
-
-
 </style>
 
 <script>
