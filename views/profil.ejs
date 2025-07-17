@@ -2,14 +2,14 @@
   <h2 class="ios-title">Profil bearbeiten</h2>
 
   <!-- Name ändern -->
-  <form action="/profil/name" method="POST" class="ios-form">
+  <form action="/profil/name" method="POST" class="ios-form" novalidate>
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" value="<%= user.name %>" required />
+    <input type="text" id="name" name="name" value="<%= user.username %>" required autocomplete="name" />
     <% if (nameMsg) { %>
-      <div class="msg-success"><%= nameMsg %></div>
+      <div class="msg-success" role="alert"><%= nameMsg %></div>
     <% } %>
     <% if (nameErr) { %>
-      <div class="msg-error"><%= nameErr %></div>
+      <div class="msg-error" role="alert"><%= nameErr %></div>
     <% } %>
     <button type="submit" class="ios-btn ios-btn-small">Name speichern</button>
   </form>
@@ -17,16 +17,16 @@
   <hr class="ios-separator">
 
   <!-- Passwort ändern -->
-  <form action="/profil/passwort" method="POST" autocomplete="off" class="ios-form">
+  <form action="/profil/passwort" method="POST" autocomplete="off" class="ios-form" novalidate>
     <label for="oldpw">Altes Passwort:</label>
-    <input type="password" id="oldpw" name="oldpw" required />
+    <input type="password" id="oldpw" name="oldpw" required autocomplete="current-password" />
     <label for="newpw">Neues Passwort:</label>
-    <input type="password" id="newpw" name="newpw" minlength="6" required />
+    <input type="password" id="newpw" name="newpw" minlength="6" required autocomplete="new-password" />
     <% if (pwMsg) { %>
-      <div class="msg-success"><%= pwMsg %></div>
+      <div class="msg-success" role="alert"><%= pwMsg %></div>
     <% } %>
     <% if (pwErr) { %>
-      <div class="msg-error"><%= pwErr %></div>
+      <div class="msg-error" role="alert"><%= pwErr %></div>
     <% } %>
     <button type="submit" class="ios-btn ios-btn-small">Passwort ändern</button>
   </form>
@@ -37,8 +37,7 @@
 
   :root {
     --green-light: #a9d6b8;
-    
-    
+    --green-dark: #184c34;
     --blur-bg: rgba(255 255 255 / 0.5);
     --glass-border: rgba(255 255 255 / 0.35);
     --shadow-glass: rgba(0 0 0 / 0.12);
@@ -56,7 +55,7 @@
       0 6px 16px var(--shadow-glass);
     border: 1.7px solid var(--glass-border);
     font-family: 'SF Pro Display Variable', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #184c34;
+    color: var(--green-dark);
     animation: fadeinScale 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
     opacity: 0;
     transform: translateY(24px) scale(0.94);
@@ -74,7 +73,7 @@
     user-select: none;
     text-shadow:
       0 2px 8px #a9d6b8aa,
-      0 0 0 #184c34;
+      0 0 0 var(--green-dark);
   }
 
   .ios-form {
@@ -114,7 +113,6 @@
     background: #eaf8f1;
   }
 
-  /* Kleinere Buttons, mittig unter dem Formular */
   .ios-btn {
     cursor: pointer;
     user-select: none;

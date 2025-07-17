@@ -1,5 +1,4 @@
 <main class="apple2025-users">
-  <!-- GLASIGER, BLURRIGER HEADER -->
   <section class="apple2025-glass-header">
     <div class="apple2025-header-content">
       <div class="glass-blur-bg"></div>
@@ -24,18 +23,18 @@
             <span><%= u.username.slice(0,2).toUpperCase() %></span>
           </div>
           <div class="apple2025-userdata">
-            <span class="apple2025-username"><%= u.username %></span>
+            <span class="apple2025-username" title="<%= u.username %>"><%= u.username %></span>
             <span class="apple2025-role <%= u.is_admin ? 'admin' : '' %>">
               <%= u.is_admin ? 'Spieß' : 'Mitglied' %>
             </span>
           </div>
           <div class="apple2025-actions">
-            <a href="/users/edit/<%= u.id %>" class="icon-btn" title="Bearbeiten">✏️</a>
+            <a href="/users/edit/<%= u.id %>" class="icon-btn edit" title="Bearbeiten">✏️</a>
             <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
               <button class="icon-btn danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️</button>
             </form>
-            <a href="/export/user/<%= u.id %>/pdf" class="icon-btn" title="PDF" target="_blank">📄</a>
-            <a href="/export/user/<%= u.id %>/csv" class="icon-btn" title="CSV" target="_blank">📑</a>
+            <a href="/export/user/<%= u.id %>/pdf" class="icon-btn export" title="PDF" target="_blank" rel="noopener">📄</a>
+            <a href="/export/user/<%= u.id %>/csv" class="icon-btn export" title="CSV" target="_blank" rel="noopener">📑</a>
           </div>
         </div>
       </div>
@@ -45,6 +44,7 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap');
+
 :root {
   --accent: #28543a;
   --accent2: #c8eed4;
@@ -57,16 +57,27 @@
   --role-admin: linear-gradient(95deg,#ffefb8 10%,#ffe67a 95%);
   --fab-glass: rgba(61, 105, 90, 0.84);
 }
+
 body, html {
   font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, system-ui, sans-serif;
   background: linear-gradient(135deg,#e7f1eb 0%,#e3f7f4 100%);
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%; /* iOS Textgröße fixieren */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 .apple2025-users {
   max-width: 740px;
   margin: 2.9rem auto 2rem auto;
   padding: 0 1.3rem;
+  box-sizing: border-box;
+  width: 100%;
 }
+
 .apple2025-glass-header {
   margin-bottom: 2.2rem;
   border-radius: 2em;
@@ -75,11 +86,13 @@ body, html {
   background: transparent;
   min-height: 126px;
 }
+
 .apple2025-header-content {
   position: relative;
   z-index: 2;
   padding: 2.1rem 2.2rem 1.1rem 2.2rem;
 }
+
 .glass-blur-bg {
   position: absolute;
   inset: 0;
@@ -90,12 +103,19 @@ body, html {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   z-index: 1;
-  transition: background 0.22s, box-shadow 0.22s;
   pointer-events: none;
 }
+
 .header-flex {
-  display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 2.1rem; position: relative; z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  z-index: 2;
 }
+
 .apple2025-section-title {
   font-size: 2.15rem;
   font-weight: 900;
@@ -108,117 +128,281 @@ body, html {
   background-clip: text;
   filter: drop-shadow(0 1px 10px #c9eed877);
   text-shadow: 0 2px 5px #c8eed48c;
+  white-space: nowrap;
 }
+
 .apple2025-header-meta {
-  display: flex; gap: 0.7em; align-items: baseline; font-size: 1.17em; margin-top: 0.25em; font-weight: 600; color: #2fa770; letter-spacing: 0.01em; opacity: .83;
+  display: flex;
+  gap: 0.7em;
+  align-items: baseline;
+  font-size: 1.17em;
+  margin-top: 0.25em;
+  font-weight: 600;
+  color: #2fa770;
+  letter-spacing: 0.01em;
+  opacity: 0.83;
+  flex-wrap: wrap;
 }
+
 .apple2025-header-value {
-  font-size: 1.75em; font-weight: 900; color: #1b4d34; letter-spacing: -0.04em; margin-left: 0.12em; filter: drop-shadow(0 0 5px #a8eed4ad);
+  font-size: 1.75em;
+  font-weight: 900;
+  color: #1b4d34;
+  letter-spacing: -0.04em;
+  margin-left: 0.12em;
+  filter: drop-shadow(0 0 5px #a8eed4ad);
 }
+
 .apple2025-fab-btn {
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--fab-glass);
-  color: #fff; font-size: 2.09rem; font-weight: 800;
-  border-radius: 50%; width: 54px; height: 54px;
+  color: #fff;
+  font-size: 2.09rem;
+  font-weight: 800;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
   box-shadow: 0 8px 22px #a4edc944;
-  border: none; transition: background 0.13s, box-shadow 0.13s;
-  text-decoration: none; position: relative; z-index: 5;
-  outline: none; cursor: pointer;
+  border: none;
+  transition: background 0.13s, box-shadow 0.13s;
+  text-decoration: none;
+  position: relative;
+  z-index: 5;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
 }
-.apple2025-fab-btn:hover { background: #327a56; box-shadow: 0 13px 24px #b4f7d2bb; }
+.apple2025-fab-btn:hover {
+  background: #327a56;
+  box-shadow: 0 13px 24px #b4f7d2bb;
+}
 
 .apple2025-userlist {
-  display: flex; flex-direction: column; gap: 1.35rem; margin-top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 0.9rem;
+  overflow-wrap: anywhere;
 }
+
 .apple2025-usercard {
   background: rgba(255,255,255,0.95);
   border-radius: 1.25em;
   border: 1.3px solid var(--glass-outline);
   box-shadow: 0 7px 35px #94eecb27;
-  padding: 1.3rem 1.1rem 1.1rem 1.1rem;
-  display: flex; flex-direction: column; gap: 0.19em;
+  padding: 1.2rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
   animation: fadein-user 0.91s both cubic-bezier(.44,.15,0,1.12);
   animation-delay: var(--delay, 0ms);
   opacity: 0;
-  transition: box-shadow .18s, border .12s, background .13s;
+  transition: box-shadow 0.18s, border 0.12s, background 0.13s;
   will-change: box-shadow, border;
   position: relative;
   overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
 }
-@keyframes fadein-user { from { opacity: 0; transform: translateY(18px);} to { opacity: 1; transform: none;} }
+
+@keyframes fadein-user {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .apple2025-usercard:hover {
   box-shadow: 0 14px 44px #7ef2bc35, 0 2px 11px #b8eeb355;
   border: 1.7px solid #9be2b8;
   background: #f9fdfc;
 }
+
 .apple2025-user-row {
-  display: flex; align-items: center; gap: 1.19em;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
+
 .apple2025-avatar {
   background: var(--user-gradient);
-  color: #fff; width: 2.39em; height: 2.39em;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; font-weight: 900; font-size: 1.14em;
+  color: #fff;
+  width: 2.3em;
+  height: 2.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 1.1em;
   box-shadow: 0 2px 11px #54dc9745;
-  letter-spacing: 0.4px; transition: box-shadow 0.17s;
-  position: relative; font-family: inherit;
+  letter-spacing: 0.4px;
+  transition: box-shadow 0.17s;
+  position: relative;
+  font-family: inherit;
+  flex-shrink: 0;
+  user-select: none;
 }
 .apple2025-avatar.admin {
-  background: var(--user-admin); color: #bb8f0a;
+  background: var(--user-admin);
+  color: #bb8f0a;
   box-shadow: 0 2px 16px #ffe1873a;
 }
+
 .apple2025-userdata {
-  flex: 1;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 0.01em;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.01em;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
+
 .apple2025-username {
-  font-size: 1.08em;
+  font-size: 1.05em;
   font-weight: 900;
   color: #1b2d21;
   letter-spacing: -0.36px;
   margin-bottom: 0.02em;
   font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, system-ui, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: text;
 }
+
 .apple2025-role {
-  font-size: 0.91em; font-weight: 700;
-  padding: 0.14em 1.08em; border-radius: 2em;
+  font-size: 0.9em;
+  font-weight: 700;
+  padding: 0.12em 1em;
+  border-radius: 2em;
   box-shadow: 0 1px 6px #dafae035;
   border: 1px solid #e6efe7;
   margin-top: 0.03em;
   background: var(--role-member);
   color: #21a85d;
+  white-space: nowrap;
 }
 .apple2025-role.admin {
-  background: var(--role-admin); color: #c48f0a; border-color: #ffe7b3;
+  background: var(--role-admin);
+  color: #c48f0a;
+  border-color: #ffe7b3;
 }
-.apple2025-actions {
-  display: flex; flex-wrap: wrap; gap: 0.25em; align-items: center;
-}
-.icon-btn {
-  border: none; background: none;
-  font-size: 1.04em; cursor: pointer;
-  border-radius: 2em; padding: 0.19em 0.72em;
-  font-weight: 600; text-decoration: none;
-  transition: background 0.13s, color 0.13s, box-shadow 0.12s;
-  display: inline-flex; align-items: center; justify-content: center;
-  margin-left: 0.05em;
-}
-.icon-btn.edit { color: #2270d9; }
-.icon-btn.edit:hover { background: #eaf1fd; color: #1762be; }
-.icon-btn.danger { color: #b82828; }
-.icon-btn.danger:hover { background: #ffe7e7; color: #871010;}
-.icon-btn.export { color: #26895d; }
-.icon-btn.export:hover { background: #e6fff2; color: #077d36; }
 
-@media (max-width: 700px) {
-  .apple2025-glass-header { border-radius: 1.03em; }
-  .apple2025-header-content { padding: 1.3rem 0.7rem 0.4rem 0.7rem;}
-  .header-flex { flex-direction: column; align-items: flex-start; gap: 0.61em;}
-  .apple2025-section-title { font-size: 1.13rem;}
-  .apple2025-fab-btn { font-size: 1.14rem; width: 2.05em; height: 2.05em;}
-  .apple2025-usercard { padding: 0.77rem 0.29rem 0.67rem 0.29rem; border-radius: 0.97em;}
-  .apple2025-avatar { width: 1.07em; height: 1.07em; font-size: 0.86em;}
-  .apple2025-username { font-size: 0.90em;}
+.apple2025-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
 }
-.fade-in { animation: fadein-user 0.98s both; }
+
+.icon-btn {
+  border: none;
+  background: none;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 2em;
+  padding: 0.15em 0.6em;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.13s, color 0.13s, box-shadow 0.12s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.05em;
+  white-space: nowrap;
+  user-select: none;
+}
+.icon-btn.edit {
+  color: #2270d9;
+}
+.icon-btn.edit:hover {
+  background: #eaf1fd;
+  color: #1762be;
+}
+.icon-btn.danger {
+  color: #b82828;
+}
+.icon-btn.danger:hover {
+  background: #ffe7e7;
+  color: #871010;
+}
+.icon-btn.export {
+  color: #26895d;
+}
+.icon-btn.export:hover {
+  background: #e6fff2;
+  color: #077d36;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 700px) {
+  .apple2025-glass-header {
+    border-radius: 1.03em;
+  }
+  .apple2025-header-content {
+    padding: 1.3rem 0.7rem 0.4rem 0.7rem;
+  }
+  .header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .apple2025-section-title {
+    font-size: 1.4rem;
+    white-space: normal;
+  }
+  .apple2025-header-meta {
+    font-size: 1.05em;
+  }
+  .apple2025-fab-btn {
+    font-size: 1.5rem;
+    width: 2.6em;
+    height: 2.6em;
+  }
+  .apple2025-usercard {
+    padding: 1rem 0.8rem 0.7rem 0.8rem;
+    border-radius: 1em;
+  }
+  .apple2025-user-row {
+    gap: 0.7rem;
+    justify-content: flex-start;
+  }
+  .apple2025-avatar {
+    width: 2.1em;
+    height: 2.1em;
+    font-size: 1em;
+  }
+  .apple2025-username {
+    font-size: 1rem;
+    white-space: normal;
+  }
+  .apple2025-role {
+    padding: 0.1em 0.85em;
+    font-size: 0.8em;
+  }
+  .apple2025-actions {
+    gap: 0.1em;
+    justify-content: flex-start;
+  }
+  .icon-btn {
+    font-size: 0.9em;
+    padding: 0.15em 0.5em;
+  }
+}
+.fade-in {
+  animation: fadein-user 0.98s both;
+}
 </style>

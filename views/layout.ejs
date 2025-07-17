@@ -9,6 +9,7 @@
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,500,600&display=swap" />
   <style>
+    /* --- Root CSS & Basis Styles --- */
     :root {
       --green-dark: #606e56;
       --nav-bg: rgba(255 255 255 / 0.65);
@@ -20,7 +21,7 @@
     html, body {
       margin: 0;
       padding: 0;
-      overflow-x: hidden; /* verhindert horizontalen Scroll */
+      overflow-x: hidden;
       width: 100vw;
       box-sizing: border-box;
       font-family: var(--font);
@@ -39,6 +40,7 @@
       display: flex;
       flex-direction: column;
     }
+    /* --- Navigation --- */
     .main-nav {
       position: sticky;
       top: 0;
@@ -186,6 +188,7 @@
     .hamburger-btn:active {
       background: #dce1d5;
     }
+    /* --- Main Content Container --- */
     main.container {
       flex: 1;
       width: 100%;
@@ -211,6 +214,7 @@
       box-shadow: 0 18px 66px 0 #b0b99b33, 0 6px 22px 0 #a0bb8c2e;
       border-color: var(--accent);
     }
+    /* --- Footer --- */
     .footer {
       text-align: center;
       font-size: 0.99rem;
@@ -223,6 +227,7 @@
       user-select: none;
       -webkit-user-select: none;
     }
+    /* --- Scrollbar Styling --- */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -232,8 +237,7 @@
       background-color: rgba(181 198 164 / 0.18);
       border-radius: 8px;
     }
-
-    /* Responsive Mobile Anpassungen */
+    /* --- Responsive Mobile --- */
     @media (max-width: 680px) {
       .main-nav {
         padding: 0.58rem 0.38rem;
@@ -280,8 +284,7 @@
         color: #6d7a64;
       }
     }
-
-    /* Verhindert horizontales Scrollen bei breiten Inhalten */
+    /* --- Verhindert horizontales Scrollen bei breiten Inhalten --- */
     img, table, video, iframe, input, textarea, select {
       max-width: 100%;
       box-sizing: border-box;
@@ -330,17 +333,6 @@
   <footer class="footer" role="contentinfo" tabindex="-1">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
   </footer>
-
-  <div id="push-popup" class="push-popup hidden" role="dialog" aria-modal="true" aria-labelledby="push-popup-title" tabindex="-1">
-    <div class="push-popup-box">
-      <h2 id="push-popup-title">🔔 Push-Benachrichtigungen</h2>
-      <p>Möchtest du benachrichtigt werden, wenn neue Strafen eingetragen werden?</p>
-      <div class="push-popup-actions">
-        <button id="enable-push" class="btn" tabindex="0">Ja, aktivieren</button>
-        <button id="dismiss-push" class="btn btn-secondary" tabindex="0">Später</button>
-      </div>
-    </div>
-  </div>
 
   <script>
     const btn = document.getElementById('hamburger-btn');
