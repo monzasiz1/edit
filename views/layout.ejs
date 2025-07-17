@@ -2,91 +2,84 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
-  <meta name="theme-color" content="#b0b99b">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/logo.png">
+  <meta name="theme-color" content="#b0b99b" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/logo.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,500,600&display=swap" />
   <style>
     :root {
       --green-dark: #606e56;
-      --nav-bg: rgba(255 255 255 / 0.65);
+      --nav-bg: rgba(255 255 255 / 0.9);
       --radius: 1.85rem;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --blur: blur(12px);
       --accent: #a0bb8c;
+      --max-content-width: 680px;
     }
     html, body {
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden; /* verhindert horizontalen Scroll */
-      width: 100vw;
-      box-sizing: border-box;
+      margin: 0; padding: 0;
       font-family: var(--font);
       font-size: 17.5px;
       background: #f8fafb;
       color: #222;
-      scroll-behavior: smooth;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
+      overflow-x: hidden;
+      height: 100%;
+      touch-action: manipulation;
     }
     body {
-      min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
     }
     .main-nav {
       position: sticky;
       top: 0;
-      z-index: 99;
+      z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.7rem 2.4rem 0.7rem 0;
+      padding: 0.7rem 2rem 0.7rem 1rem;
       background: var(--nav-bg);
       border-radius: 0 0 var(--radius) var(--radius);
       min-height: 64px;
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       user-select: none;
+      box-shadow: 0 0 12px rgb(0 0 0 / 0.05);
     }
     .main-nav .logo {
       display: flex;
       align-items: center;
-      gap: 1.2em;
-      font-size: 2.4rem;
+      gap: 1.1rem;
+      font-size: 2.2rem;
       font-weight: 900;
       color: var(--green-dark);
       letter-spacing: -0.025em;
       text-decoration: none;
       user-select: text;
       line-height: 1;
-      padding-left: 1rem;
+      padding-left: 0.5rem;
     }
     .main-nav .logo img {
-      height: 56px;
-      width: 56px;
+      height: 52px;
+      width: 52px;
       object-fit: contain;
-      border-radius: 0;
-      box-shadow: none;
-      background: none;
-      filter: none;
       user-select: none;
       pointer-events: none;
-      transition: none;
     }
     .nav-menu {
       display: flex;
-      gap: 0.38em;
+      gap: 0.4em;
       align-items: center;
       list-style: none;
       margin: 0;
       padding: 0;
       user-select: none;
+      transition: transform 0.28s ease, opacity 0.28s ease;
     }
     .nav-menu li {
       position: relative;
@@ -95,26 +88,23 @@
     .btn-logout {
       display: flex;
       align-items: center;
-      gap: 0.31em;
+      gap: 0.3em;
       background: none;
       border: none;
       font-size: 1.1rem;
       color: var(--green-dark);
       text-decoration: none;
-      padding: 0.64em 1.27em;
+      padding: 0.6em 1.2em;
       border-radius: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      user-select: text;
       transition:
         background 0.22s ease,
         color 0.18s ease,
         box-shadow 0.3s ease,
         filter 0.18s ease;
-      font-weight: 500;
-      cursor: pointer;
-      outline: none;
-      position: relative;
-      overflow: hidden;
-      will-change: background, box-shadow, filter;
-      user-select: text;
     }
     .nav-menu a:hover,
     .btn-logout:hover {
@@ -135,12 +125,6 @@
       stroke-width: 2.3;
       stroke-linejoin: round;
     }
-    .nav-menu a:active,
-    .btn:active {
-      box-shadow: none;
-      filter: none;
-      transition: none;
-    }
     .hamburger-btn {
       display: none;
       flex-direction: column;
@@ -154,7 +138,7 @@
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       position: relative;
-      z-index: 110;
+      z-index: 10001;
       width: 40px;
       height: 32px;
     }
@@ -186,25 +170,63 @@
     .hamburger-btn:active {
       background: #dce1d5;
     }
+    @media (max-width: 680px) {
+      .nav-menu {
+        flex-direction: column;
+        align-items: flex-end;
+        position: fixed;
+        top: 64px;
+        right: 1rem;
+        background: var(--nav-bg);
+        padding: 1.4em 1.2em 1.2em 1.2em;
+        border-radius: 1.5rem;
+        box-shadow: 0 14px 28px rgb(0 0 0 / 0.14);
+        min-width: 180px;
+        display: none;
+        user-select: none;
+        backdrop-filter: var(--blur);
+        -webkit-backdrop-filter: var(--blur);
+        transform-origin: top right;
+        z-index: 10000;
+      }
+      .nav-menu.open {
+        display: flex;
+        animation: navPop 0.2s ease forwards;
+      }
+      @keyframes navPop {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hamburger-btn {
+        display: flex;
+      }
+    }
+
     main.container {
       flex: 1;
-      width: 100%;
-      max-width: 680px;
-      box-sizing: border-box;
+      max-width: var(--max-content-width);
       margin: 2.6rem auto 2.8rem auto;
+      width: calc(100% - 3rem);
       background: rgba(255 255 255 / 0.55);
       border-radius: var(--radius);
       box-shadow: 0 12px 40px rgba(122 142 111 / 0.14), 0 4px 16px rgba(181 198 164 / 0.09);
       padding: 2.8rem 2.3rem 2.3rem 2.3rem;
       min-height: 66dvh;
+      animation: cardIn 0.57s cubic-bezier(0.22, 0.95, 0.32, 1.05);
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       border: 1.4px solid #d4dfcfcc;
       transition: box-shadow 0.28s ease, border-color 0.28s ease;
       will-change: box-shadow;
       user-select: text;
-      overflow-wrap: break-word;
-      word-break: break-word;
+      overflow-x: hidden;
+      box-sizing: border-box;
     }
     main.container:focus-within,
     main.container:hover {
@@ -215,78 +237,12 @@
       text-align: center;
       font-size: 0.99rem;
       color: #7d8e7a;
-      margin-bottom: 0.9rem;
-      margin-top: 1.9rem;
+      margin: 2rem auto 1rem auto;
       letter-spacing: 0.01em;
-      background: none;
-      opacity: 0.91;
       user-select: none;
       -webkit-user-select: none;
-    }
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background-color: rgba(181 198 164 / 0.18);
-      border-radius: 8px;
-    }
-
-    /* Responsive Mobile Anpassungen */
-    @media (max-width: 680px) {
-      .main-nav {
-        padding: 0.58rem 0.38rem;
-      }
-      .main-nav .logo img {
-        height: 42px;
-        width: 42px;
-      }
-      .nav-menu {
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.08em;
-        position: fixed;
-        top: 64px;
-        right: 12px;
-        background: var(--nav-bg);
-        padding: 1.3em 1em 1em 1em;
-        border-radius: 1.5rem;
-        box-shadow: none;
-        min-width: 175px;
-        display: none;
-        user-select: none;
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-      }
-      .nav-menu.open {
-        display: flex;
-        animation: navPop 0.2s ease forwards;
-      }
-      .hamburger-btn {
-        display: flex;
-      }
-      main.container {
-        margin: 1.3rem 0.15rem 2rem 0.15rem;
-        padding: 1.2rem 1rem;
-        min-height: 58dvh;
-        box-shadow: 0 10px 26px rgba(120 137 116 / 0.18);
-        border-radius: var(--radius);
-        border: 1.2px solid #c8d0bdcc;
-      }
-      .footer {
-        font-size: 0.85rem;
-        margin: 1rem 0 1.5rem 0;
-        color: #6d7a64;
-      }
-    }
-
-    /* Verhindert horizontales Scrollen bei breiten Inhalten */
-    img, table, video, iframe, input, textarea, select {
-      max-width: 100%;
-      box-sizing: border-box;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
+      max-width: var(--max-content-width);
+      width: calc(100% - 3rem);
     }
   </style>
 </head>
@@ -331,20 +287,10 @@
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
   </footer>
 
-  <div id="push-popup" class="push-popup hidden" role="dialog" aria-modal="true" aria-labelledby="push-popup-title" tabindex="-1">
-    <div class="push-popup-box">
-      <h2 id="push-popup-title">🔔 Push-Benachrichtigungen</h2>
-      <p>Möchtest du benachrichtigt werden, wenn neue Strafen eingetragen werden?</p>
-      <div class="push-popup-actions">
-        <button id="enable-push" class="btn" tabindex="0">Ja, aktivieren</button>
-        <button id="dismiss-push" class="btn btn-secondary" tabindex="0">Später</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const btn = document.getElementById('hamburger-btn');
-    const menu = document.getElementById('main-menu');
+    const menu
+ = document.getElementById('main-menu');
     if(btn && menu){
       btn.onclick = () => {
         menu.classList.toggle('open');
