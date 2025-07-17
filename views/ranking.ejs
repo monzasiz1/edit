@@ -1,39 +1,411 @@
-<h2 class="ranking-title">Strafen-Ranking</h2>
-<table class="ranking-table">
-  <thead>
-    <tr>
-      <th>Platz</th>
-      <th>Benutzername</th>
-      <th>Betrag</th> <!-- Betrag der Strafen -->
-    </tr>
-  </thead>
-  <tbody>
-    <% users.forEach((user, index) => { %>
-      <% if (user.id === userId) { %> <!-- Der aktuelle Benutzer wird hervorgehoben -->
-        <tr class="highlight-user">
-          <td><%= index + 1 %></td>
-          <td><%= user.username %></td>
-          <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
-        </tr>
-      <% } else { %> 
-        <% if (isAdmin) { %> <!-- Admin sieht alle Benutzer ohne Blur -->
-          <tr>
-            <td><%= index + 1 %></td>
-            <td><%= user.username %></td>
-            <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
-          </tr>
-        <% } else { %> <!-- Nicht-Admin sieht andere Benutzer geblurrt -->
-          <tr class="blurred">
-            <td><%= index + 1 %></td>
-            <td><%= user.username %></td>
-            <td><%= user.total_penalty_amount.toFixed(2) %> €</td>
-          </tr>
-        <% } %>
-      <% } %>
-    <% }); %>
-  </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strafen-Ranking</title>
 
-<div class="back-to-dashboard">
-  <a href="/dashboard" class="btn btn-back">🔙 Zurück zum Dashboard</a>
-</div>
+  <!-- SF Pro Variable Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/sf-pro-display@latest/index.min.css">
+
+  <style>
+    :root {
+      --apple-green: #4CAF50;
+      --apple-green-light: #8BC34A;
+      --apple-green-lighter: #AED581;
+      --apple-bg: linear-gradient(112deg,#F7FAF8 0%,#eef7ee 100%);
+      --glass: rgba(255,255,255,0.85);
+      --shadow-card: 0 12px 42px 0 #B9C9B244, 0 2px 14px 0 #C2D6BC22;
+      --radius-xl: 2.25rem;
+      --blur: blur(20px);
+      --face-size: 2.25em;
+      --text-color: #21332a;
+      --text-muted: #5a6b51;
+      --btn-bg-gradient: linear-gradient(135deg, var(--apple-green), var(--apple-green-light));
+      --btn-bg-gradient-hover: linear-gradient(135deg, var(--apple-green-light), var(--apple-green-lighter));
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'SF Pro Display Variable', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--apple-bg);
+      color: var(--text-color);
+      font-size: 17.5px;
+      letter-spacing: -0.011em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 0 3rem;
+    }
+
+    .ranking-section {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 2rem 0 1.6rem;
+      padding: 0 1rem;
+    }
+
+    /* iOS Style Title mit Fade-In */
+    .ranking-title-ios {
+      font-weight: 900;
+      font-size: 2.8rem;
+      letter-spacing: -0.015em;
+      background: linear-gradient(90deg, var(--apple-green) 15%, var(--apple-green-light) 60%, var(--apple-green-lighter) 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 2.4rem;
+      text-align: center;
+      user-select: none;
+      text-shadow:
+        0 1px 1px rgba(255 255 255 / 0.4),
+        0 -1px 1px rgba(0 0 0 / 0.1);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      animation: fadein-ios 1.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      opacity: 0;
+      transform: translateY(32px);
+    }
+    @keyframes fadein-ios {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .ranking-table-wrap {
+      background: var(--glass);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(20px) saturate(120%);
+      padding: 2rem 1.5rem;
+      margin-bottom: 2.3rem;
+      width: 100%;
+      border: 1.5px solid #dbe9d7;
+      overflow-x: auto;
+      animation: fadein 0.9s cubic-bezier(.21,.8,.4,1.06);
+      position: relative;
+    }
+
+    .ranking-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      background: none;
+      min-width: 320px;
+    }
+
+    .ranking-table th {
+      text-align: left;
+      font-weight: 800;
+      padding: 0.55em 1.2em 0.55em 0.3em;
+      border-bottom: 2px solid #b4d0a3;
+      color: var(--apple-green);
+      font-size: 1rem;
+      user-select: none;
+      background: none;
+    }
+
+    .ranking-table td {
+      padding: 0.7em 1.2em 0.65em 0.3em;
+      border-bottom: 1px solid #e6f0de;
+      background: none;
+      font-weight: 600;
+      vertical-align: middle;
+      position: relative;
+      z-index: 1;
+      color: var(--text-color);
+    }
+
+    .ranking-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .highlight-user {
+      background: linear-gradient(92deg, #e0f4d6 74%, #d1eac8 100%);
+      box-shadow: 0 3px 18px 0 #c3d9b722;
+      color: #2e6f2b;
+      font-weight: 900;
+      border-radius: 1.2em;
+      animation: ownin 0.85s cubic-bezier(.19,.89,.33,1.06);
+      z-index: 2;
+      position: relative;
+    }
+
+    @keyframes ownin {
+      0% {
+        opacity: 0;
+        transform: translateY(32px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .highlight-user .user-face {
+      box-shadow: 0 7px 22px #a3dba779, 0 1px 7px #cdf0bf38;
+      border: 2px solid #b5dbb6;
+      animation: popface 0.6s;
+    }
+    @keyframes popface {
+      0% {
+        transform: scale(0.65);
+      }
+      70% {
+        transform: scale(1.06);
+      }
+      100% {
+        transform: none;
+      }
+    }
+
+    .highlight-user .user-name {
+      color: #1e5e21;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+
+    .you-tag {
+      font-size: 0.84em;
+      color: #fff;
+      background: var(--apple-green);
+      border-radius: 0.7em;
+      padding: 0.18em 0.8em;
+      margin-left: 0.75em;
+      font-weight: 700;
+      vertical-align: middle;
+      box-shadow: 0 2px 9px #a5bd8a4d;
+      border: 1.1px solid #c0d1af;
+      text-shadow: 0 1px 5px #8abc7596;
+    }
+
+    .amount-strong {
+      font-weight: 900;
+      color: #2e6f2b;
+      font-size: 1.1em;
+    }
+
+    .user-face {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e4f0dc 60%, #c5dfb9 100%);
+      color: #567e3a;
+      font-weight: 900;
+      font-size: 1.1em;
+      width: var(--face-size);
+      height: var(--face-size);
+      border-radius: 50%;
+      margin-right: 0.85em;
+      box-shadow: 0 2px 15px #cadbb46b;
+      border: 1.7px solid #d7ebd7;
+      letter-spacing: 0.01em;
+      overflow: hidden;
+      position: relative;
+      z-index: 5;
+      transition: box-shadow 0.17s;
+    }
+
+    .user-face img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .user-face svg {
+      width: 1.2em;
+      height: 1.2em;
+      opacity: 0.3;
+      margin-top: 1px;
+    }
+
+    .user-name {
+      vertical-align: middle;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .blurred .user-face,
+    .blurred .user-name,
+    .blurred .amount-blur {
+      filter: blur(8px) grayscale(0.25) brightness(0.95) !important;
+      opacity: 0.43 !important;
+      pointer-events: none;
+      user-select: none;
+      position: relative;
+    }
+
+    .blurred .user-face::before {
+      content: "●●";
+      display: block;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #bbbbbb99;
+      opacity: 0.75;
+      z-index: 12;
+      letter-spacing: 0.06em;
+      font-family: inherit;
+      filter: none;
+    }
+
+    .blurred .user-name::before {
+      content: "██████";
+      font-size: 1em;
+      color: #b2b9ba88;
+      font-family: inherit;
+      font-weight: 700;
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 13;
+      letter-spacing: 0.13em;
+      pointer-events: none;
+    }
+
+    .blurred .amount-blur::before {
+      content: "●●●,– €";
+      font-size: 1em;
+      color: #b2b9ba77;
+      font-family: inherit;
+      font-weight: 900;
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 13;
+      letter-spacing: 0.11em;
+      pointer-events: none;
+    }
+
+    .ranking-table tr {
+      transition: background 0.14s, box-shadow 0.14s;
+    }
+
+    .back-to-dashboard {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .btn-back {
+      background: var(--btn-bg-gradient);
+      background-size: 200% 100%;
+      color: #fff;
+      font-size: 1.15em;
+      font-weight: 900;
+      border-radius: 1.5em;
+      padding: 0.65em 2.2em;
+      border: none;
+      cursor: pointer;
+      margin: 0 auto;
+      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.45);
+      transition: background-position 0.4s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+      font-family: inherit;
+    }
+
+    .btn-back:hover {
+      background-position: 100% 0;
+      box-shadow: 0 7px 28px rgba(139, 195, 74, 0.75);
+      transform: translateY(-3px) scale(1.05);
+    }
+
+    @media (max-width: 650px) {
+      .ranking-table-wrap {
+        padding: 1rem 0.1rem 0.7rem 0.1rem;
+      }
+
+      .ranking-title-ios {
+        font-size: 2rem;
+      }
+
+      .ranking-table th,
+      .ranking-table td {
+        font-size: 0.9rem;
+      }
+
+      .user-face {
+        width: 1.9em;
+        height: 1.9em;
+      }
+
+      .btn-back {
+        font-size: 1em;
+        padding: 0.5em 1.3em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="ranking-section">
+    <h2 class="ranking-title-ios">🏆 Strafen-Ranking</h2>
+    <div class="ranking-table-wrap">
+      <table class="ranking-table" aria-label="Strafen Ranking Tabelle">
+        <thead>
+          <tr>
+            <th scope="col">Platz</th>
+            <th scope="col">Benutzer</th>
+            <th scope="col">Betrag</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach((user, index) => { %>
+            <% if (user.id === userId) { %>
+              <tr class="highlight-user">
+                <td><%= index + 1 %></td>
+                <td>
+                  <span class="user-face" aria-label="Avatar von <%= user.username %>">
+                    <% if(user.avatar){ %>
+                      <img src="<%= user.avatar %>" alt="Avatar von <%= user.username %>" />
+                    <% } else { %>
+                      <%= user.username.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2) %>
+                      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#d7ebce"/><ellipse cx="16" cy="13" rx="6" ry="5" fill="#b5e2b3"/><ellipse cx="16" cy="24" rx="8.5" ry="5.5" fill="#c1e1c1"/></svg>
+                    <% } %>
+                  </span>
+                  <span class="user-name"><%= user.username %></span>
+                  <span class="you-tag" aria-label="Du">Du</span>
+                </td>
+                <td><span class="amount-strong"><%= user.total_penalty_amount.toFixed(2) %> €</span></td>
+              </tr>
+            <% } else { %>
+              <tr class="blurred" aria-hidden="true">
+                <td><%= index + 1 %></td>
+                <td>
+                  <span class="user-face"></span>
+                  <span class="user-name"></span>
+                </td>
+                <td class="amount-blur"></td>
+              </tr>
+            <% } %>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="back-to-dashboard">
+      <a href="/dashboard" class="btn-back" aria-label="Zurück zum Dashboard">🔙 Zurück zum Dashboard</a>
+    </div>
+  </section>
+</body>
+</html>

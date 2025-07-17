@@ -4,54 +4,420 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
-
-  <!-- Manifest + Icons -->
+  <meta name="theme-color" content="#b0b99b">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Spießbuch">
-  <link rel="apple-touch-icon" href="/icons/logo-192.png">
   <link rel="apple-touch-icon" href="/logo.png">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="/style.css" />
-  <link rel="stylesheet" href="/hamburger.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,500,600&display=swap" />
   <style>
-    html { scroll-behavior: smooth; }
+    :root {
+      --green-dark: #606e56;
+      --nav-bg: rgba(255 255 255 / 0.65);
+      --radius: 1.85rem;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --blur: blur(12px);
+    }
+    html {
+      font-family: var(--font);
+      font-size: 17.5px;
+      background: #f8fafb;
+      color: #222;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #f8fafb;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-nav {
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 2.4rem 0.7rem 0; /* Kein links padding */
+      background: var(--nav-bg);
+      border-radius: 0 0 var(--radius) var(--radius);
+      min-height: 64px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      user-select: none;
+    }
+    .main-nav .logo {
+      display: flex;
+      align-items: center;
+      gap: 1.2em;
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: var(--green-dark);
+      letter-spacing: -0.025em;
+      text-decoration: none;
+      user-select: text;
+      text-shadow: none;
+      line-height: 1;
+      padding-left: 1rem; /* Kleiner Abstand zum Rand, sonst klebt es komplett */
+    }
+    .main-nav .logo img {
+      height: 56px;
+      width: 56px;
+      object-fit: contain;
+      border-radius: 0; /* keine Abrundung */
+      box-shadow: none; /* kein Schatten */
+      background: none; /* kein Background */
+      filter: none; /* kein Filter */
+      user-select: none;
+      pointer-events: none;
+      transition: none;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 0.38em;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    .nav-menu li {
+      position: relative;
+    }
+    .nav-menu a,
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 0.31em;
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      color: var(--green-dark);
+      text-decoration: none;
+      padding: 0.64em 1.27em;
+      border-radius: 1.1rem;
+      transition:
+        background 0.22s ease,
+        color 0.18s ease,
+        box-shadow 0.3s ease,
+        filter 0.18s ease;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+      will-change: background, box-shadow, filter;
+      user-select: text;
+    }
+    .nav-menu a:hover,
+    .btn-logout:hover {
+      background: #dce1d5;
+      color: var(--green-dark);
+      box-shadow: none;
+      filter: none;
+    }
+    .nav-menu a:focus-visible,
+    .btn-logout:focus-visible {
+      outline-offset: 4px;
+      outline: 3px solid #a0bb8ccc;
+      background: rgba(170 188 150 / 0.15);
+    }
+    .btn-logout svg {
+      vertical-align: middle;
+      margin-left: 3px;
+      stroke-width: 2.3;
+      stroke-linejoin: round;
+    }
+    .nav-menu a:active,
+    .btn:active {
+      box-shadow: none;
+      filter: none;
+      transition: none;
+    }
+    .hamburger-btn {
+      display: none;
+      flex-direction: column;
+      gap: 4.3px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 7px 7px;
+      border-radius: 13px;
+      transition: background 0.23s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      z-index: 110;
+      width: 40px;
+      height: 32px;
+    }
+    .hamburger-btn span {
+      display: block;
+      width: 30px;
+      height: 4px;
+      background: var(--green-dark);
+      border-radius: 4px;
+      transition: 0.3s ease;
+      transform-origin: 3px 3px;
+      will-change: transform;
+      position: relative;
+    }
+    .hamburger-btn.open span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 7px);
+    }
+    .hamburger-btn.open span:nth-child(2) {
+      opacity: 0;
+      transform: translateX(-34px);
+    }
+    .hamburger-btn.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -8px);
+    }
+    .hamburger-btn:focus-visible {
+      outline-offset: 4px;
+      outline: 3px solid #a0bb8ccc;
+    }
+    .hamburger-btn:active {
+      background: #dce1d5;
+    }
+    @media (max-width: 900px) {
+      .main-nav {
+        padding-left: 0;
+      }
+      .main-nav .logo {
+        font-size: 1.8rem;
+        gap: 1rem;
+        padding-left: 0.7rem;
+      }
+      .main-nav .logo img {
+        height: 48px;
+        width: 48px;
+      }
+      .nav-menu a,
+      .btn-logout {
+        font-size: 1rem;
+        padding: 0.55em 1em;
+      }
+    }
+    @media (max-width: 680px) {
+      .main-nav {
+        padding: 0.58rem 0.38rem;
+      }
+      .main-nav .logo img {
+        height: 42px;
+        width: 42px;
+      }
+      .nav-menu {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.08em;
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        background: var(--nav-bg);
+        padding: 1.3em 1em 1em 1em;
+        border-radius: 1.5rem;
+        box-shadow: none;
+        min-width: 175px;
+        display: none;
+        user-select: none;
+        backdrop-filter: var(--blur);
+        -webkit-backdrop-filter: var(--blur);
+      }
+      .nav-menu.open {
+        display: flex;
+        animation: navPop 0.2s ease forwards;
+      }
+      @keyframes navPop {
+        0% {
+          opacity: 0;
+          transform: translateY(-14px);
+        }
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .hamburger-btn {
+        display: flex;
+      }
+    }
+    main.container {
+      flex: 1;
+      width: 100%;
+      max-width: 680px;
+      margin: 2.6rem auto 2.8rem auto;
+      background: rgba(255 255 255 / 0.55);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 40px rgba(122 142 111 / 0.14), 0 4px 16px rgba(181 198 164 / 0.09);
+      padding: 2.8rem 2.3rem 2.3rem 2.3rem;
+      min-height: 66dvh;
+      animation: cardIn 0.57s cubic-bezier(0.22, 0.95, 0.32, 1.05);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1.4px solid #d4dfcfcc;
+      transition: box-shadow 0.28s ease, border-color 0.28s ease;
+      will-change: box-shadow;
+      user-select: text;
+    }
+    main.container:focus-within,
+    main.container:hover {
+      box-shadow: 0 18px 66px 0 #b0b99b33, 0 6px 22px 0 #a0bb8c2e;
+      border-color: var(--accent);
+    }
+    @keyframes cardIn {
+      0% {
+        opacity: 0;
+        transform: translateY(38px) scale(0.965);
+      }
+      100% {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    @media (max-width: 600px) {
+      main.container {
+        padding: 1.4rem 0.5rem 1.3rem 0.5rem;
+        margin: 1.5rem 0.15rem;
+      }
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.99rem;
+      color: #7d8e7a;
+      margin-bottom: 0.9rem;
+      margin-top: 1.9rem;
+      letter-spacing: 0.01em;
+      background: none;
+      opacity: 0.91;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .push-popup {
+      position: fixed;
+      z-index: 201;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(70 87 58 / 0.13);
+      transition: opacity 0.33s ease;
+      backdrop-filter: blur(3.4px);
+      -webkit-backdrop-filter: blur(3.4px);
+      user-select: none;
+    }
+    .push-popup.hidden {
+      display: none;
+    }
+    .push-popup.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .push-popup-box {
+      background: #fff;
+      border-radius: 1.3em;
+      box-shadow: 0 9px 30px rgba(120 137 116 / 0.15);
+      padding: 2.2rem 1.4rem 1.5rem 1.4rem;
+      min-width: 300px;
+      max-width: 92vw;
+      text-align: center;
+      animation: cardIn 0.36s ease;
+      border: 1.3px solid #d8dfd2;
+      user-select: text;
+    }
+    .push-popup-box h2 {
+      margin: 0 0 0.54em 0;
+      font-size: 1.22rem;
+      color: var(--green-dark);
+      user-select: text;
+    }
+    .push-popup-box p {
+      margin-bottom: 1.18em;
+      color: #444b3b;
+      user-select: text;
+    }
+    .push-popup-actions {
+      display: flex;
+      gap: 0.75em;
+      justify-content: center;
+      user-select: none;
+    }
+    .push-popup .btn {
+      font-family: inherit;
+      font-size: 1.02em;
+      background: var(--green-dark);
+      color: #fff;
+      border: none;
+      border-radius: 1.1em;
+      padding: 0.62em 1.25em;
+      font-weight: 600;
+      box-shadow: 0 3px 10px -2px #758467cc;
+      cursor: pointer;
+      transition: background 0.16s ease, box-shadow 0.18s ease;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+    .push-popup .btn:hover {
+      background: #606e56;
+      box-shadow: 0 6px 22px rgba(96 110 86 / 0.75);
+    }
+    .push-popup .btn-secondary {
+      background: #f1f3f0;
+      color: var(--green-dark);
+      font-weight: 400;
+    }
+    .btn:focus-visible {
+      outline-offset: 4px;
+      outline: 3px solid #a0bb8ccc;
+      background: rgba(170 188 150 / 0.15);
+    }
+    .btn:active {
+      box-shadow: none;
+      filter: brightness(1.12);
+      transition: none;
+    }
+    input, button, select, textarea {
+      outline: none;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(181 198 164 / 0.18);
+      border-radius: 8px;
+    }
   </style>
 </head>
-
 <body>
-  <nav class="main-nav">
-    <a href="/" class="logo logo-large">
-      <img src="/logo.png" alt="Logo" /> Spießbuch
+  <nav class="main-nav" role="navigation" aria-label="Hauptnavigation">
+    <a href="/" class="logo" tabindex="0" aria-label="Spießbuch Startseite">
+      <img src="/logo.png" alt="Logo Spießbuch" />
+      Spießbuch
     </a>
-
     <% if (user) { %>
-      <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen">
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen" aria-expanded="false" aria-controls="main-menu" tabindex="0">
         <span></span><span></span><span></span>
       </button>
-
-      <ul id="main-menu">
-        <li><a href="/dashboard">Dashboard</a></li>
+      <ul class="nav-menu" id="main-menu" role="menu" tabindex="-1">
+        <li role="none"><a role="menuitem" href="/dashboard" tabindex="-1">Dashboard</a></li>
         <% if (user.is_admin) { %>
-          <li><a href="/penalties">Strafen</a></li>
-          <li><a href="/users">Nutzer</a></li>
+          <li role="none"><a role="menuitem" href="/penalties" tabindex="-1">Strafen</a></li>
+          <li role="none"><a role="menuitem" href="/users" tabindex="-1">Nutzer</a></li>
         <% } %>
-        <li><a href="/profil">Profil</a></li>
-        <li><a href="/ranking">Ranking</a></li>
-        <li><a href="/export">Export</a></li>
-        <li><a href="/strafenkatalog.pdf" target="_blank" rel="noopener">📄 Strafenkatalog</a></li>
-        <li>
+        <li role="none"><a role="menuitem" href="/profil" tabindex="-1">Profil</a></li>
+        <li role="none"><a role="menuitem" href="/ranking" tabindex="-1">Ranking</a></li>
+        <li role="none"><a role="menuitem" href="/export" tabindex="-1">Export</a></li>
+        <li role="none"><a role="menuitem" href="/strafenkatalog.pdf" target="_blank" rel="noopener" tabindex="-1">📄 Strafenkatalog</a></li>
+        <li role="none">
           <form action="/logout" method="POST" style="display:inline; margin:0;">
-            <button type="submit" class="btn btn-logout btn-icon" title="Logout" style="background:none; border:none; padding:0; cursor:pointer;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block">
-                <path d="M9 16l-1.5-1.5M9 16l1.5-1.5M9 16h7"/>
-                <path d="M16 12v-6a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v6"/>
-                <polyline points="19 16 22 12 19 8"/>
-                <line x1="22" y1="12" x2="9" y2="12"/>
-              </svg>
+            <button type="submit" class="btn btn-logout" title="Logout" tabindex="-1" aria-label="Logout">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16l-1.5-1.5M9 16l1.5-1.5M9 16h7"/><path d="M16 12v-6a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v6"/><polyline points="19 16 22 12 19 8"/><line x1="22" y1="12" x2="9" y2="12"/></svg>
             </button>
           </form>
         </li>
@@ -62,122 +428,47 @@
   <% if (typeof noContainer !== 'undefined' && noContainer) { %>
     <main><%- body %></main>
   <% } else { %>
-    <main class="container"><%- body %></main>
+    <main class="container" tabindex="0"><%- body %></main>
   <% } %>
 
-  <footer class="footer">
+  <footer class="footer" role="contentinfo" tabindex="-1">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
   </footer>
 
-  <!-- Push-Benachrichtigungs-Modal -->
-  <div id="push-popup" class="push-popup hidden">
+  <div id="push-popup" class="push-popup hidden" role="dialog" aria-modal="true" aria-labelledby="push-popup-title" tabindex="-1">
     <div class="push-popup-box">
-      <h2>🔔 Push-Benachrichtigungen</h2>
+      <h2 id="push-popup-title">🔔 Push-Benachrichtigungen</h2>
       <p>Möchtest du benachrichtigt werden, wenn neue Strafen eingetragen werden?</p>
       <div class="push-popup-actions">
-        <button id="enable-push" class="btn">Ja, aktivieren</button>
-        <button id="dismiss-push" class="btn btn-secondary">Später</button>
+        <button id="enable-push" class="btn" tabindex="0">Ja, aktivieren</button>
+        <button id="dismiss-push" class="btn btn-secondary" tabindex="0">Später</button>
       </div>
     </div>
   </div>
 
-  <script src="/menu.js"></script>
-
-  <% if (user) { %>
-    <script>
-   
-  if (!window.PUBLIC_VAPID_KEY) {
-  window.PUBLIC_VAPID_KEY = 'BMNz5-yJd5D66IWYpt1jP6XWdodPJF-54HxRY34-15-D8zAc24G8P3lhsx8VHDfuWKwT1ZQi-Y9l12z7irijHVA';
-}
-
-
-  if (window.location.pathname === '/dashboard') {
-    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isStandalone = ('standalone' in navigator) && navigator.standalone;
-
-    if (isIos && !isStandalone) {
-      alert('📱 Um Push-Benachrichtigungen zu erhalten, installiere die App über "Teilen" > "Zum Home-Bildschirm".');
+  <script>
+    const btn = document.getElementById('hamburger-btn');
+    const menu = document.getElementById('main-menu');
+    if(btn && menu){
+      btn.onclick = () => {
+        menu.classList.toggle('open');
+        btn.classList.toggle('open');
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+      };
+      window.addEventListener('resize',()=> {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.body.addEventListener('click',e=>{
+        if(menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+          menu.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      },true);
     }
-
-    function urlB64ToUint8Array(base64String) {
-      const padding = '='.repeat((4 - base64String.length % 4) % 4);
-      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-      const rawData = window.atob(base64);
-      return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-    }
-
-    navigator.serviceWorker.ready.then(async reg => {
-      const sub = await reg.pushManager.getSubscription();
-
-      if (!sub) {
-        setTimeout(() => {
-          if (sessionStorage.getItem('pushModalShown') === 'true') return;
-
-          const popup = document.getElementById('push-popup');
-          const enableBtn = document.getElementById('enable-push');
-          const dismissBtn = document.getElementById('dismiss-push');
-
-          popup.classList.remove('hidden');
-          sessionStorage.setItem('pushModalShown', 'true');
-
-          const closePopup = () => {
-            popup.classList.add('fade-out');
-            setTimeout(() => {
-              popup.classList.add('hidden');
-              popup.classList.remove('fade-out');
-            }, 300);
-          };
-
-          enableBtn.addEventListener('click', async () => {
-            try {
-              const permission = await Notification.requestPermission();
-              if (permission !== 'granted') {
-                alert('Benachrichtigungen wurden nicht erlaubt.');
-                closePopup();
-                return;
-              }
-
-              const newSub = await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlB64ToUint8Array(PUBLIC_VAPID_KEY)
-              });
-
-              const res = await fetch('/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newSub)
-              });
-
-              if (res.ok) {
-                alert('✅ Push erfolgreich aktiviert!');
-              } else {
-                alert('❌ Fehler beim Speichern der Subscription.');
-              }
-
-              closePopup();
-            } catch (err) {
-              console.error('Push-Aktivierung fehlgeschlagen:', err);
-              alert('❌ Push konnte nicht aktiviert werden.');
-              closePopup();
-            }
-          });
-
-          dismissBtn.addEventListener('click', () => {
-            closePopup();
-          });
-        }, 1000);
-      } else {
-        await fetch('/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sub)
-        });
-      }
-    }); // ← Ende von navigator.serviceWorker.ready.then
-  } // ← Ende von if (window.location.pathname === '/dashboard')
-</script>
-
-    </script>
-  <% } %>
+  </script>
 </body>
 </html>

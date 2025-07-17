@@ -1,12 +1,162 @@
+<h2 class="ios-title">Benutzer bearbeiten</h2>
+<% if (error) { %>
+  <div class="error"><%= error %></div>
+<% } %>
+<form method="POST" action="/users/edit/<%= userToEdit.id %>" class="ios-form">
+  <label for="username">Benutzername</label>
+  <input type="text" id="username" name="username" value="<%= userToEdit.username %>" required />
 
-<h2>Benutzer bearbeiten</h2>
-<% if (error) { %><div class="error"><%= error %></div><% } %>
-<form method="POST" action="/users/edit/<%= userToEdit.id %>">
-  <input type="text" name="username" value="<%= userToEdit.username %>" required />
-  <input type="password" name="password" placeholder="Neues Passwort (leer lassen für unverändert)" />
-  <label>
-    <input type="checkbox" name="is_admin" <% if (userToEdit.is_admin) { %>checked<% } %> /> Admin
+  <label for="password">Neues Passwort (leer lassen für unverändert)</label>
+  <input type="password" id="password" name="password" placeholder="Neues Passwort (leer lassen)" />
+
+  <label class="checkbox-label">
+    <input type="checkbox" name="is_admin" id="is_admin" <% if (userToEdit.is_admin) { %>checked<% } %> />
+    Admin
   </label>
-  <button type="submit">Speichern</button>
+
+  <button type="submit" class="ios-btn">Speichern</button>
 </form>
-<a href="/users">Zurück</a>
+<a href="/users" class="ios-link">← Zurück</a>
+
+<style>
+  @import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/sf-pro-display@latest/index.min.css');
+
+  .ios-title {
+    font-family: 'SF Pro Display Variable', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 900;
+    font-size: 2.3rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(90deg, #4caf50 15%, #8bc34a 60%, #aed581 90%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    text-shadow:
+      0 1px 1px rgba(255 255 255 / 0.4),
+      0 -1px 1px rgba(0 0 0 / 0.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    user-select: none;
+  }
+
+  .error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1.8rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .ios-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 400px;
+  }
+
+  .ios-form label {
+    font-weight: 600;
+    color: #1b2e2b;
+    margin-bottom: 0.3rem;
+    user-select: none;
+  }
+
+  .ios-form input[type="text"],
+  .ios-form input[type="password"] {
+    padding: 0.7rem 1rem;
+    border-radius: 1.4rem;
+    border: 1.5px solid #a6d7bb;
+    font-size: 1rem;
+    font-family: 'SF Pro Display Variable', 'SF Pro Display', sans-serif;
+    color: #1b2e2b;
+    background: #f7faf7;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .ios-form input[type="text"]:focus,
+  .ios-form input[type="password"]:focus {
+    border-color: #16e080;
+    box-shadow: 0 0 12px 3px #16e080aa;
+    background: #f1f9f3;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-weight: 700;
+    color: #1b2e2b;
+    user-select: none;
+  }
+  .checkbox-label input[type="checkbox"] {
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 0.4rem;
+    border: 1.6px solid #a6d7bb;
+    cursor: pointer;
+    accent-color: #16e080;
+    transition: box-shadow 0.22s ease;
+  }
+  .checkbox-label input[type="checkbox"]:focus {
+    box-shadow: 0 0 10px 2px #16e080cc;
+  }
+
+  .ios-btn {
+    padding: 0.95rem 0;
+    background: linear-gradient(120deg, #16e080 15%, #4ade80 90%);
+    border: none;
+    border-radius: 1.8rem;
+    font-weight: 900;
+    font-size: 1.22rem;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 7px 22px #16e08077;
+    transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.16s ease;
+  }
+  .ios-btn:hover {
+    background: linear-gradient(120deg, #1af993 20%, #5deb81 90%);
+    box-shadow: 0 11px 30px #16f080cc;
+    transform: scale(1.04);
+  }
+  .ios-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 6px 18px #15c072aa;
+  }
+
+  .ios-link {
+    display: inline-block;
+    margin-top: 1.8rem;
+    font-weight: 700;
+    color: #16e080;
+    text-decoration: none;
+    font-family: 'SF Pro Display Variable', 'SF Pro Display', sans-serif;
+    user-select: text;
+    transition: color 0.22s ease;
+  }
+  .ios-link:hover {
+    color: #31ffad;
+  }
+
+  @media (max-width: 460px) {
+    .ios-title {
+      font-size: 1.9rem;
+      margin-bottom: 1.3rem;
+    }
+    .ios-form {
+      max-width: 100%;
+      gap: 1.2rem;
+    }
+    .ios-form input[type="text"],
+    .ios-form input[type="password"] {
+      font-size: 0.95rem;
+      padding: 0.55rem 1rem;
+    }
+    .ios-btn {
+      font-size: 1.05rem;
+      padding: 0.75rem 0;
+      border-radius: 1.3rem;
+    }
+  }
+</style>

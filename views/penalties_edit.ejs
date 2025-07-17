@@ -1,7 +1,110 @@
+<style>
+  form.form-card {
+    max-width: 520px;
+    margin: 0 auto;
+    background: rgba(255 255 255 / 0.7);
+    padding: 2.8rem 2.4rem 2.2rem 2.4rem;
+    border-radius: 2rem;
+    box-shadow:
+      0 18px 44px rgba(105 139 91 / 0.12),
+      inset 0 0 14px rgba(255 255 255 / 0.45);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #37502f;
+    user-select: text;
+  }
+
+  form.form-card label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #3a4a1c;
+    letter-spacing: 0.01em;
+  }
+
+  form.form-card input[type="text"],
+  form.form-card input[type="number"],
+  form.form-card input[type="date"],
+  form.form-card select {
+    width: 100%;
+    padding: 16px 18px;
+    font-size: 1.12rem;
+    border-radius: 1.3rem;
+    border: 1.5px solid #9bbb7a;
+    background: #f5f8f4;
+    color: #3a4a1c;
+    box-shadow: inset 0 1.8px 6px rgba(119 141 115 / 0.18);
+    margin-bottom: 1.8rem;
+    transition: border-color 0.3s ease;
+    outline-offset: 3px;
+  }
+
+  form.form-card input[type="text"]:focus,
+  form.form-card input[type="number"]:focus,
+  form.form-card input[type="date"]:focus,
+  form.form-card select:focus {
+    border-color: #5a7a39;
+  }
+
+  form.form-card button[type="submit"] {
+    background: linear-gradient(135deg, #4B6F28, #7FAB57);
+    color: #F0FDF0;
+    border: none;
+    border-radius: 1.9rem;
+    font-size: 1.25rem;
+    font-weight: 900;
+    padding: 0.75em 2.1em;
+    box-shadow: 0 10px 26px rgba(123 168 92 / 0.52);
+    cursor: pointer;
+    transition: background 0.32s ease;
+    user-select: none;
+  }
+  form.form-card button[type="submit"]:hover,
+  form.form-card button[type="submit"]:focus {
+    background: linear-gradient(135deg, #3A5C1F, #6E9650);
+    box-shadow: 0 12px 34px rgba(80 129 32 / 0.7);
+  }
+
+  form.form-card a.btn-cancel {
+    background: transparent;
+    border: 2.3px solid #7FAB57;
+    border-radius: 1.9rem;
+    color: #7FAB57;
+    font-size: 1.22rem;
+    font-weight: 700;
+    padding: 0.72em 2.3em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+  form.form-card a.btn-cancel:hover,
+  form.form-card a.btn-cancel:focus {
+    background: #7FAB57;
+    color: #F0FDF0;
+  }
+
+  .error {
+    background: #FF453A;
+    color: white;
+    font-weight: 700;
+    border-radius: 1.6rem;
+    padding: 1rem 1.3rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 12px rgba(255 69 58 / 0.45);
+  }
+</style>
+
 <h2>Strafe bearbeiten</h2>
+
 <% if (error) { %>
   <div class="error"><%= error %></div>
 <% } %>
+
 <form method="POST" class="form-card">
   <label for="user_id">Nutzer:</label>
   <select name="user_id" id="user_id" required>

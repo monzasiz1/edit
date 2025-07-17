@@ -1,33 +1,92 @@
-<h2>Neue Strafe vergeben</h2>
+<h2 style="font-weight: 700; font-size: 1.9rem; color: #3A3A3C; margin-bottom: 1.8rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  Neue Strafe vergeben
+</h2>
+
 <% if (error) { %>
-  <div class="error"><%= error %></div>
+  <div style="background: #FF3B30; color: white; padding: 1rem 1.25rem; border-radius: 1rem; font-weight: 600; margin-bottom: 2rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <%= error %>
+  </div>
 <% } %>
-<form method="POST" class="form-card">
-  <label for="user_id">Nutzer:</label>
-  <select name="user_id" id="user_id" required>
+
+<form method="POST" class="form-card" style="max-width: 480px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  
+  <label for="user_id" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
+    Nutzer:
+  </label>
+  <select id="user_id" name="user_id" required
+    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; appearance: none; -webkit-appearance: none; -moz-appearance: none; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem;">
     <% users.forEach(u => { %>
       <option value="<%= u.id %>"><%= u.username %></option>
     <% }) %>
   </select>
+
+  <label for="type" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
+    Grund:
+  </label>
+  <input type="text" id="type" name="type" required placeholder="z.B. Verspätung"
+    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
   
-  <label for="type">Grund:</label>
-  <input type="text" name="type" id="type" required>
+  <label for="event" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
+    Veranstaltung:
+  </label>
+  <input type="text" id="event" name="event" required placeholder="z.B. Stammtisch"
+    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
+  
+  <label for="amount" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
+    Betrag (€):
+  </label>
+  <input type="number" id="amount" name="amount" required min="0" step="0.01" placeholder="z.B. 3.50"
+    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
 
-  <label for="event">Veranstaltung:</label>
-  <input type="text" name="event" id="event" required>
+  <label for="date" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
+    Datum:
+  </label>
+  <input type="date" id="date" name="date" required
+    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
 
-  <label for="amount">Betrag (€):</label>
-  <input type="number" name="amount" id="amount" min="0" step="0.01" required placeholder="z.B. 3.50">
-
-  <label for="date">Datum:</label>
-  <input type="date" name="date" id="date" required>
-
-  <label for="status">Status:</label>
-  <select name="status" id="status" required>
+  <label for="status" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
+    Status:
+  </label>
+  <select id="status" name="status" required
+    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 2.4rem; appearance: none; cursor: pointer;">
     <option value="offen" selected>🔴 offen</option>
     <option value="bezahlt">🟢 bezahlt</option>
   </select>
 
-  <button type="submit" class="btn">➕ Eintragen</button>
-  <a href="/penalties" class="btn btn-cancel">Abbrechen</a>
+  <div style="display: flex; gap: 1.2rem; justify-content: flex-start;">
+    <button type="submit" style="
+      background-color: #007AFF;
+      color: white;
+      border: none;
+      border-radius: 17px;
+      font-size: 1.18rem;
+      font-weight: 700;
+      padding: 14px 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 122, 255, 0.45);
+      transition: background-color 0.3s ease;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+    " onmouseenter="this.style.backgroundColor='#005BBB'; this.style.boxShadow='0 8px 16px rgba(0, 91, 187, 0.6)';" onmouseleave="this.style.backgroundColor='#007AFF'; this.style.boxShadow='0 6px 12px rgba(0, 122, 255, 0.45)';">
+      ➕ Eintragen
+    </button>
+    <a href="/penalties" style="
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 28px;
+      font-size: 1.16rem;
+      font-weight: 600;
+      border-radius: 17px;
+      border: 2px solid #007AFF;
+      color: #007AFF;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+    " onmouseenter="this.style.backgroundColor='#007AFF'; this.style.color='white';" onmouseleave="this.style.backgroundColor='transparent'; this.style.color='#007AFF';">
+      Abbrechen
+    </a>
+  </div>
 </form>
