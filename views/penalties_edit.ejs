@@ -1,136 +1,199 @@
 <style>
-  form.form-card {
-    max-width: 520px;
-    margin: 0 auto;
-    background: rgba(255 255 255 / 0.7);
-    padding: 2.8rem 2.4rem 2.2rem 2.4rem;
-    border-radius: 2rem;
-    box-shadow:
-      0 18px 44px rgba(105 139 91 / 0.12),
-      inset 0 0 14px rgba(255 255 255 / 0.45);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    color: #37502f;
-    user-select: text;
+  :root {
+    --green: #4B6F28;
+    --green-soft: #7FAB57;
+    --green-glow: rgba(123, 168, 92, 0.3);
+    --red: #FF3B30;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   }
 
-  form.form-card label {
-    display: block;
-    margin-bottom: 0.4rem;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: #3a4a1c;
-    letter-spacing: 0.01em;
+  .page-header {
+    text-align: center;
+    margin-bottom: 2.4rem;
+    position: relative;
+    transition: all 0.3s ease;
   }
 
-  form.form-card input[type="text"],
-  form.form-card input[type="number"],
-  form.form-card input[type="date"],
-  form.form-card select {
-    width: 100%;
-    padding: 16px 18px;
+  .page-title {
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(to right, #4b6f28, #7fab57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    font-family: var(--font);
+    margin: 0;
+    transition: all 0.3s ease;
+  }
+
+  .page-subline {
     font-size: 1.12rem;
-    border-radius: 1.3rem;
-    border: 1.5px solid #9bbb7a;
-    background: #f5f8f4;
-    color: #3a4a1c;
-    box-shadow: inset 0 1.8px 6px rgba(119 141 115 / 0.18);
-    margin-bottom: 1.8rem;
-    transition: border-color 0.3s ease;
-    outline-offset: 3px;
+    color: rgba(44, 60, 34, 0.58);
+    font-style: italic;
+    margin-top: 0.6rem;
+    font-family: var(--font);
+    transition: all 0.3s ease;
+    opacity: 1;
   }
 
-  form.form-card input[type="text"]:focus,
-  form.form-card input[type="number"]:focus,
-  form.form-card input[type="date"]:focus,
-  form.form-card select:focus {
-    border-color: #5a7a39;
+  .form-card {
+    max-width: 540px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.65);
+    padding: 2.6rem 2.3rem;
+    border-radius: 2rem;
+    box-shadow: 0 22px 60px rgba(71, 85, 59, 0.12), inset 0 0 14px rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    font-family: var(--font);
   }
 
-  form.form-card button[type="submit"] {
-    background: linear-gradient(135deg, #4B6F28, #7FAB57);
-    color: #F0FDF0;
+  .form-card label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    font-size: 1.02rem;
+    color: #2f3e1a;
+    letter-spacing: 0.015em;
+    opacity: 0.85;
+  }
+
+  .form-card input,
+  .form-card select {
+    width: 100%;
+    padding: 1rem 1.15rem;
+    font-size: 1.06rem;
+    border-radius: 1.2rem;
+    border: 1.5px solid #b3cba0;
+    background: #f9fbf8;
+    margin-bottom: 1.6rem;
+    transition: border-color 0.25s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    font-family: var(--font);
+  }
+
+  .form-card input:focus,
+  .form-card select:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 4px var(--green-glow);
+    transform: scale(1.015);
+  }
+
+  .form-card button[type="submit"] {
+    width: 100%;
+    padding: 0.9em;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--green), var(--green-soft));
     border: none;
-    border-radius: 1.9rem;
-    font-size: 1.25rem;
-    font-weight: 900;
-    padding: 0.75em 2.1em;
-    box-shadow: 0 10px 26px rgba(123 168 92 / 0.52);
+    border-radius: 2rem;
     cursor: pointer;
-    transition: background 0.32s ease;
-    user-select: none;
-  }
-  form.form-card button[type="submit"]:hover,
-  form.form-card button[type="submit"]:focus {
-    background: linear-gradient(135deg, #3A5C1F, #6E9650);
-    box-shadow: 0 12px 34px rgba(80 129 32 / 0.7);
+    transition: all 0.25s ease;
+    box-shadow: 0 12px 32px rgba(76, 117, 55, 0.28);
+    font-family: var(--font);
   }
 
-  form.form-card a.btn-cancel {
-    background: transparent;
-    border: 2.3px solid #7FAB57;
-    border-radius: 1.9rem;
-    color: #7FAB57;
-    font-size: 1.22rem;
-    font-weight: 700;
-    padding: 0.72em 2.3em;
+  .form-card button[type="submit"]:hover {
+    background: linear-gradient(135deg, #3a581d, var(--green));
+    box-shadow: 0 14px 36px rgba(76, 117, 55, 0.4);
+  }
+
+  .form-card button[type="submit"]:active {
+    transform: scale(0.985);
+  }
+
+  .form-card .btn-cancel {
+    display: block;
+    margin-top: 1.2rem;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 2rem;
+    padding: 0.75em;
+    color: var(--green-soft);
+    border: 2px solid var(--green-soft);
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease;
-    user-select: none;
-  }
-  form.form-card a.btn-cancel:hover,
-  form.form-card a.btn-cancel:focus {
-    background: #7FAB57;
-    color: #F0FDF0;
+    transition: all 0.2s ease;
+    font-family: var(--font);
   }
 
-  .error {
-    background: #FF453A;
+  .form-card .btn-cancel:hover {
+    background: var(--green-soft);
     color: white;
-    font-weight: 700;
-    border-radius: 1.6rem;
+  }
+
+  .error-box {
+    background: var(--red);
+    color: white;
+    font-weight: 600;
+    border-radius: 1.5rem;
     padding: 1rem 1.3rem;
-    margin-bottom: 2.5rem;
-    box-shadow: 0 4px 12px rgba(255 69 58 / 0.45);
+    margin: 0 auto 2rem;
+    max-width: 520px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(255, 59, 48, 0.4);
+    font-family: var(--font);
   }
 </style>
 
-<h2>Strafe bearbeiten</h2>
+<div class="page-header" id="header">
+  <h1 class="page-title" id="title">🧾 Strafe bearbeiten</h1>
+  <p class="page-subline" id="subline">Bearbeite Strafen im modernen iOS-Look.</p>
+</div>
 
 <% if (error) { %>
-  <div class="error"><%= error %></div>
+  <div class="error-box"><%= error %></div>
 <% } %>
 
 <form method="POST" class="form-card">
-  <label for="user_id">Nutzer:</label>
+  <label for="user_id">Nutzer</label>
   <select name="user_id" id="user_id" required>
     <% users.forEach(u => { %>
       <option value="<%= u.id %>" <%= (penalty.user_id == u.id ? 'selected' : '') %>><%= u.username %></option>
     <% }) %>
   </select>
 
-  <label for="type">Grund:</label>
+  <label for="type">Grund</label>
   <input type="text" name="type" id="type" required value="<%= penalty.type %>">
 
-  <label for="event">Veranstaltung:</label>
+  <label for="event">Veranstaltung</label>
   <input type="text" name="event" id="event" required value="<%= penalty.event %>">
 
-  <label for="amount">Betrag (€):</label>
+  <label for="amount">Betrag (€)</label>
   <input type="number" name="amount" id="amount" min="0" step="0.01" required value="<%= penalty.amount %>" placeholder="z.B. 3.50">
 
-  <label for="date">Datum:</label>
+  <label for="date">Datum</label>
   <input type="date" name="date" id="date" required value="<%= penalty.date ? penalty.date.toISOString ? penalty.date.toISOString().slice(0,10) : penalty.date : '' %>">
 
-  <label for="status">Status:</label>
+  <label for="status">Status</label>
   <select name="status" id="status" required>
     <option value="offen" <%= penalty.status === 'offen' ? 'selected' : '' %>>🔴 offen</option>
     <option value="bezahlt" <%= penalty.status === 'bezahlt' ? 'selected' : '' %>>🟢 bezahlt</option>
   </select>
 
-  <button type="submit" class="btn">💾 Speichern</button>
-  <a href="/penalties" class="btn btn-cancel">Abbrechen</a>
+  <button type="submit">💾 Speichern</button>
+  <a href="/penalties" class="btn-cancel">Abbrechen</a>
 </form>
+
+<script>
+  // Apple-Header Animation beim Scroll
+  const title = document.getElementById("title");
+  const subline = document.getElementById("subline");
+
+  window.addEventListener("scroll", () => {
+    const y = window.scrollY;
+    if (y > 15) {
+      title.style.fontSize = "2.2rem";
+      title.style.letterSpacing = "-0.01em";
+      subline.style.opacity = "0";
+      subline.style.transform = "translateY(-10px)";
+    } else {
+      title.style.fontSize = "";
+      title.style.letterSpacing = "";
+      subline.style.opacity = "1";
+      subline.style.transform = "translateY(0)";
+    }
+  });
+</script>

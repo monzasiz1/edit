@@ -8,15 +8,19 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,500,600&display=swap" />
+ 
   <style>
-    /* --- Root CSS & Basis Styles --- */
     :root {
-      --green-dark: #606e56;
-      --nav-bg: rgba(255 255 255 / 0.65);
+      --green-dark: #3b413c;
+      --nav-bg: rgba(255, 255, 255, 0.65);
       --radius: 1.85rem;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --blur: blur(12px);
-      --accent: #a0bb8c;
+      --accent: #6d9250;
+      --menu-glass: rgba(241, 250, 233, 0.96);
+      --menu-shadow: 0 14px 44px 0 #b6f6e77c, 0 2px 18px 0 #b9e8b342;
+      --menu-border: 1.9px solid #c2e7d599;
+      --hamburger-glow: 0 2px 12px #a7d7a726;
     }
     html, body {
       margin: 0;
@@ -32,14 +36,9 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-    body {
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-    }
+    *, *::before, *::after { box-sizing: inherit; }
+    body { min-height: 100dvh; display: flex; flex-direction: column; }
+
     /* --- Navigation --- */
     .main-nav {
       position: sticky;
@@ -89,10 +88,9 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      transition: none;
     }
-    .nav-menu li {
-      position: relative;
-    }
+    .nav-menu li { position: relative; }
     .nav-menu a,
     .btn-logout {
       display: flex;
@@ -106,10 +104,10 @@
       padding: 0.64em 1.27em;
       border-radius: 1.1rem;
       transition:
-        background 0.22s ease,
-        color 0.18s ease,
-        box-shadow 0.3s ease,
-        filter 0.18s ease;
+        background 0.22s,
+        color 0.18s,
+        box-shadow 0.3s,
+        filter 0.18s;
       font-weight: 500;
       cursor: pointer;
       outline: none;
@@ -137,57 +135,149 @@
       stroke-width: 2.3;
       stroke-linejoin: round;
     }
-    .nav-menu a:active,
-    .btn:active {
-      box-shadow: none;
-      filter: none;
-      transition: none;
-    }
+
+    /* --- Hamburger Fancy Style --- */
     .hamburger-btn {
       display: none;
       flex-direction: column;
-      gap: 4.3px;
-      background: none;
+      gap: 4.2px;
+      background: rgba(184,218,170,0.17);
       border: none;
       cursor: pointer;
-      padding: 7px 7px;
+      padding: 8px 8px;
       border-radius: 13px;
-      transition: background 0.23s ease;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      box-shadow: var(--hamburger-glow);
+      transition: background 0.22s, box-shadow 0.19s, filter 0.21s;
       position: relative;
-      z-index: 110;
-      width: 40px;
-      height: 32px;
+      z-index: 130;
+      width: 42px;
+      height: 34px;
+      opacity: 0.77;
+      will-change: filter, box-shadow, background;
+      outline: none;
+      backdrop-filter: blur(7px) saturate(1.12);
+      -webkit-backdrop-filter: blur(7px) saturate(1.12);
     }
     .hamburger-btn span {
       display: block;
-      width: 30px;
+      width: 27px;
       height: 4px;
-      background: var(--green-dark);
+      background: linear-gradient(90deg, #84be91 20%, #b0b99b 85%);
       border-radius: 4px;
-      transition: 0.3s ease;
+      box-shadow: 0 1px 6px #bbd9bb1f;
+      transition: 0.33s cubic-bezier(.74,.12,.31,1.14);
       transform-origin: 3px 3px;
-      will-change: transform;
+      will-change: transform, background;
       position: relative;
+      opacity: 0.92;
     }
-    .hamburger-btn.open span:nth-child(1) {
-      transform: rotate(45deg) translate(6px, 7px);
-    }
-    .hamburger-btn.open span:nth-child(2) {
+    .hamburger-btn.open { background: rgba(152,192,150,0.26); opacity: 0.99; }
+    .hamburger-btn.open span:nth-child(1) { transform: rotate(44deg) translate(6px, 7px);}
+    .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: translateX(-33px);}
+    .hamburger-btn.open span:nth-child(3) { transform: rotate(-43deg) translate(7px, -8px);}
+    .hamburger-btn:active { background: #dce1d5; }
+
+    /* --- Fancy Overlay for mobile nav --- */
+    .nav-fancy-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(186,206,176,0.23);
+      backdrop-filter: blur(4.5px) saturate(1.04);
+      -webkit-backdrop-filter: blur(4.5px) saturate(1.04);
+      transition: opacity 0.33s cubic-bezier(.64,.02,0,1.12);
       opacity: 0;
-      transform: translateX(-34px);
+      pointer-events: none;
     }
-    .hamburger-btn.open span:nth-child(3) {
-      transform: rotate(-45deg) translate(7px, -8px);
+    .nav-fancy-overlay.active {
+      display: block;
+      opacity: 1;
+      pointer-events: all;
+      animation: overlayFadeIn 0.3s cubic-bezier(.64,.02,0,1.12);
     }
-    .hamburger-btn:focus-visible {
-      outline-offset: 4px;
-      outline: 3px solid #a0bb8ccc;
+    @keyframes overlayFadeIn { from{opacity:0;} to{opacity:1;} }
+
+    /* --- Fancy Mobile Nav --- */
+    @media (max-width: 680px) {
+      .main-nav {
+        padding: 0.56rem 0.32rem;
+      }
+      .main-nav .logo img {
+        height: 40px; width: 40px;
+      }
+      .nav-menu {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.01em;
+        position: fixed;
+        top: 57px;
+        right: 8px;
+        background: var(--menu-glass);
+        padding: 1.44em 1.2em 1.1em 1.2em;
+        border-radius: 1.7rem 1.7rem 1.2rem 1.9rem;
+        box-shadow: var(--menu-shadow);
+        min-width: 175px;
+        max-width: 93vw;
+        border: var(--menu-border);
+        display: none;
+        opacity: 0;
+        transform: translateY(-30px) scale(.99);
+        transition:
+          opacity 0.28s cubic-bezier(.64,.02,0,1.12),
+          transform 0.39s cubic-bezier(.64,.02,0,1.12);
+        user-select: none;
+        will-change: opacity, transform;
+        backdrop-filter: blur(17px) saturate(1.12);
+        -webkit-backdrop-filter: blur(17px) saturate(1.12);
+        z-index: 110;
+      }
+      .nav-menu.open {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        animation: navPop 0.39s cubic-bezier(.68,.01,0,1.09);
+      }
+      @keyframes navPop {
+        from { opacity: 0; transform: translateY(-35px) scale(.97);}
+        to   { opacity: 1; transform: translateY(0) scale(1);}
+      }
+      .nav-menu li { width: 100%; }
+      .nav-menu a,
+      .btn-logout {
+        font-size: 1.16rem;
+        color: #1a4029;
+        padding: 0.72em 1.2em;
+        margin: 0.09em 0;
+        border-radius: 1.2em;
+        transition: background 0.22s, color 0.18s;
+        background: none;
+        box-shadow: none;
+        width: 100%;
+        justify-content: flex-start;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        filter: none;
+      }
+      .nav-menu a:active,
+      .btn-logout:active {
+        background: #e9f1ea;
+        color: #2d6640;
+      }
+      .nav-menu a:focus-visible,
+      .btn-logout:focus-visible {
+        background: #e4f2eb;
+        color: #238a50;
+        outline: 3px solid #a0bb8ccc;
+      }
+      .nav-menu li { animation: navLinkIn 0.8s cubic-bezier(.68,.01,0,1.19); }
+      @keyframes navLinkIn {
+        from { opacity:0; transform: translateY(-20px);}
+        to { opacity:1; transform: none;}
+      }
+      .hamburger-btn { display: flex; }
     }
-    .hamburger-btn:active {
-      background: #dce1d5;
-    }
+
     /* --- Main Content Container --- */
     main.container {
       flex: 1;
@@ -229,60 +319,10 @@
     }
     /* --- Scrollbar Styling --- */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-      background: transparent;
+      width: 8px; height: 8px; background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background-color: rgba(181 198 164 / 0.18);
-      border-radius: 8px;
-    }
-    /* --- Responsive Mobile --- */
-    @media (max-width: 680px) {
-      .main-nav {
-        padding: 0.58rem 0.38rem;
-      }
-      .main-nav .logo img {
-        height: 42px;
-        width: 42px;
-      }
-      .nav-menu {
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.08em;
-        position: fixed;
-        top: 64px;
-        right: 12px;
-        background: var(--nav-bg);
-        padding: 1.3em 1em 1em 1em;
-        border-radius: 1.5rem;
-        box-shadow: none;
-        min-width: 175px;
-        display: none;
-        user-select: none;
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-      }
-      .nav-menu.open {
-        display: flex;
-        animation: navPop 0.2s ease forwards;
-      }
-      .hamburger-btn {
-        display: flex;
-      }
-      main.container {
-        margin: 1.3rem 0.15rem 2rem 0.15rem;
-        padding: 1.2rem 1rem;
-        min-height: 58dvh;
-        box-shadow: 0 10px 26px rgba(120 137 116 / 0.18);
-        border-radius: var(--radius);
-        border: 1.2px solid #c8d0bdcc;
-      }
-      .footer {
-        font-size: 0.85rem;
-        margin: 1rem 0 1.5rem 0;
-        color: #6d7a64;
-      }
+      background-color: rgba(181 198 164 / 0.18); border-radius: 8px;
     }
     /* --- Verhindert horizontales Scrollen bei breiten Inhalten --- */
     img, table, video, iframe, input, textarea, select {
@@ -291,6 +331,21 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
+  </style>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
+  <meta name="theme-color" content="#b0b99b">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,500,600&display=swap" />
+  <!-- (CSS bleibt wie bei dir, hier gekürzt) -->
+  <style>
+    /* ... [dein ganzer Style wie oben, alles übernommen!] ... */
+    /* (aus Platzgründen entfernt – einfach wie oben einfügen) */
   </style>
 </head>
 <body>
@@ -303,15 +358,28 @@
       <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen" aria-expanded="false" aria-controls="main-menu" tabindex="0">
         <span></span><span></span><span></span>
       </button>
+      <div class="nav-fancy-overlay" id="nav-fancy-overlay"></div>
       <ul class="nav-menu" id="main-menu" role="menu" tabindex="-1">
-        <li role="none"><a role="menuitem" href="/dashboard" tabindex="-1">Dashboard</a></li>
+        <li role="none"><a role="menuitem" href="/dashboard"
+          <% if (typeof path !== 'undefined' && path === '/dashboard') { %>class="active" aria-current="page"<% } %>
+          tabindex="-1">Dashboard</a></li>
         <% if (user.is_admin) { %>
-          <li role="none"><a role="menuitem" href="/penalties" tabindex="-1">Strafen</a></li>
-          <li role="none"><a role="menuitem" href="/users" tabindex="-1">Nutzer</a></li>
+          <li role="none"><a role="menuitem" href="/penalties"
+            <% if (typeof path !== 'undefined' && path === '/penalties') { %>class="active" aria-current="page"<% } %>
+            tabindex="-1">Strafen</a></li>
+          <li role="none"><a role="menuitem" href="/users"
+            <% if (typeof path !== 'undefined' && path === '/users') { %>class="active" aria-current="page"<% } %>
+            tabindex="-1">Nutzer</a></li>
         <% } %>
-        <li role="none"><a role="menuitem" href="/profil" tabindex="-1">Profil</a></li>
-        <li role="none"><a role="menuitem" href="/ranking" tabindex="-1">Ranking</a></li>
-        <li role="none"><a role="menuitem" href="/export" tabindex="-1">Export</a></li>
+        <li role="none"><a role="menuitem" href="/profil"
+          <% if (typeof path !== 'undefined' && path === '/profil') { %>class="active" aria-current="page"<% } %>
+          tabindex="-1">Profil</a></li>
+        <li role="none"><a role="menuitem" href="/ranking"
+          <% if (typeof path !== 'undefined' && path === '/ranking') { %>class="active" aria-current="page"<% } %>
+          tabindex="-1">Ranking</a></li>
+        <li role="none"><a role="menuitem" href="/export"
+          <% if (typeof path !== 'undefined' && path === '/export') { %>class="active" aria-current="page"<% } %>
+          tabindex="-1">Export</a></li>
         <li role="none"><a role="menuitem" href="/strafenkatalog.pdf" target="_blank" rel="noopener" tabindex="-1">📄 Strafenkatalog</a></li>
         <li role="none">
           <form action="/logout" method="POST" style="display:inline; margin:0;">
@@ -337,22 +405,33 @@
   <script>
     const btn = document.getElementById('hamburger-btn');
     const menu = document.getElementById('main-menu');
-    if(btn && menu){
+    const overlay = document.getElementById('nav-fancy-overlay');
+    if(btn && menu && overlay){
       btn.onclick = () => {
         menu.classList.toggle('open');
         btn.classList.toggle('open');
+        overlay.classList.toggle('active');
         const expanded = btn.getAttribute('aria-expanded') === 'true';
         btn.setAttribute('aria-expanded', String(!expanded));
+      };
+      overlay.onclick = () => {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        overlay.classList.remove('active');
+        btn.setAttribute('aria-expanded', 'false');
       };
       window.addEventListener('resize',()=> {
         menu.classList.remove('open');
         btn.classList.remove('open');
+        overlay.classList.remove('active');
         btn.setAttribute('aria-expanded', 'false');
       });
       document.body.addEventListener('click',e=>{
-        if(menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        if(menu.classList.contains('open') &&
+           !menu.contains(e.target) && !btn.contains(e.target) && !overlay.contains(e.target)) {
           menu.classList.remove('open');
           btn.classList.remove('open');
+          overlay.classList.remove('active');
           btn.setAttribute('aria-expanded', 'false');
         }
       },true);

@@ -165,11 +165,11 @@
   }
   .strikeboard-add-btn {
     margin-left: auto;
-    font-size: 2.05rem;
+    font-size: 1.4rem; /* kleiner als vorher */
     font-weight: 800;
-    width: 2.07em; height: 2.07em;
+    width: 1.75em; height: 1.75em;
     background: linear-gradient(120deg,#1ae68d 8%,#39c9ff 92%);
-    box-shadow: 0 8px 32px #1ae68d19;
+    box-shadow: 0 6px 20px #1ae68d19;
     border-radius: 50%;
     color: #fff;
     border: none;
@@ -183,8 +183,8 @@
   }
   .strikeboard-add-btn:hover {
     background: linear-gradient(118deg,#0ed377,#3dcfff 82%);
-    box-shadow: 0 14px 37px #31ffa61c;
-    transform: scale(1.09) rotate(-2deg);
+    box-shadow: 0 10px 30px #31ffa61c;
+    transform: scale(1.07) rotate(-2deg);
   }
 
   .strikeboard-statistics {
@@ -273,17 +273,18 @@
   .user-avatar-lg {
     background: var(--avatar-grad);
     color: #fff;
-    width: 2.69em; height: 2.69em; display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; font-weight: 900; font-size: 1.17em; letter-spacing: 0.4px; box-shadow: 0 4px 12px #6bffec17;
+    width: 2.1em; height: 2.1em; /* kleiner */
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-weight: 900; font-size: 1.05em; letter-spacing: 0.4px; box-shadow: 0 4px 12px #6bffec17;
   }
   .user-name {
     flex: 1; font-size: 1.07em; font-weight: 700; color: #1d2727; letter-spacing: -0.59px;
   }
   .user-strike-count {
-    background: #fff; color: #1ae68d; font-size: 1.13em; padding: 0.13em 0.62em; border-radius: 1.2em; margin-right: 0.6em; font-weight: 800; border: 1.5px solid #d8f6ef; box-shadow: 0 1px 8px #13c07418;
+    background: #fff; color: #1ae68d; font-size: 1.05em; padding: 0.11em 0.5em; border-radius: 1.2em; margin-right: 0.6em; font-weight: 800; border: 1.5px solid #d8f6ef; box-shadow: 0 1px 8px #13c07418;
   }
   .chevron {
-    font-size: 1.7em; color: #b0bac8; margin-right: 0.3em; transition: transform 0.34s cubic-bezier(.7,.3,0,1.4);
+    font-size: 1.5em; color: #b0bac8; margin-right: 0.3em; transition: transform 0.34s cubic-bezier(.7,.3,0,1.4);
   }
   .strikeboard-user-card.open .chevron {
     transform: rotate(90deg);
@@ -312,7 +313,7 @@
     gap: 1.07vw;
     padding: 0.54em 0.6em;
     border-bottom: 1px solid #f2f3f4;
-    font-size: 1.09em;
+    font-size: 1.05em;
   }
   .strike-date {
     min-width: 84px;
@@ -335,34 +336,34 @@
   }
   .strike-status-dot {
     display: inline-block;
-    width: 1em;
-    height: 1em;
+    width: 0.7em; /* kleiner */
+    height: 0.7em;
     border-radius: 50%;
-    margin-left: 0.17em;
-    margin-right: 0.39em;
+    margin-left: 0.18em;
+    margin-right: 0.38em;
   }
   .strike-status-dot.bezahlt {
     background: var(--strike-green);
-    box-shadow: 0 0 17px 4px #1ae68d65;
+    box-shadow: 0 0 12px 3px #1ae68d50; /* etwas dezenter */
   }
   .strike-status-dot.offen {
     background: var(--strike-red);
-    box-shadow: 0 0 22px 6.2px #fe495c65;
-    animation: status-pulse 1.28s infinite cubic-bezier(.6,.2,0,1.2);
+    box-shadow: 0 0 14px 4px #fe495c55;
+    animation: status-pulse 2.4s infinite ease-in-out;
   }
   @keyframes status-pulse {
-    0%, 100% { box-shadow: 0 0 17px 4px #fe495c77; }
-    50% { box-shadow: 0 0 29px 11px #fe495c; }
+    0%, 100% { box-shadow: 0 0 12px 3px #fe495c77; }
+    50% { box-shadow: 0 0 18px 5px #fe495c99; }
   }
   .strike-row-actions {
-    margin-left: 0.8em;
+    margin-left: 0.6em;
     display: flex;
-    gap: 0.13em;
+    gap: 0.15em;
   }
   .strike-action-icon {
     border: none;
     background: none;
-    font-size: 1.15em;
+    font-size: 1.1em;
     cursor: pointer;
     color: #b9c5d5;
     padding: 0.14em 0.08em;

@@ -33,172 +33,130 @@
 </div>
 
 <style>
-  @import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/sf-pro-display@latest/index.min.css');
+.profil-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 1.7em;
+  box-shadow: 0 6px 32px #c9eed877, 0 1.5px 14px #54dc9737;
+  border: 1.2px solid #c8eed4;
+  padding: 2.2em 2em 1.7em 2em;
+  max-width: 390px;
+  margin: 2.5em auto 2.2em auto;
+  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  animation: fadein-user 0.98s both;
+}
+.ios-fadein { animation: fadein-user 0.98s both; }
 
-  :root {
-    --green-light: #a9d6b8;
-    --green-dark: #184c34;
-    --blur-bg: rgba(255 255 255 / 0.5);
-    --glass-border: rgba(255 255 255 / 0.35);
-    --shadow-glass: rgba(0 0 0 / 0.12);
-  }
+@keyframes fadein-user {
+  from { opacity: 0; transform: translateY(18px);}
+  to   { opacity: 1; transform: none;}
+}
 
-  .profil-card {
-    max-width: 420px;
-    width: 95%;
-    margin: 3rem auto;
-    background: var(--blur-bg);
-    border-radius: 2.5rem;
-    padding: 3rem 3.5rem 3.5rem;
-    box-shadow:
-      0 12px 38px var(--shadow-glass),
-      0 6px 16px var(--shadow-glass);
-    border: 1.7px solid var(--glass-border);
-    font-family: 'SF Pro Display Variable', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: var(--green-dark);
-    animation: fadeinScale 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-    opacity: 0;
-    transform: translateY(24px) scale(0.94);
-  }
+.ios-title {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #17432b;
+  letter-spacing: -1.1px;
+  margin: 0 0 1.3em 0;
+  background: linear-gradient(91deg, #28543a 60%, #a2ffe2 120%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 1px 10px #c9eed877);
+  text-shadow: 0 2px 5px #c8eed48c;
+}
 
-  .ios-title {
-    font-weight: 900;
-    font-size: 2.6rem;
-    margin-bottom: 3rem;
-    letter-spacing: -0.02em;
-    background: linear-gradient(120deg, var(--green-light), var(--green-dark));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    user-select: none;
-    text-shadow:
-      0 2px 8px #a9d6b8aa,
-      0 0 0 var(--green-dark);
-  }
+.ios-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  background: none;
+  margin-bottom: 0;
+}
+.ios-form label {
+  font-weight: 600;
+  color: #2fa770;
+  font-size: 1.06em;
+  margin-bottom: 0.11em;
+  letter-spacing: 0.01em;
+}
+.ios-form input[type="text"],
+.ios-form input[type="password"] {
+  width: 100%;
+  padding: 0.66em 1.1em;
+  border: 1.2px solid #c8eed4;
+  border-radius: 1.1em;
+  background: #f7fdf8;
+  font-size: 1.08em;
+  font-family: inherit;
+  margin-bottom: 0.13em;
+  transition: border 0.13s, background 0.13s;
+  outline: none;
+}
+.ios-form input:focus {
+  border-color: #21a85d;
+  background: #f1fff6;
+}
 
-  .ios-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.8rem;
-    position: relative;
-  }
+.ios-btn {
+  background: linear-gradient(91deg, #21a85d 0%, #2fa770 95%);
+  color: #fff;
+  font-weight: 800;
+  border: none;
+  border-radius: 1.3em;
+  font-size: 1.09em;
+  padding: 0.7em 1.55em;
+  margin-top: 0.7em;
+  box-shadow: 0 4px 18px #1ae68d17;
+  cursor: pointer;
+  transition: background 0.14s, box-shadow 0.14s, transform 0.12s;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+.ios-btn-small { font-size: 1em; padding: 0.55em 1.15em; margin-top: 0.5em; }
+.ios-btn:hover {
+  background: linear-gradient(91deg, #18984d 0%, #1bbf6c 95%);
+  box-shadow: 0 7px 26px #2fa77033;
+  transform: translateY(-2px) scale(1.03);
+}
 
-  .ios-form label {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--green-dark);
-    user-select: none;
-  }
+.ios-separator {
+  border: none;
+  border-top: 1.2px solid #e2efe9;
+  margin: 2em 0 2em 0;
+  opacity: 0.75;
+  background: none;
+}
 
-  .ios-form input[type="text"],
-  .ios-form input[type="password"] {
-    font-family: inherit;
-    padding: 1rem 1.4rem;
-    font-size: 1.05rem;
-    border-radius: 2rem;
-    border: 2px solid var(--green-light);
-    background: #f3fbf6;
-    color: var(--green-dark);
-    outline-offset: 4px;
-    transition:
-      border-color 0.3s ease,
-      box-shadow 0.3s ease,
-      background 0.35s ease;
-  }
+.msg-success, .msg-error {
+  font-size: 1em;
+  border-radius: 1em;
+  padding: 0.85em 1em;
+  margin-bottom: 0.23em;
+  margin-top: 0.2em;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.msg-success {
+  background: #f1fff3;
+  color: #20a85a;
+  border: 1.2px solid #c8eed4;
+  box-shadow: 0 1px 6px #c8eed48c;
+}
+.msg-error {
+  background: #ffe8e8;
+  color: #a02020;
+  border: 1.1px solid #ffd6d6;
+  box-shadow: 0 1px 6px #fdcaca44;
+}
 
-  .ios-form input[type="text"]:focus,
-  .ios-form input[type="password"]:focus {
-    border-color: var(--green-dark);
-    box-shadow: 0 0 20px 5px var(--green-light);
-    background: #eaf8f1;
-  }
-
-  .ios-btn {
-    cursor: pointer;
-    user-select: none;
-    background: linear-gradient(135deg, var(--green-dark), var(--green-light));
-    border: none;
-    border-radius: 2.5rem;
-    padding: 1.15rem 0;
-    font-weight: 900;
-    font-size: 1.18rem;
-    color: white;
-    box-shadow: 0 8px 28px var(--green-light);
-    transition:
-      background 0.3s ease,
-      box-shadow 0.3s ease,
-      transform 0.2s ease;
-    width: 160px;
-    margin: 1.8rem auto 0;
-    display: block;
-  }
-
-  .ios-btn:hover {
-    background: linear-gradient(135deg, #22b86f, #8ddba7);
-    box-shadow: 0 12px 36px #8ddba78f;
-    transform: scale(1.08);
-  }
-
-  .ios-btn:active {
-    transform: scale(0.96);
-    box-shadow: 0 6px 20px #73b283;
-  }
-
-  .msg-success,
-  .msg-error {
-    font-weight: 700;
-    padding: 0.8rem 1.2rem;
-    border-radius: 1.5rem;
-    user-select: none;
-    text-align: center;
-  }
-
-  .msg-success {
-    background-color: #d0f0d8;
-    color: #1a6a2d;
-    margin-top: -1rem;
-  }
-
-  .msg-error {
-    background-color: #fbdcdc;
-    color: #b61b20;
-    margin-top: -1rem;
-  }
-
-  .ios-separator {
-    margin: 3rem 0;
-    border: none;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--green-light), transparent);
-    opacity: 0.55;
-  }
-
-  @keyframes fadeinScale {
-    0% {
-      opacity: 0;
-      transform: translateY(24px) scale(0.94);
-    }
-    100% {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .profil-card {
-      padding: 2.5rem 2rem 2.8rem;
-      width: 90vw;
-    }
-    .ios-title {
-      font-size: 2rem;
-      margin-bottom: 2rem;
-    }
-    .ios-btn {
-      width: 100%;
-      font-size: 1.05rem;
-      padding: 1rem 0;
-      border-radius: 2rem;
-      margin-top: 1.5rem;
-    }
-  }
+/* Responsive */
+@media (max-width: 700px) {
+  .profil-card { padding: 1.2em 0.7em 1.1em 0.7em; max-width: 97vw; border-radius: 1.06em;}
+  .ios-title { font-size: 1.25rem; }
+  .ios-btn, .ios-btn-small { font-size: 1em; padding: 0.51em 1em;}
+}
 </style>

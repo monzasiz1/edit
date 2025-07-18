@@ -27,8 +27,16 @@
             <span class="apple2025-role <%= u.is_admin ? 'admin' : '' %>">
               <%= u.is_admin ? 'Spieß' : 'Mitglied' %>
             </span>
+            <div class="apple2025-actions mobile-actions">
+              <a href="/users/edit/<%= u.id %>" class="icon-btn edit" title="Bearbeiten">✏️</a>
+              <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
+                <button class="icon-btn danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️</button>
+              </form>
+              <a href="/export/user/<%= u.id %>/pdf" class="icon-btn export" title="PDF" target="_blank" rel="noopener">📄</a>
+              <a href="/export/user/<%= u.id %>/csv" class="icon-btn export" title="CSV" target="_blank" rel="noopener">📑</a>
+            </div>
           </div>
-          <div class="apple2025-actions">
+          <div class="apple2025-actions desktop-actions">
             <a href="/users/edit/<%= u.id %>" class="icon-btn edit" title="Bearbeiten">✏️</a>
             <form action="/users/delete/<%= u.id %>" method="POST" style="display:inline">
               <button class="icon-btn danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️</button>
@@ -117,7 +125,7 @@ body, html {
 }
 
 .apple2025-section-title {
-  font-size: 2.15rem;
+  font-size: 2.7rem;
   font-weight: 900;
   color: #17432b;
   letter-spacing: -1.2px;
@@ -228,8 +236,13 @@ body, html {
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  min-width: 500px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  width: 100%;
 }
 
 .apple2025-avatar {
@@ -266,6 +279,7 @@ body, html {
   min-width: 0;
   word-break: break-word;
   overflow-wrap: anywhere;
+  max-width: 220px;
 }
 
 .apple2025-username {
@@ -279,6 +293,7 @@ body, html {
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: text;
+  max-width: 100%;
 }
 
 .apple2025-role {
@@ -301,12 +316,15 @@ body, html {
 
 .apple2025-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.2em;
   align-items: center;
   justify-content: flex-end;
   min-width: 0;
+  margin-top: 0;
 }
+.desktop-actions { display: flex; }
+.mobile-actions { display: none; }
 
 .icon-btn {
   border: none;
@@ -347,61 +365,52 @@ body, html {
   color: #077d36;
 }
 
-/* Mobile Anpassungen */
-@media (max-width: 700px) {
-  .apple2025-glass-header {
-    border-radius: 1.03em;
-  }
-  .apple2025-header-content {
-    padding: 1.3rem 0.7rem 0.4rem 0.7rem;
-  }
-  .header-flex {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.35rem;
-  }
-  .apple2025-section-title {
-    font-size: 1.4rem;
-    white-space: normal;
-  }
-  .apple2025-header-meta {
-    font-size: 1.05em;
-  }
-  .apple2025-fab-btn {
-    font-size: 1.5rem;
-    width: 2.6em;
-    height: 2.6em;
-  }
-  .apple2025-usercard {
-    padding: 1rem 0.8rem 0.7rem 0.8rem;
-    border-radius: 1em;
-  }
-  .apple2025-user-row {
-    gap: 0.7rem;
-    justify-content: flex-start;
-  }
-  .apple2025-avatar {
-    width: 2.1em;
-    height: 2.1em;
-    font-size: 1em;
-  }
-  .apple2025-username {
-    font-size: 1rem;
-    white-space: normal;
-  }
-  .apple2025-role {
-    padding: 0.1em 0.85em;
-    font-size: 0.8em;
-  }
-  .apple2025-actions {
-    gap: 0.1em;
-    justify-content: flex-start;
-  }
-  .icon-btn {
-    font-size: 0.9em;
-    padding: 0.15em 0.5em;
-  }
+/* Responsive */
+@media (max-width: 900px) {
+  .apple2025-user-row { min-width: 600px; }
 }
+@media (max-width: 700px) {
+  .apple2025-glass-header { border-radius: 1.03em; }
+  .apple2025-header-content { padding: 1.3rem 0.7rem 0.4rem 0.7rem; }
+  .header-flex { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+  .apple2025-section-title {
+    font-size: 2.2rem;
+    white-space: normal;
+    line-height: 1.13;
+  }
+  .apple2025-header-meta { font-size: 1.13em; }
+  .apple2025-fab-btn {
+    font-size: 1.14rem;
+    width: 2.3em;
+    height: 2.3em;
+    min-width: 38px;
+    min-height: 38px;
+    box-shadow: 0 4px 10px #b8eeb355;
+  }
+  .apple2025-usercard { padding: 1rem 0.5rem 0.7rem 0.5rem; border-radius: 1em; }
+  .apple2025-user-row {
+    flex-wrap: wrap !important;
+    flex-direction: row;
+    gap: 0.7rem;
+    min-width: unset;
+    width: 100%;
+    overflow-x: unset;
+  }
+  .apple2025-avatar { width: 2em; height: 2em; font-size: 0.97em; }
+  .apple2025-username { font-size: 1.18rem; margin-bottom: 0.11em; }
+  .apple2025-role { font-size: 0.95em; padding: 0.14em 1em; }
+  .desktop-actions { display: none !important; }
+  .mobile-actions {
+    display: flex !important;
+    gap: 0.09em;
+    width: 100%;
+    margin-top: 0.35em;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .icon-btn { font-size: 1em; padding: 0.13em 0.45em; }
+}
+
 .fade-in {
   animation: fadein-user 0.98s both;
 }
