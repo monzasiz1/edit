@@ -124,6 +124,7 @@ body, html {
   z-index: 2;
 }
 
+/* Apple/iOS Style: Responsive & kleinerer Titel auf Mobile */
 .apple2025-section-title {
   font-size: 2.7rem;
   font-weight: 900;
@@ -137,6 +138,33 @@ body, html {
   filter: drop-shadow(0 1px 10px #c9eed877);
   text-shadow: 0 2px 5px #c8eed48c;
   white-space: nowrap;
+  line-height: 1.09;
+}
+
+@media (max-width: 700px) {
+  .apple2025-section-title {
+    font-size: 2.08rem;
+    line-height: 1.12;
+    letter-spacing: -0.9px;
+    white-space: normal;
+    margin-bottom: 0.07em;
+  }
+}
+
+@media (max-width: 440px) {
+  .apple2025-section-title {
+    font-size: 1.43rem;
+    line-height: 1.10;
+    letter-spacing: -0.6px;
+    margin-bottom: 0.05em;
+  }
+}
+@media (max-width: 340px) {
+  .apple2025-section-title {
+    font-size: 1.15rem;
+    letter-spacing: -0.4px;
+    line-height: 1.09;
+  }
 }
 
 .apple2025-header-meta {
@@ -373,20 +401,6 @@ body, html {
   .apple2025-glass-header { border-radius: 1.03em; }
   .apple2025-header-content { padding: 1.3rem 0.7rem 0.4rem 0.7rem; }
   .header-flex { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
-  .apple2025-section-title {
-    font-size: 2.2rem;
-    white-space: normal;
-    line-height: 1.13;
-  }
-  .apple2025-header-meta { font-size: 1.13em; }
-  .apple2025-fab-btn {
-    font-size: 1.14rem;
-    width: 2.3em;
-    height: 2.3em;
-    min-width: 38px;
-    min-height: 38px;
-    box-shadow: 0 4px 10px #b8eeb355;
-  }
   .apple2025-usercard { padding: 1rem 0.5rem 0.7rem 0.5rem; border-radius: 1em; }
   .apple2025-user-row {
     flex-wrap: wrap !important;
