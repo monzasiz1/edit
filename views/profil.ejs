@@ -892,18 +892,18 @@
     <style>
       .equip-figure-wrap {
         display: grid;
-        grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
-        gap: 1.5rem;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
         align-items: start;
-        padding: 0.75rem 1rem 1rem;
+        padding: 0.85rem 1rem 1rem;
       }
       .equip-figure {
         display: flex;
         justify-content: center;
-        background: #f5f7f5;
+        background: linear-gradient(180deg, #f7faf7 0%, #eef5f0 100%);
         border-radius: 20px;
         border: 1px solid #d5e8dd;
-        padding: 0.75rem 0.5rem 0.5rem;
+        padding: 1rem 0.5rem 0.6rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       }
 
@@ -1047,10 +1047,11 @@
       }
       .puppet-tooltip-close:hover { background: #f3f4f6; color: #374151; }
 
-      /* Desktop: Figur größer */
-      @media (min-width: 681px) {
+      /* Desktop: 2-Spalten erst ab 960px wenn genug Platz */
+      @media (min-width: 960px) {
         .equip-figure-wrap {
-          grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+          grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+          gap: 1.75rem;
         }
         .equip-puppet-wrap {
           max-width: 360px;
@@ -1100,6 +1101,7 @@
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #6b7c70;
+        white-space: nowrap;
       }
       .equip-summary-divider {
         width: 1px;
@@ -1123,9 +1125,14 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr;
         gap: 0.5rem;
+      }
+      @media (min-width: 560px) and (max-width: 959.98px) {
+        .equip-slot-list {
+          grid-template-columns: 1fr 1fr;
+        }
       }
       .equip-slot {
         background: #fff;
