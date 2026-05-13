@@ -1368,18 +1368,11 @@
 
   let stream = null;
   let scanning = false;
-  let detector = null;
   let zxingLoading = null;
   let zxingReader = null;
+  let zxingControls = null;
   let lastSubmitted = '';
   let lastSubmittedAt = 0;
-
-  // Alle Formate, die Zahlen UND/ODER Buchstaben tragen koennen
-  const WANTED_FORMATS = [
-    'qr_code', 'data_matrix', 'aztec', 'pdf417',
-    'code_128', 'code_39', 'code_93', 'codabar', 'itf',
-    'ean_13', 'ean_8', 'upc_a', 'upc_e'
-  ];
 
   function setStatus(msg, kind) {
     if (!msg) { status.hidden = true; status.textContent = ''; return; }
@@ -1389,73 +1382,59 @@
   }
 
   function loadZXing() {
-    if (window.ZXingBrowser) return Promise.resolve(window.ZXingBrowser);
+    if (window.ZXingBrowser || window.ZXing) return Promise.resolve(window.ZXingBrowser || window.ZXing);
     if (zxingLoading) return zxingLoading;
     zxingLoading = new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      // ZXing-js Browser bundle (UMD)
       s.src = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js';
       s.onload  = () => resolve(window.ZXingBrowser || window.ZXing);
-      s.onerror = () => reject(new Error('ZXing konnte nicht geladen werden'));
+      s.onerror = () => reject(new Error('Scanner-Bibliothek konnte nicht geladen werden'));
       document.head.appendChild(s);
     });
     return zxingLoading;
   }
 
   async function startCamera() {
+    setStatus('Scanner wird geladen…', 'info');
+    hint.textContent = 'Scanner wird geladen…';
+    let ZX;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } },
-        audio: false,
-      });
-      video.srcObject = stream;
-      await video.play();
+      ZX = await loadZXing();
+      if (!ZX || !ZX.BrowserMultiFormatReader) throw new Error('ZXing nicht geladen');
+    } catch (e) {
+      hint.textContent = 'Scanner konnte nicht geladen werden';
+      setStatus('Offline oder CDN blockiert – bitte Code unten manuell eingeben.', 'error');
+      return;
+    }
+
+    try {
+      zxingReader = new ZX.BrowserMultiFormatReader();
       hint.textContent = 'QR / Barcode in den Rahmen halten';
+      setStatus('Kamera startet…', 'info');
       scanning = true;
 
-      // ZXing direkt benutzen wenn BarcodeDetector fehlt (Firefox/Safari)
-      if (!('BarcodeDetector' in window)) {
-        try {
-          const ZX = await loadZXing();
-          if (ZX) {
-            zxingReader = new ZX.BrowserMultiFormatReader();
-            zxingReader.decodeFromVideoElement(video, (result, err) => {
-              if (!scanning) return;
-              if (result && result.getText) {
-                handleCode(result.getText());
-              }
-            });
-            return;
-          }
-        } catch (e) { /* fall through to scanLoop */ }
-      }
-      scanLoop();
-    } catch (err) {
-      hint.textContent = 'Kein Kamerazugriff';
-      setStatus('Kamera nicht verfügbar – bitte Seriennummer manuell eingeben.', 'info');
-    }
-  }
+      // Bevorzugt Rückkamera – ZXing wählt selbst, fällt notfalls auf erste Kamera zurück.
+      let deviceId;
+      try {
+        const devices = await ZX.BrowserMultiFormatReader.listVideoInputDevices?.()
+          || await navigator.mediaDevices.enumerateDevices().then(ds => ds.filter(d => d.kind === 'videoinput'));
+        const back = devices.find(d => /back|rear|environment|hinten/i.test(d.label));
+        deviceId = (back || devices[devices.length - 1] || {}).deviceId;
+      } catch (e) { /* egal */ }
 
-  async function scanLoop() {
-    if (!scanning) return;
-    try {
-      if ('BarcodeDetector' in window) {
-        if (!detector) {
-          const supported = await window.BarcodeDetector.getSupportedFormats();
-          const formats = WANTED_FORMATS.filter(f => supported.includes(f));
-          detector = new window.BarcodeDetector({
-            formats: formats.length ? formats : supported,
-          });
+      zxingControls = await zxingReader.decodeFromVideoDevice(deviceId || null, video, (result, err) => {
+        if (!scanning) return;
+        if (result && result.getText) {
+          handleCode(result.getText());
         }
-        const codes = await detector.detect(video);
-        if (codes && codes.length > 0 && codes[0].rawValue) {
-          return handleCode(codes[0].rawValue);
-        }
-      }
-    } catch (e) {
-      // ignore single-frame errors
+        // err NotFoundException ist normal pro Frame – nicht loggen
+      });
+      setStatus('');
+    } catch (err) {
+      console.error('[QR] Kamera-Start fehlgeschlagen', err);
+      hint.textContent = 'Kein Kamerazugriff';
+      setStatus('Kamera nicht verfügbar – bitte Seriennummer manuell eingeben.', 'error');
     }
-    if (scanning) requestAnimationFrame(scanLoop);
   }
 
   async function handleCode(value) {
@@ -1465,16 +1444,14 @@
       .trim();
     if (!code) return;
     const now = Date.now();
-    if (code === lastSubmitted && now - lastSubmittedAt < 3000) {
-      if (scanning) requestAnimationFrame(scanLoop);
-      return;
-    }
+    if (code === lastSubmitted && now - lastSubmittedAt < 3000) return;
     lastSubmitted = code;
     lastSubmittedAt = now;
     scanning = false;
     hint.textContent = 'Code erkannt – wird gesucht…';
     setStatus('Suche „' + code + '“…', 'info');
-    try { console.log('[QR] Scan-Ergebnis:', JSON.stringify(value), '→ normalisiert:', JSON.stringify(code)); } catch (e) {}
+    if (manualInput) manualInput.value = code;
+    try { console.log('[QR] Scan:', JSON.stringify(value), '→', JSON.stringify(code)); } catch (e) {}
 
     try {
       const res = await fetch('/equipment/lookup?code=' + encodeURIComponent(code), {
@@ -1488,7 +1465,11 @@
         return;
       }
       if (res.status === 404) {
-        setStatus('Kein Equipment mit diesem Code gefunden.', 'error');
+        setStatus('Kein Equipment mit „' + code + '" gefunden. Code wurde unten eingefügt – kannst du anpassen oder mit Enter erneut suchen.', 'error');
+        if (manualInput) {
+          manualInput.focus();
+          manualInput.select();
+        }
       } else {
         setStatus('Fehler bei der Suche (Status ' + res.status + ').', 'error');
       }
@@ -1496,27 +1477,30 @@
       setStatus('Netzwerkfehler bei der Suche.', 'error');
     }
 
-    // Resume scanning after short pause so the same code isn't re-fired immediately
+    // Scanning nach kurzer Pause fortsetzen
     setTimeout(() => {
       if (modal.classList.contains('open')) {
         scanning = true;
         hint.textContent = 'Nächsten Code halten…';
-        scanLoop();
       }
-    }, 1500);
+    }, 1200);
   }
 
   function stopCamera() {
     scanning = false;
-    if (zxingReader) {
-      try { zxingReader.reset(); } catch (e) {}
-      zxingReader = null;
-    }
+    try {
+      if (zxingControls && typeof zxingControls.stop === 'function') zxingControls.stop();
+    } catch (e) {}
+    zxingControls = null;
+    try {
+      if (zxingReader && typeof zxingReader.reset === 'function') zxingReader.reset();
+    } catch (e) {}
+    zxingReader = null;
     if (stream) {
-      stream.getTracks().forEach(t => t.stop());
+      try { stream.getTracks().forEach(t => t.stop()); } catch (e) {}
       stream = null;
     }
-    video.srcObject = null;
+    try { video.srcObject = null; } catch (e) {}
   }
 
   function openModal() {
