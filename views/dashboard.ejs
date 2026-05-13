@@ -96,13 +96,17 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
-/* html behaelt Header-Farbe -> Overscroll oben bleibt im Header-Ton.
-   body bekommt die helle Dashboard-Flaeche, damit Inhalt sichtbar vom Header abgesetzt ist. */
-body { background-color: #f3f6f1 !important; }
+/* WICHTIG: body bleibt in Header-Farbe (aus layout.ejs) - damit Notch, Statusleiste
+   und Overscroll oben dieselbe Farbe wie der Header behalten und nahtlos wirken.
+   Das Dashboard-Element selbst hat seine eigene, klar andere Flaeche und deckt
+   den sichtbaren Inhaltsbereich komplett ab. */
 
 .apple-dashboard {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-  min-height: 100%;
+  flex: 1 0 auto;
+  align-self: stretch;
+  width: 100%;
+  min-height: calc(100dvh - 130px);
   background: linear-gradient(180deg, #f7faf4 0%, #eef3ea 100%);
   border-radius: inherit;
   padding: 0;
