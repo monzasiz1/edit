@@ -46,12 +46,21 @@
       -moz-osx-font-smoothing: grayscale;
     }
     *, *::before, *::after { box-sizing: inherit; }
-    body { min-height: 100dvh; display: flex; flex-direction: column; }
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      /* Platz fuer den fixierten Header (Logo 138px + Paddings + Notch) */
+      padding-top: calc(158px + env(safe-area-inset-top, 0px));
+    }
 
     /* --- Navigation --- */
     .main-nav {
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
       z-index: 120;
       display: flex;
       align-items: center;
@@ -1072,6 +1081,24 @@
   <footer class="footer" role="contentinfo" tabindex="-1">
     &copy; <%= new Date().getFullYear() %> GutSchlag Spie&szlig;buch v1.1 &middot; by R.S. &middot; Beequ.de
   </footer>
+
+  <script>
+    // Dynamische Hoehe des fixierten Headers messen, damit body padding-top exakt passt
+    (function() {
+      var nav = document.querySelector('.main-nav');
+      if (!nav) return;
+      function syncNavHeight() {
+        var h = nav.offsetHeight;
+        if (h > 0) document.body.style.paddingTop = h + 'px';
+      }
+      syncNavHeight();
+      window.addEventListener('resize', syncNavHeight);
+      window.addEventListener('orientationchange', syncNavHeight);
+      if (window.ResizeObserver) {
+        try { new ResizeObserver(syncNavHeight).observe(nav); } catch(e) {}
+      }
+    })();
+  </script>
 
   <script>
     (function() {
