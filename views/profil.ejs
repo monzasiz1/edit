@@ -924,7 +924,7 @@
         border-radius: 10px;
       }
 
-      /* Overlay-Dot: Basis */
+      /* Overlay-Dot: Basis (unsichtbar, solange kein Gegenstand verlinkt ist) */
       .puppet-dot {
         position: absolute;
         width: 14px;
@@ -937,9 +937,11 @@
         pointer-events: none;
         cursor: default;
         z-index: 1;
+        display: none;
       }
       /* Ausgerüstet: klickbar + Glow-Puls */
       .puppet-dot.equipped {
+        display: block;
         background: #3da973;
         border-color: #1a7a45;
         box-shadow: 0 0 0 3px rgba(61,169,115,0.28), 0 0 12px rgba(61,169,115,0.5);
