@@ -2,6 +2,9 @@
 <% if (error) { %>
   <div class="error"><%= error %></div>
 <% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="success"><%= success %></div>
+<% } %>
 <form method="POST" action="/users/edit/<%= userToEdit.id %>" class="ios-form">
   <label for="username">Benutzername</label>
   <input type="text" id="username" name="username" value="<%= userToEdit.username %>" required />
@@ -21,6 +24,70 @@
 
   <button type="submit" class="ios-btn">Speichern</button>
 </form>
+
+<% if (typeof allRoles !== 'undefined' && allRoles && allRoles.length) { %>
+  <section class="roles-section">
+    <h3 class="roles-section-title">Rollen</h3>
+    <p class="roles-section-sub">Hier kannst du diesem Nutzer eine oder mehrere Rollen zuweisen. Berechtigungen kommen aus der Rolle selbst.</p>
+
+    <% const assignedRoles = allRoles.filter(r => userRoleIds.indexOf(r.id) !== -1); %>
+    <% const availableRoles = allRoles.filter(r => userRoleIds.indexOf(r.id) === -1); %>
+
+    <div class="roles-assigned">
+      <div class="roles-block-label">Zugewiesen</div>
+      <% if (!assignedRoles.length) { %>
+        <p class="roles-empty-note">Noch keine Rollen zugewiesen.</p>
+      <% } else { %>
+        <ul class="role-chip-list">
+          <% assignedRoles.forEach(function(r){ %>
+            <li class="role-chip<%= r.is_admin ? ' is-admin' : (r.is_board ? ' is-board' : '') %>">
+              <span class="role-chip-name"><%= r.name %></span>
+              <% if (r.is_admin) { %><span class="role-chip-flag">Admin</span><% } else if (r.is_board) { %><span class="role-chip-flag">Vorstand</span><% } %>
+              <% if (typeof canManageRoles !== 'undefined' && canManageRoles) { %>
+                <form method="POST" action="/roles/unassign" class="role-chip-form" onsubmit="return confirm('Rolle &quot;<%= r.name %>&quot; entfernen?');">
+                  <input type="hidden" name="user_id" value="<%= userToEdit.id %>">
+                  <input type="hidden" name="role_id" value="<%= r.id %>">
+                  <button type="submit" class="role-chip-remove" aria-label="Entfernen" title="Rolle entfernen">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </form>
+              <% } %>
+            </li>
+          <% }); %>
+        </ul>
+      <% } %>
+    </div>
+
+    <% if (typeof canManageRoles !== 'undefined' && canManageRoles) { %>
+      <% if (availableRoles.length) { %>
+        <form method="POST" action="/roles/assign" class="role-assign-form">
+          <input type="hidden" name="user_id" value="<%= userToEdit.id %>">
+          <label for="role_id">Rolle hinzufügen</label>
+          <div class="role-assign-row">
+            <select name="role_id" id="role_id" required>
+              <option value="" disabled selected>– Rolle wählen –</option>
+              <% availableRoles.forEach(function(r){ %>
+                <option value="<%= r.id %>"><%= r.name %><%= r.is_admin ? ' (Admin)' : (r.is_board ? ' (Vorstand)' : '') %></option>
+              <% }); %>
+            </select>
+            <button type="submit" class="role-assign-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Zuweisen
+            </button>
+          </div>
+        </form>
+      <% } else { %>
+        <p class="roles-empty-note">Alle vorhandenen Rollen sind diesem Nutzer bereits zugewiesen.</p>
+      <% } %>
+      <p class="roles-help">
+        Neue Rolle nötig? <a href="/roles/add">Hier anlegen</a> &middot; <a href="/roles">Alle Rollen</a>
+      </p>
+    <% } else { %>
+      <p class="roles-help">Nur Rollen-Administratoren können hier zuweisen.</p>
+    <% } %>
+  </section>
+<% } %>
+
 <a href="/users" class="ios-link">← Zurück</a>
 
 <style>
@@ -162,4 +229,152 @@
       border-radius: 1.3rem;
     }
   }
+
+  .success {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Rollen-Sektion */
+  .roles-section {
+    max-width: 540px;
+    margin: 2.2rem 0 1.6rem;
+    padding: 1.1rem 1.15rem 1.2rem;
+    background: linear-gradient(135deg, #f7fbf8 0%, #eef5ee 100%);
+    border: 1px solid #d6e6d8;
+    border-radius: 14px;
+  }
+  .roles-section-title {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    color: #1a3d2a;
+    font-weight: 800;
+  }
+  .roles-section-sub {
+    margin: 0 0 1rem;
+    font-size: 0.82rem;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+  .roles-block-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2d6a45;
+    margin-bottom: 0.5rem;
+  }
+  .roles-assigned { margin-bottom: 1.1rem; }
+  .role-chip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.32rem 0.45rem 0.32rem 0.75rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #c5e8d2;
+    color: #1a7a45;
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+  .role-chip-flag {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.08rem 0.4rem;
+    border-radius: 4px;
+    background: #e6f4ec;
+  }
+  .role-chip.is-admin { color: #a82a2a; border-color: #f6c6c6; }
+  .role-chip.is-admin .role-chip-flag { background: #fde8e8; color: #a82a2a; }
+  .role-chip.is-board { color: #3a5ec0; border-color: #c8d3f4; }
+  .role-chip.is-board .role-chip-flag { background: #e8edfb; color: #3a5ec0; }
+  .role-chip-form { margin: 0; line-height: 0; }
+  .role-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: #f3f6f1;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.14s, color 0.14s;
+  }
+  .role-chip-remove:hover { background: #fde8e8; color: #a82a2a; }
+  .roles-empty-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
+  }
+  .role-assign-form { margin: 0.4rem 0 0; }
+  .role-assign-form label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2d6a45;
+    margin-bottom: 0.4rem;
+  }
+  .role-assign-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .role-assign-row select {
+    flex: 1;
+    min-width: 0;
+    padding: 0.55rem 0.8rem;
+    border: 1.4px solid #a6d7bb;
+    border-radius: 0.8rem;
+    background: #fff;
+    font-size: 0.95rem;
+    color: #1b2e2b;
+    font-family: inherit;
+  }
+  .role-assign-row select:focus {
+    outline: none;
+    border-color: #2d8f55;
+    box-shadow: 0 0 0 3px rgba(45,143,85,0.18);
+  }
+  .role-assign-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 1rem;
+    border-radius: 0.8rem;
+    border: none;
+    background: linear-gradient(120deg, #16e080 15%, #2d8f55 90%);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(45,143,85,0.28);
+  }
+  .role-assign-btn:hover { transform: translateY(-1px); }
+  .roles-help {
+    margin: 0.9rem 0 0;
+    font-size: 0.78rem;
+    color: #6b7280;
+  }
+  .roles-help a { color: #2d8f55; font-weight: 700; text-decoration: none; }
+  .roles-help a:hover { text-decoration: underline; }
 </style>

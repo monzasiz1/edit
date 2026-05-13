@@ -20,10 +20,31 @@ router.get('/', requireAdminOrBoard, async (req, res) => {
 
 router.get('/edit/:id', requireAdminOrBoard, async (req, res) => {
   const { rows } = await db.query('SELECT id, username, is_admin, is_board FROM users WHERE id=$1', [req.params.id]);
+  let allRoles = [];
+  let userRoleIds = [];
+  try {
+    const r = await db.query(
+      `SELECT id, name, description, is_admin, is_board
+       FROM roles
+       ORDER BY is_admin DESC, is_board DESC, name ASC`
+    );
+    allRoles = r.rows;
+    const ur = await db.query(
+      `SELECT role_id FROM user_roles WHERE user_id = $1`,
+      [req.params.id]
+    );
+    userRoleIds = ur.rows.map(x => x.role_id);
+  } catch (e) {
+    // Tabellen evtl. noch nicht da
+  }
   res.render('users_edit', {
     user: req.session.user,
     userToEdit: rows[0],
-    error: null
+    error: null,
+    allRoles,
+    userRoleIds,
+    success: req.query.success || null,
+    canManageRoles: !!(req.session.user && (req.session.user.is_admin || res.locals.canManageRoles))
   });
 });
 

@@ -24,10 +24,38 @@
   </header>
 
   <div class="dev-card" style="max-width: 700px;">
-    <form method="POST" action="/roles/add">
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="role-error-banner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <% if (typeof existingRoles !== 'undefined' && existingRoles && existingRoles.length) { %>
+      <div class="existing-roles-block" id="existingRolesBlock" data-names='<%- JSON.stringify(existingRoles.map(function(r){return (r.name||"").toLowerCase();})) %>'>
+        <div class="existing-roles-label">Bereits vorhandene Rollen <span class="existing-roles-count"><%= existingRoles.length %></span></div>
+        <div class="existing-roles-list">
+          <% existingRoles.forEach(function(r){ %>
+            <span class="existing-role-chip<%= r.is_admin ? ' is-admin' : (r.is_board ? ' is-board' : '') %>" title="<%= r.description || '' %>">
+              <%= r.name %>
+              <% if (r.is_admin) { %><small>Admin</small><% } else if (r.is_board) { %><small>Vorstand</small><% } %>
+            </span>
+          <% }); %>
+        </div>
+        <p class="existing-roles-hint">Bitte keinen dieser Namen erneut verwenden &ndash; sie sind bereits vergeben.</p>
+      </div>
+    <% } %>
+
+    <form method="POST" action="/roles/add" id="roleAddForm">
       <div class="apple-form-group">
         <label>Rollenname *</label>
-        <input type="text" name="name" class="apple-input" placeholder="z.B. Kassenwart" required>
+        <input type="text" name="name" id="roleNameInput" class="apple-input" placeholder="z.B. Kassenwart" required value="<%= typeof prefillName !== 'undefined' ? prefillName : '' %>" autocomplete="off">
+        <div id="roleNameWarning" class="role-name-warning" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Diese Rolle existiert bereits.
+        </div>
+      </div>
       </div>
 
       <div class="apple-form-group">
@@ -170,4 +198,134 @@
     .perm-chip-icon svg { width: 17px; height: 17px; }
     .perm-chip > span:last-child { font-size: 0.85rem; }
   }
+
+  /* Bereits vorhandene Rollen */
+  .existing-roles-block {
+    margin: 0 0 1.4rem;
+    padding: 0.95rem 1rem 1rem;
+    background: linear-gradient(135deg, #f7fbf8 0%, #eef5ee 100%);
+    border: 1px solid #d6e6d8;
+    border-radius: 12px;
+  }
+  .existing-roles-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #2d6a45;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.55rem;
+  }
+  .existing-roles-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    padding: 0 0.45rem;
+    height: 20px;
+    border-radius: 999px;
+    background: #2d8f55;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+  .existing-roles-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .existing-role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #c5e8d2;
+    color: #1a7a45;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .existing-role-chip small {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    background: #e6f4ec;
+  }
+  .existing-role-chip.is-admin { color: #a82a2a; border-color: #f6c6c6; }
+  .existing-role-chip.is-admin small { background: #fde8e8; color: #a82a2a; }
+  .existing-role-chip.is-board { color: #3a5ec0; border-color: #c8d3f4; }
+  .existing-role-chip.is-board small { background: #e8edfb; color: #3a5ec0; }
+  .existing-roles-hint {
+    margin: 0.65rem 0 0;
+    font-size: 0.76rem;
+    color: #6b7280;
+  }
+
+  .role-error-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 0.9rem;
+    margin-bottom: 1.1rem;
+    background: #fde8e8;
+    color: #a82a2a;
+    border: 1px solid #f6c6c6;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  .role-name-warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+    color: #a82a2a;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .apple-input.is-duplicate {
+    border-color: #d96363 !important;
+    box-shadow: 0 0 0 3px rgba(217,99,99,0.16) !important;
+  }
 </style>
+
+<script>
+(function(){
+  const block = document.getElementById('existingRolesBlock');
+  const input = document.getElementById('roleNameInput');
+  const warn  = document.getElementById('roleNameWarning');
+  const form  = document.getElementById('roleAddForm');
+  if (!input || !form) return;
+  let names = [];
+  if (block) {
+    try { names = JSON.parse(block.dataset.names || '[]'); } catch(e) { names = []; }
+  }
+  function isDup() {
+    const v = (input.value || '').trim().toLowerCase();
+    return v.length > 0 && names.indexOf(v) !== -1;
+  }
+  function update() {
+    const dup = isDup();
+    if (warn) warn.hidden = !dup;
+    input.classList.toggle('is-duplicate', dup);
+  }
+  input.addEventListener('input', update);
+  input.addEventListener('blur', update);
+  form.addEventListener('submit', function(e){
+    if (isDup()) {
+      e.preventDefault();
+      update();
+      input.focus();
+    }
+  });
+  update();
+})();
+</script>

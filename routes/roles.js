@@ -48,12 +48,42 @@ router.get('/', requireRoleManagement, async (req, res) => {
 });
 
 router.get('/add', requireRoleManagement, async (req, res) => {
-  res.render('roles_add', { layout: 'layout' });
+  try {
+    const existing = await db.query(
+      `SELECT id, name, description, is_admin, is_board
+       FROM roles
+       ORDER BY is_admin DESC, is_board DESC, name ASC`
+    );
+    res.render('roles_add', {
+      layout: 'layout',
+      existingRoles: existing.rows,
+      error: req.query.error || null,
+      prefillName: req.query.name || ''
+    });
+  } catch (err) {
+    console.error(err);
+    res.render('roles_add', { layout: 'layout', existingRoles: [], error: null, prefillName: '' });
+  }
 });
 
 router.post('/add', requireRoleManagement, async (req, res) => {
   try {
     const { name, description, permissions } = req.body;
+    const trimmedName = (name || '').trim();
+    if (!trimmedName) {
+      return res.redirect('/roles/add?error=' + encodeURIComponent('Name darf nicht leer sein'));
+    }
+    // Case-insensitive Duplikat-Pruefung
+    const dup = await db.query(
+      `SELECT id FROM roles WHERE LOWER(name) = LOWER($1) LIMIT 1`,
+      [trimmedName]
+    );
+    if (dup.rows.length > 0) {
+      return res.redirect(
+        '/roles/add?name=' + encodeURIComponent(trimmedName) +
+        '&error=' + encodeURIComponent('Rolle "' + trimmedName + '" existiert bereits')
+      );
+    }
     const perms = Array.isArray(permissions) ? permissions : (permissions ? [permissions] : []);
     await db.query(`
       INSERT INTO roles (
@@ -64,7 +94,7 @@ router.post('/add', requireRoleManagement, async (req, res) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       ON CONFLICT (name) DO NOTHING
     `, [
-      name, description,
+      trimmedName, description,
       perms.includes('can_manage_members'),
       perms.includes('can_manage_penalties'),
       perms.includes('can_view_all_penalties'),
@@ -74,10 +104,10 @@ router.post('/add', requireRoleManagement, async (req, res) => {
       perms.includes('is_board'),
       perms.includes('is_admin')
     ]);
-    res.redirect('/roles?success=Rolle erstellt');
+    res.redirect('/roles?success=' + encodeURIComponent('Rolle erstellt'));
   } catch (err) {
     console.error(err);
-    res.redirect('/roles/add?error=Fehler beim Erstellen');
+    res.redirect('/roles/add?error=' + encodeURIComponent('Fehler beim Erstellen'));
   }
 });
 
@@ -149,7 +179,7 @@ router.post('/assign', requireRoleManagement, async (req, res) => {
        ON CONFLICT (user_id, role_id) DO NOTHING`,
       [user_id, role_id]
     );
-    res.redirect(`/users/${user_id}/edit?success=Rolle zugewiesen`);
+    res.redirect(`/users/edit/${user_id}?success=` + encodeURIComponent('Rolle zugewiesen'));
   } catch (err) {
     console.error(err);
     res.redirect('/users?error=Fehler');
@@ -160,7 +190,7 @@ router.post('/unassign', requireRoleManagement, async (req, res) => {
   try {
     const { user_id, role_id } = req.body;
     await db.query(`DELETE FROM user_roles WHERE user_id = $1 AND role_id = $2`, [user_id, role_id]);
-    res.redirect(`/users/${user_id}/edit?success=Rolle entfernt`);
+    res.redirect(`/users/edit/${user_id}?success=` + encodeURIComponent('Rolle entfernt'));
   } catch (err) {
     console.error(err);
     res.redirect('/users?error=Fehler');
