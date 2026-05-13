@@ -2,12 +2,12 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title><%= typeof title !== 'undefined' ? title : 'Spießbuch' %></title>
-  <meta name="theme-color" content="#3da973">
+  <meta name="theme-color" content="#e6ede0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Spießbuch">
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icons/logo-192.png">
@@ -37,7 +37,7 @@
       box-sizing: border-box;
       font-family: var(--font);
       font-size: 17.5px;
-      background: #ffffff;
+      background: #e6ede0;
       color: #222;
       scroll-behavior: smooth;
       -webkit-font-smoothing: antialiased;
@@ -54,7 +54,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.6rem 2.4rem 0.6rem 0;
+      /* Reicht bis unter Notch / Statusleiste */
+      padding:
+        calc(0.6rem + env(safe-area-inset-top, 0px))
+        calc(2.4rem + env(safe-area-inset-right, 0px))
+        0.6rem
+        env(safe-area-inset-left, 0px);
+      margin: 0;
       background:
         radial-gradient(120% 200% at 50% -40%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 30%, rgba(232,241,229,0.0) 60%),
         linear-gradient(180deg, #e6ede0 0%, #dde6d6 55%, #d2dccb 100%);
@@ -310,7 +316,12 @@
     /* Bottom Sheet: versteckt per display:none, JS setzt display:flex vor Animation */
     @media (max-width: 680px) {
       .main-nav {
-        padding: 0.56rem 0.75rem;
+        min-height: 64px;
+        padding:
+          calc(0.56rem + env(safe-area-inset-top, 0px))
+          calc(0.75rem + env(safe-area-inset-right, 0px))
+          0.56rem
+          calc(0.75rem + env(safe-area-inset-left, 0px));
         justify-content: center;
       }
       .main-nav .logo {
@@ -345,7 +356,6 @@
       .main-nav .logo img { height: 40px; width: 40px; }
       .main-nav .logo-img-wrap { width: 48px; height: 48px; }
       .main-nav .logo-wordmark { font-size: 28px; letter-spacing: -0.8px; }
-      .main-nav { min-height: 64px; padding: 0.56rem 0.75rem; }
 
       /* Bottom Sheet – transition-basiert, kein keyframe */
       .nav-menu {
