@@ -1,0 +1,103 @@
+<style>
+  .cat-select { position: relative; }
+  .cat-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-align: left;
+    background: #fff;
+  }
+  .cat-select-label { display: inline-flex; align-items: center; gap: 0.55rem; min-width: 0; }
+  .cat-select-label > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cat-select-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: #2d8f55;
+  }
+  .cat-select-icon svg { width: 20px; height: 20px; }
+  .cat-select-icon--empty {
+    border: 1.5px dashed #c8d2bc;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .cat-select-caret { transition: transform 0.18s ease; flex-shrink: 0; color: #6b7c69; }
+  .cat-select.is-open .cat-select-caret { transform: rotate(180deg); }
+  .cat-select-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.35rem;
+    list-style: none;
+    background: #fff;
+    border: 1px solid rgba(45,143,85,0.22);
+    border-radius: 0.85em;
+    box-shadow: 0 18px 40px rgba(20,60,40,0.16), 0 4px 14px rgba(20,60,40,0.08);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 60;
+  }
+  .cat-select-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.6em;
+    cursor: pointer;
+    color: #1c3a25;
+    font-size: 0.95rem;
+    transition: background 0.12s ease;
+  }
+  .cat-select-opt:hover,
+  .cat-select-opt.is-active { background: #eef6ef; }
+</style>
+<script>
+  (function () {
+    document.querySelectorAll('[data-cat-select]').forEach(function (root) {
+      var btn = root.querySelector('[data-cat-toggle]');
+      var list = root.querySelector('[data-cat-list]');
+      var input = root.querySelector('[data-cat-input]');
+      var label = root.querySelector('[data-cat-label]');
+      if (!btn || !list || !input || !label) return;
+
+      function close() {
+        list.hidden = true;
+        root.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+      function open() {
+        list.hidden = false;
+        root.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (list.hidden) open(); else close();
+      });
+      list.querySelectorAll('.cat-select-opt').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          input.value = opt.dataset.value || '';
+          var iconHtml = opt.dataset.icon
+            ? '<span class="cat-select-icon">' + opt.dataset.icon + '</span>'
+            : '<span class="cat-select-icon cat-select-icon--empty"></span>';
+          label.innerHTML = iconHtml + '<span>' + (opt.dataset.label || '') + '</span>';
+          close();
+        });
+      });
+      document.addEventListener('click', function (e) {
+        if (!root.contains(e.target)) close();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') close();
+      });
+    });
+  })();
+</script>

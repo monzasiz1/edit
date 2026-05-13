@@ -1,0 +1,152 @@
+<main class="board-suggestions-page">
+  <section class="board-suggestions-hero">
+    <span class="board-suggestions-kicker">Übersicht</span>
+    <h1>Anonyme Vorschläge/Ideen</h1>
+  </section>
+
+  <section class="board-suggestions-panel">
+    <% if (!suggestions.length) { %>
+      <div class="board-suggestions-empty">Noch keine Vorschläge eingegangen.</div>
+    <% } else { %>
+      <div class="board-suggestions-list">
+        <% suggestions.forEach((suggestion) => { %>
+          <article class="board-suggestions-card">
+            <div class="board-suggestions-meta">
+              <span class="board-suggestions-badge">Anonym</span>
+              <time datetime="<%= suggestion.created_at.toISOString() %>"><%= new Date(suggestion.created_at).toLocaleString('de-DE') %></time>
+            </div>
+            <p><%= suggestion.message %></p>
+            <form action="/suggestions/<%= suggestion.id %>/delete" method="POST">
+              <button type="submit" class="board-suggestions-delete">Entfernen</button>
+            </form>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+</main>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+
+.board-suggestions-page {
+  max-width: 900px;
+  margin: 2.4rem auto;
+  padding: 0 1rem 2rem;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.board-suggestions-hero {
+  padding: 2rem;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, rgba(235, 244, 255, 0.96), rgba(223, 237, 251, 0.96));
+  border: 1px solid #d4e2f1;
+  box-shadow: 0 12px 38px rgba(82, 122, 170, 0.14);
+}
+
+.board-suggestions-kicker {
+  display: inline-flex;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: #edf5ff;
+  color: #33648f;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.board-suggestions-hero h1 {
+  margin: 0.7rem 0 0.45rem;
+  color: #183553;
+  font-size: 2.35rem;
+}
+
+.board-suggestions-hero p {
+  margin: 0;
+  color: #4f6780;
+  line-height: 1.6;
+}
+
+.board-suggestions-panel {
+  margin-top: 1.5rem;
+}
+
+.board-suggestions-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.board-suggestions-card,
+.board-suggestions-empty {
+  padding: 1.2rem;
+  border-radius: 1.4rem;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid #d8e5f0;
+  box-shadow: 0 10px 28px rgba(95, 128, 163, 0.1);
+}
+
+.board-suggestions-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.7rem;
+  color: #64809d;
+  font-size: 0.92rem;
+}
+
+.board-suggestions-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  background: #edf5ff;
+  color: #33648f;
+  font-weight: 800;
+}
+
+.board-suggestions-card p {
+  margin: 0 0 0.9rem 0;
+  color: #1c3550;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.board-suggestions-delete {
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: #e85d5d;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.board-suggestions-empty {
+  color: #58708a;
+}
+
+@media (max-width: 700px) {
+  .board-suggestions-page {
+    margin-top: 1.4rem;
+    padding: 0 0.6rem 1.5rem;
+  }
+
+  .board-suggestions-hero,
+  .board-suggestions-card,
+  .board-suggestions-empty {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+
+  .board-suggestions-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .board-suggestions-delete {
+    width: 100%;
+  }
+}
+</style>

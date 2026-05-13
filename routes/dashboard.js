@@ -22,11 +22,17 @@ router.get('/', requireLogin, async (req, res) => {
     [req.session.user.id]
   )).rows;
 
+  const admins = (await db.query(
+    `SELECT username FROM users WHERE is_admin = true ORDER BY username ASC`
+  )).rows;
+
   res.render('dashboard', {
     layout: 'layout',
     user: req.session.user,
-    penalties,   // Zeigt die Strafen des Nutzers an (inkl. Admin-Name)
-    title: 'Dashboard'
+    penalties,
+    title: 'Dashboard',
+    path: '/dashboard',
+    dashboardPage: true
   });
 });
 

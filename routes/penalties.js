@@ -13,6 +13,30 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+async function getActivePenaltyCatalog() {
+  const result = await db.query(`
+    SELECT id, label, amount_under18, amount_over18, sort_order
+    FROM penalty_catalog
+    WHERE is_active = TRUE
+    ORDER BY sort_order ASC, label ASC
+  `);
+
+  return result.rows.map(item => ({
+    ...item,
+    amount_under18: Number(item.amount_under18),
+    amount_over18: Number(item.amount_over18)
+  }));
+}
+
+async function getActiveEventCatalog() {
+  const result = await db.query(`
+    SELECT id, label FROM event_catalog
+    WHERE is_active = TRUE
+    ORDER BY sort_order ASC, label ASC
+  `);
+  return result.rows;
+}
+
 // Weiterleitung auf /penalties/all
 router.get('/', (req, res) => res.redirect('/penalties/all'));
 
@@ -38,7 +62,7 @@ router.get('/all', requireAdmin, async (req, res) => {
     res.render('penalties', { user: req.session.user, strafen });
   } catch (err) {
     console.error('Fehler beim Laden der Strafen:', err.message);
-    res.status(500).render('500', { user: req.session.user });
+    res.status(500).send('Fehler beim Laden der Strafen. Bitte später erneut versuchen.');
   }
 });
 
@@ -73,7 +97,9 @@ router.get('/meine', requireLogin, async (req, res) => {
 // Formular: Neue Strafe
 router.get('/add', requireAdmin, async (req, res) => {
   const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
-  res.render('penalties_add', { users, user: req.session.user, error: null });
+  const penaltyCatalog = await getActivePenaltyCatalog();
+  const eventCatalog = await getActiveEventCatalog();
+  res.render('penalties_add', { users, penaltyCatalog, eventCatalog, user: req.session.user, error: null });
 });
 
 // Neue Strafe speichern + Push senden
@@ -106,8 +132,12 @@ router.post('/add', requireAdmin, async (req, res) => {
     res.redirect('/penalties/all');
   } catch (e) {
     const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+    const penaltyCatalog = await getActivePenaltyCatalog();
+    const eventCatalog = await getActiveEventCatalog();
     res.render('penalties_add', {
       users,
+      penaltyCatalog,
+      eventCatalog,
       user: req.session.user,
       error: 'Fehler beim Speichern! ' + e.message
     });
@@ -121,10 +151,14 @@ router.get('/edit/:id', requireAdmin, async (req, res) => {
   if (!penaltyRes.rows[0]) return res.status(404).render('404', { user: req.session.user });
 
   const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+  const penaltyCatalog = await getActivePenaltyCatalog();
+  const eventCatalog = await getActiveEventCatalog();
 
   res.render('penalties_edit', {
     penalty: penaltyRes.rows[0],
     users,
+    penaltyCatalog,
+    eventCatalog,
     error: null,
     user: req.session.user
   });
@@ -143,11 +177,15 @@ router.post('/edit/:id', requireAdmin, async (req, res) => {
     res.redirect('/penalties/all');
   } catch (e) {
     const users = (await db.query('SELECT id, username FROM users ORDER BY username')).rows;
+    const penaltyCatalog = await getActivePenaltyCatalog();
+    const eventCatalog = await getActiveEventCatalog();
     const penaltyRes = await db.query('SELECT * FROM penalties WHERE id = $1', [penaltyId]);
 
     res.render('penalties_edit', {
       penalty: penaltyRes.rows[0] || {},
       users,
+      penaltyCatalog,
+      eventCatalog,
       error: 'Fehler beim Speichern! ' + e.message,
       user: req.session.user
     });

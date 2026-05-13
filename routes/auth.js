@@ -14,7 +14,7 @@ router.post('/login', async (req, res) => {
   const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
   const user = result.rows[0];
   if (user && await bcrypt.compare(password, user.password)) {
-    req.session.user = { id: user.id, username: user.username, is_admin: user.is_admin };
+    req.session.user = { id: user.id, username: user.username, is_admin: user.is_admin, is_board: user.is_board };
     return res.redirect('/dashboard');
   }
   res.render('login', { layout: 'layout_public', error: 'Benutzername oder Passwort falsch.', title: 'Login' });
@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
   }
   const hash = await bcrypt.hash(password, 10);
   try {
-    await db.query('INSERT INTO users (username, password, is_admin) VALUES ($1, $2, $3)', [username, hash, false]);
+    await db.query('INSERT INTO users (username, password, is_admin, is_board) VALUES ($1, $2, $3, $4)', [username, hash, false, false]);
     res.redirect('/login');
   } catch (err) {
     res.render('register', { layout: 'layout_public', error: 'Benutzername existiert bereits.', title: 'Registrierung' });

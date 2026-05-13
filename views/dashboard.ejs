@@ -1,17 +1,20 @@
 <main class="apple-dashboard">
   <div class="apple-dashboard-hero">
-    <div class="apple-logo-gradient"></div>
+    <div class="apple-logo-wrap">
+      <div class="apple-logo-halo"></div>
+      <img src="/logo.png" alt="Spießbuch" class="apple-logo-img" />
+    </div>
     <h1 class="apple-welcome-head">
-      <span class="apple-welcome-emoji">👋</span>
+      <span class="apple-welcome-emoji"><svg width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span>
       Willkommen zurück,<br>
       <strong><%= user.username %></strong>
     </h1>
-    <div class="apple-hero-badge">Dein <span>Strafenkonto</span> im Überblick</div>
+    <div class="apple-hero-badge">Dein <span>Spießbuch</span> – immer dabei</div>
   </div>
 
   <% if (!penalties || penalties.length === 0) { %>
     <div class="apple-empty">
-      <span class="apple-empty-emoji">🎉</span>
+      <span class="apple-empty-emoji"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="#22a06b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
       <span class="apple-empty-text">Keine Strafen – alles sauber!<br>Genieß den Tag.</span>
     </div>
   <% } else { %>
@@ -24,23 +27,31 @@
           <!-- Spieß-Chip -->
           <% if (p.admin) { %>
             <span class="apple-spiess-chip">
-              <span class="apple-spiess-icon">🧑‍⚖️</span>
+              <svg class="apple-spiess-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               <span class="apple-spiess-name"><%= p.admin %></span>
             </span>
           <% } %>
           <div class="apple-card-content">
             <div class="apple-row apple-top-row">
-              <span class="apple-card-emoji"><%= p.type === "Unpünktlichkeit" ? "⏰" : p.type === "Uniform vergessen" ? "👕" : "⚡" %></span>
+              <span class="apple-card-emoji">
+                <% if (p.type === "Unpünktlichkeit") { %>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e07b30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <% } else if (p.type === "Uniform vergessen") { %>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
+                <% } else { %>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <% } %>
+              </span>
               <span class="apple-type"><%= p.type %></span>
             </div>
             <div class="apple-row">
-              <span>📅</span><span><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
+              <span class="apple-card-emoji"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7db3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span><%= new Date(p.date).toLocaleDateString('de-DE') %></span>
             </div>
             <div class="apple-row">
-              <span>🎪</span><span><%= p.event %></span>
+              <span class="apple-card-emoji"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e05a5a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span><%= p.event %></span>
             </div>
             <div class="apple-row">
-              <span>💶</span><span><%= Number(p.amount).toFixed(2) %> €</span>
+              <span class="apple-card-emoji"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22a06b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span><%= Number(p.amount).toFixed(2) %> €</span>
             </div>
           </div>
         </article>
@@ -53,6 +64,31 @@
       </article>
     </section>
   <% } %>
+
+  <% if (admins && admins.length > 0) { %>
+  <div class="dash-contact-card">
+    <div class="dash-contact-kicker">Fragen? Wende dich an</div>
+    <div class="dash-contact-list">
+      <% admins.forEach(a => { %>
+        <div class="dash-contact-row">
+          <span class="dash-contact-avatar"><%= a.username.slice(0,2).toUpperCase() %></span>
+          <span class="dash-contact-name"><%= a.username %></span>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+
+  <section class="dash-purpose-note" aria-label="Kameradschaftlicher Hinweis">
+    <img src="/logo.png" class="dash-purpose-logo" alt="" aria-hidden="true" />
+    <h4 class="dash-purpose-heading">Für unsere Gemeinschaft</h4>
+    <p>
+      Das Spießbuch dient nicht nur der Ordnung innerhalb der Kameradschaft, sondern unterstützt gleichzeitig unsere gemeinsame Vereinskasse.
+      Die gesammelten Beiträge kommen direkt dem Vereinsleben zugute – zum Beispiel für Veranstaltungen, gemeinsame Aktivitäten, Ausrüstung oder besondere Kameradschaftsabende.
+      So trägt jeder auf seine Weise dazu bei, unsere Gemeinschaft aktiv zu stärken und das Miteinander im Verein lebendig zu halten.
+    </p>
+  </section>
+
 </main>
 
 <style>
@@ -60,10 +96,12 @@
 
 .apple-dashboard {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-  min-height: 100vh;
+  min-height: 100%;
   background: linear-gradient(111deg, #f6faf8 86%, #e7ecee 100%);
+  border-radius: inherit;
   padding: 0;
   margin: 0;
+  overflow: hidden;
 }
 
 .apple-dashboard-hero {
@@ -76,18 +114,76 @@
   margin-bottom: 2.1rem;
 }
 
-.apple-logo-gradient {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #99bc98 18%, #c6e7c8 80%, #fff0 100%);
-  box-shadow: 0 8px 48px 0 #60ad707e, 0 0 0 0 #fff0;
-  margin-bottom: 0.35em;
-  animation: apple-logo-fadein 2.1s cubic-bezier(.6,.05,.6,1.07);
+.apple-logo-wrap {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  margin-bottom: 0.55em;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: logo-appear 0.6s cubic-bezier(.34,1.56,.64,1) both;
 }
-@keyframes apple-logo-fadein {
-  0% { opacity: 0; transform: scale(0.83);}
-  100% { opacity: 1; transform: scale(1);}
+
+.apple-logo-halo {
+  position: absolute;
+  inset: -22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(61,169,115,0.32) 0%, rgba(61,169,115,0.10) 45%, rgba(61,169,115,0) 72%);
+  animation: halo-pulse 2.4s ease-in-out 0.8s infinite;
+  pointer-events: none;
+}
+
+.apple-logo-halo::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(120,220,160,0.18) 0%, rgba(61,169,115,0) 70%);
+  animation: halo-pulse 2.4s ease-in-out 1.4s infinite;
+}
+
+.apple-logo-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  animation: logo-img-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.15s both,
+             logo-float 3.5s ease-in-out 1.2s infinite;
+  filter:
+    drop-shadow(0 0 8px rgba(61,169,115,0.35))
+    drop-shadow(0 5px 14px rgba(20,100,60,0.22))
+    drop-shadow(0 2px 4px rgba(0,0,0,0.14));
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes logo-appear {
+  0%   { opacity: 0; transform: scale(0.65) translateY(16px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes logo-img-pop {
+  0%   { opacity: 0; transform: scale(0.6); }
+  65%  { transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(1.22); }
+}
+
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0)    scale(1); }
+  50%       { transform: translateY(-5px) scale(1.03); }
+}
+
+@keyframes logo-ring-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .apple-welcome-head {
@@ -130,6 +226,47 @@
   font-size: 1.13em;
   letter-spacing: 0.05em;
   box-shadow: 0 2px 16px #a8ebc911;
+}
+
+.dash-purpose-note {
+  margin: 1.4rem auto 1.5rem auto;
+  max-width: 480px;
+  background: rgba(243, 250, 245, 0.7);
+  border: 1px solid rgba(95,180,130,0.14);
+  border-radius: 0.9rem;
+  padding: 0.62rem 0.82rem 0.68rem 0.82rem;
+  box-shadow: 0 2px 10px rgba(64, 120, 86, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-purpose-logo {
+  position: absolute;
+  bottom: -14px;
+  right: -10px;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  opacity: 0.12;
+  transform: rotate(14deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.dash-purpose-heading {
+  margin: 0 0 0.32em 0;
+  font-size: 0.79rem;
+  font-weight: 900;
+  color: #2a5038;
+  letter-spacing: 0.01em;
+}
+
+.dash-purpose-note p {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: #3a5544;
+  font-weight: 400;
 }
 
 .apple-empty {
@@ -228,9 +365,12 @@
   border: 1.7px solid #e4eee4d9;
 }
 .apple-spiess-icon {
-  font-size: 1.07em;
-  filter: grayscale(0.07) brightness(0.98);
-  margin-right: 0.08em;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  stroke: #2d6640;
+  margin-right: 0.18em;
+  opacity: 0.85;
 }
 .apple-spiess-name {
   font-size: 0.98em;
@@ -253,9 +393,14 @@
   letter-spacing: -0.6px;
 }
 .apple-card-emoji {
-  font-size: 1.14em;
-  margin-right: 0.07em;
-  filter: grayscale(0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 0.18em;
+  opacity: 0.72;
+  stroke: #39502c;
+  color: #39502c;
 }
 .apple-type { color: #39502c; font-weight: 800; }
 .apple-row {
@@ -293,13 +438,76 @@
   margin-top: 0.7em;
 }
 
+/* Spieße-Bar */
+.dashboard-spiesse-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  max-width: 510px;
+  margin: 0 auto 1.6rem auto;
+  padding: 0.7rem 1rem;
+  background: rgba(255,255,255,0.6);
+  border: 1.2px solid rgba(100,180,145,0.2);
+  border-radius: 1.5em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 12px #b8eec822;
+}
+.spiesse-bar-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3da973;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+.spiesse-bar-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.spiesse-bar-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(240,255,245,0.85);
+  border: 1px solid rgba(80,190,140,0.22);
+  border-radius: 2em;
+  padding: 0.22rem 0.7rem 0.22rem 0.3rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #215137;
+}
+.spiesse-bar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55em;
+  height: 1.55em;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #3aeed0 10%, #3b8bff 90%);
+  color: #fff;
+  font-size: 0.72em;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.spiesse-bar-name {
+  color: #1b4d34;
+  font-size: 0.88em;
+  font-weight: 800;
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
   .apple-dashboard-hero { padding-top: 1.4rem; padding-bottom: 1.5rem; }
-  .apple-logo-gradient { width: 53px; height: 53px;}
+  .apple-logo-wrap { width: 64px; height: 64px; }
+  .apple-logo-img { width: 60px; height: 60px; }
   .apple-welcome-head { font-size: 1.13rem; }
   .apple-hero-badge { font-size: 0.98em;}
-  .apple-cards-list { max-width: 99vw; padding: 0 0.01em;}
+  .apple-cards-list { max-width: 99vw; padding: 0 0.75rem;}
   .apple-card { font-size: 0.97em; min-height: 60px; padding: 1em 0.6em 0.55em 1.1em;}
   .apple-status-dot { width: 0.84em; height: 0.84em; left: -0.61em; top: 0.71em;}
   .apple-spiess-chip { font-size: 0.81em; right: 0.22em; top: -0.7em; padding: 0.12em 0.6em 0.07em 0.38em;}
@@ -307,5 +515,69 @@
   .apple-card-content { font-size: 0.93em;}
   .apple-card-emoji { font-size: 0.93em;}
   .apple-total-bar { font-size: 0.91em;}
+  .dash-purpose-note {
+    max-width: 96vw;
+    margin: 1rem 0.35rem 1.2rem 0.35rem;
+    padding: 0.48rem 0.6rem;
+    border-radius: 0.82rem;
+  }
+  .dash-purpose-heading {
+    font-size: 0.74rem;
+  }
+  .dash-purpose-note p {
+    font-size: 0.7rem;
+    line-height: 1.42;
+  }
+}
+
+/* ---- Kontakt-Karte ---- */
+.dash-contact-card {
+  margin: 1.8rem auto 0.5rem auto;
+  max-width: 480px;
+  background: linear-gradient(140deg, rgba(255,255,255,0.60) 0%, rgba(200,238,212,0.28) 100%);
+  border: 1.2px solid rgba(80,200,150,0.22);
+  border-radius: 1.6em;
+  padding: 0.75rem 1rem 0.85rem 1rem;
+  box-shadow: 0 4px 22px #1ae68d14;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.dash-contact-kicker {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #13c074;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+.dash-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+.dash-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.dash-contact-avatar {
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a8f4d2 0%, #17c97d 100%);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+.dash-contact-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1b3a2e;
 }
 </style>

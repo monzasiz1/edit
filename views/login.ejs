@@ -1,29 +1,208 @@
 <div class="auth-container">
-  <a href="/" class="logo1">
-    <img src="/logo.png" alt="Logo" /> Spießbuch
+  <a href="/" class="logo1" aria-label="Spießbuch Startseite">
+    <img src="/logo.png" alt="Spießbuch Logo" />
+    Spießbuch
   </a>
   <h2>Login</h2>
   <% if (error) { %>
-    <div class="error"><%= error %></div>
+    <div class="error" role="alert"><%= error %></div>
   <% } %>
-  <form action="/login" method="POST">
+  <form action="/login" method="POST" novalidate>
     <label for="username">Benutzername</label>
-    <input type="text" id="username" name="username" required autofocus />
+    <input type="text" id="username" name="username" required autofocus autocomplete="username" />
 
     <label for="password">Passwort</label>
-    <input type="password" id="password" name="password" required />
+    <input type="password" id="password" name="password" required autocomplete="current-password" />
 
     <button type="submit" class="btn-reg">Login</button>
   </form>
   <div class="switch-auth">
-    Noch keinen Account?
-    <a href="/register">Jetzt registrieren</a>
+    Noch keinen Account? <a href="/register">Jetzt registrieren</a>
   </div>
   <footer class="footer">
-    &copy; <%= new Date().getFullYear() %> GutSchlag Spießbuch v.1.0 by RS
+    &copy; <%= new Date().getFullYear() %> GutSchlag Spie&szlig;buch v1.1 &middot; by R.S. &middot; Beequ.de
   </footer>
 </div>
-<!-- Copyright Fußzeile -->
-  
-  </div>
-</div>
+
+<style>
+  :root {
+    --apple-green: #4CAF50;
+    --apple-green-light: #8BC34A;
+    --apple-bg: #ffffff;
+    --radius: 1.5rem;
+    --shadow-soft: 0 6px 18px rgba(0,0,0,0.12);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  }
+  html, body { background: #ffffff !important; }
+
+  .auth-container {
+    max-width: 400px;
+    margin: 4rem auto 3rem;
+    padding: 2.7rem 2.4rem 2.2rem;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    font-family: var(--font-family);
+    color: #25322e;
+    user-select: text;
+  }
+
+  .logo1 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-weight: 900;
+    font-size: 1.9rem;
+    color: var(--apple-green);
+    text-decoration: none;
+    margin-bottom: 2.6rem;
+    user-select: text;
+  }
+
+  .logo1 img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 3px 14px rgba(76, 175, 80, 0.33);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  h2 {
+    font-weight: 700;
+    font-size: 2.1rem;
+    margin-bottom: 2rem;
+    user-select: none;
+    color: #2e3a27;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+    color: #4f6244;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 0.9rem;
+    border: 1.8px solid #c7d1bb;
+    background: #f9fcf8;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.04);
+    transition: border-color 0.3s ease;
+    font-family: var(--font-family);
+    color: #2e3a27;
+    margin-bottom: 1.6rem;
+    user-select: text;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus {
+    outline: none;
+    border-color: var(--apple-green);
+    box-shadow: 0 0 8px var(--apple-green-light);
+    background: #f0f9eb;
+  }
+
+  .btn-reg {
+    width: 100%;
+    padding: 1rem 0;
+    background: linear-gradient(135deg, var(--apple-green), var(--apple-green-light));
+    border: none;
+    border-radius: 1.3rem;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.22rem;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(76, 175, 80, 0.54);
+    user-select: none;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-reg:hover,
+  .btn-reg:focus-visible {
+    background: linear-gradient(135deg, var(--apple-green-light), var(--apple-green));
+    box-shadow: 0 8px 22px rgba(139, 195, 74, 0.75);
+    outline: none;
+  }
+
+  .btn-reg:active {
+    box-shadow: none;
+    filter: brightness(0.9);
+    transition: none;
+  }
+
+  .error {
+    background: #ffebe8;
+    border: 1.5px solid #ff4949;
+    color: #b00000;
+    padding: 0.95rem 1.2rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.8rem;
+    user-select: text;
+    box-shadow: 0 0 10px rgba(255, 73, 73, 0.45);
+  }
+
+  .switch-auth {
+    margin-top: 1.8rem;
+    font-size: 1rem;
+    color: #55694f;
+    text-align: center;
+  }
+
+  .switch-auth a {
+    color: var(--apple-green);
+    font-weight: 700;
+    text-decoration: none;
+    user-select: text;
+    transition: color 0.22s ease;
+  }
+
+  .switch-auth a:hover,
+  .switch-auth a:focus-visible {
+    text-decoration: underline;
+    color: var(--apple-green-light);
+  }
+
+  footer.footer {
+    margin-top: 3rem;
+    font-size: 0.74rem;
+    color: #a5b08c;
+    text-align: center;
+    user-select: none;
+  }
+
+  @media (max-width: 460px) {
+    .auth-container {
+      margin: 3rem 1rem 2rem;
+      padding: 2rem 1.5rem 1.5rem;
+    }
+    .logo1 {
+      font-size: 1.6rem;
+      gap: 0.6rem;
+    }
+    .logo1 img {
+      width: 40px;
+      height: 40px;
+    }
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1.6rem;
+    }
+    input[type="text"],
+    input[type="password"] {
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+    }
+    .btn-reg {
+      font-size: 1.05rem;
+      padding: 0.85rem 0;
+    }
+  }
+</style>

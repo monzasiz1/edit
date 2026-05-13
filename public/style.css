@@ -39,7 +39,7 @@ body {
   margin: calc(var(--nav-height) + 2.6rem) auto 2.6rem auto;
   padding: 2.2rem 2.7rem;
   background: var(--color-white);
-  border-radius: var(--radius-base);
+  border-radius: 0;
   box-shadow: var(--shadow);
   transition: box-shadow var(--transition), padding var(--transition);
 }
@@ -442,7 +442,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
 .footer {
   text-align: center;
   padding: 1em 0;
-  font-size: 0.9em;
+  font-size: 0.74em;
   color: #6b7a67; /* RAL 6013 - Schilfgrün oder eine passende Farbe */
   background: #f5f5f5;
   margin-top: 2em;
@@ -923,16 +923,7 @@ td:last-child  { border-bottom-right-radius: 14px; }
 
 /* Hinzufügen des Hintergrundbilds */
 .auth-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('public/backgroundimg.jpg') no-repeat center center;
-  background-size: cover; /* Bild soll den gesamten Bereich abdecken */
-  z-index: -1; /* Das Bild bleibt hinter dem Formular */
-  filter: brightness(0.5); /* Dimmt das Bild für bessere Lesbarkeit des Textes */
+  display: none;
 }
 
 /* Logo */

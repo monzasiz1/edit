@@ -166,6 +166,9 @@
     100% { opacity: 1; transform: none; }
   }
 
+  @media (max-width: 680px) {
+    .ranking-table-wrap { max-width: 100%; margin: 0 0 2rem 0; border-radius: 1rem; }
+  }
   @media (max-width: 540px) {
     html { font-size: 15px; }
     .ranking-title-ios {
@@ -214,8 +217,9 @@
     </thead>
     <tbody>
       <% users.forEach((user, index) => { %>
-        <% if (user.id === userId) { %>
-          <tr class="highlight-user">
+        <% const canSeeFullEntry = isAdmin || !rankingBlurEnabled || user.id === userId; %>
+        <% if (canSeeFullEntry) { %>
+          <tr<% if (user.id === userId) { %> class="highlight-user"<% } %>>
             <td><%= index + 1 %></td>
             <td>
               <div class="user-info">
@@ -232,7 +236,9 @@
                   <% } %>
                 </span>
                 <span class="user-name"><%= user.username %></span>
-                <span class="you-tag" aria-label="Du">Du</span>
+                <% if (user.id === userId) { %>
+                  <span class="you-tag" aria-label="Du">Du</span>
+                <% } %>
               </div>
             </td>
             <td><span class="amount-strong"><%= user.total_penalty_amount.toFixed(2) %> €</span></td>

@@ -1,0 +1,558 @@
+<section class="board-settings">
+  <header class="board-settings-header">
+    <p class="board-kicker">Administration</p>
+    <h1>Spießboard</h1>
+    <p class="board-subtitle">Zentrale Steuerung für Sichtbarkeit und weitere Einstellungen.</p>
+  </header>
+
+  <% if (saved) { %>
+    <div class="board-alert" role="status" aria-live="polite">
+      Einstellungen gespeichert.
+    </div>
+  <% } %>
+
+  <% if (error) { %>
+    <div class="board-alert board-alert-error" role="alert">
+      <%= error %>
+    </div>
+  <% } %>
+
+  <article class="board-card">
+    <h2>Strafenkatalog PDF</h2>
+    <p>Lade hier die Strafenkatalog-PDF hoch, damit sie im Menü verfügbar ist. Die Datei ersetzt eine bestehende Version automatisch.</p>
+
+    <% if (strafenkatalogExists) { %>
+      <div class="katalog-pdf-status">
+        <span class="katalog-pdf-badge">PDF vorhanden</span>
+        <a href="/strafenkatalog.pdf" target="_blank" rel="noopener" class="mini-btn">Ansehen</a>
+        <form action="/spiess-board/strafenkatalog-delete" method="POST" onsubmit="return confirm('Strafenkatalog PDF wirklich löschen?')" style="display:inline">
+          <button type="submit" class="mini-btn danger">Löschen</button>
+        </form>
+      </div>
+    <% } else { %>
+      <p class="katalog-pdf-missing">Aktuell keine PDF hinterlegt.</p>
+    <% } %>
+
+    <form action="/spiess-board/strafenkatalog-upload" method="POST" enctype="multipart/form-data" class="board-form" style="margin-top:0.75rem">
+      <label>
+        <span><%= strafenkatalogExists ? 'PDF ersetzen' : 'PDF hochladen' %></span>
+        <input type="file" name="katalog_pdf" accept="application/pdf" required />
+      </label>
+      <button type="submit" class="save-btn">Hochladen</button>
+    </form>
+  </article>
+
+  <article class="board-card">
+    <h2>Ranking Blur</h2>
+
+    <form action="/spiess-board/ranking-visibility" method="POST" class="board-form">
+      <label class="toggle-row" for="ranking_blur_enabled">
+        <span>Blur für andere Mitglieder aktiv</span>
+        <input
+          id="ranking_blur_enabled"
+          name="ranking_blur_enabled"
+          type="checkbox"
+          <%= rankingBlurEnabled ? 'checked' : '' %>
+        />
+      </label>
+
+      <button type="submit" class="save-btn">Speichern</button>
+    </form>
+  </article>
+
+  <article class="board-card">
+    <h2>Strafenkatalog</h2>
+    <p>Hier pflegt der Spieß Standardstrafen vor. Bei der Strafenvergabe reicht danach ein Klick auf den Eintrag.</p>
+
+    <form action="<%= editCatalogItem ? '/spiess-board/penalty-catalog/' + editCatalogItem.id + '/edit' : '/spiess-board/penalty-catalog' %>" method="POST" class="board-form catalog-form">
+      <label>
+        <span>Bezeichnung</span>
+        <input
+          type="text"
+          name="label"
+          required
+          placeholder="z.B. Dreckige Uniform"
+          value="<%= editCatalogItem ? editCatalogItem.label : '' %>"
+        />
+      </label>
+
+      <div class="catalog-amount-grid">
+        <label>
+          <span>Betrag unter 18</span>
+          <input
+            type="number"
+            name="amount_under18"
+            min="0"
+            step="0.01"
+            required
+            placeholder="2.50"
+            value="<%= editCatalogItem ? Number(editCatalogItem.amount_under18).toFixed(2) : '' %>"
+          />
+        </label>
+        <label>
+          <span>Betrag über 18</span>
+          <input
+            type="number"
+            name="amount_over18"
+            min="0"
+            step="0.01"
+            required
+            placeholder="5.00"
+            value="<%= editCatalogItem ? Number(editCatalogItem.amount_over18).toFixed(2) : '' %>"
+          />
+        </label>
+      </div>
+
+      <div class="catalog-amount-grid">
+        <label>
+          <span>Sortierung</span>
+          <input type="number" name="sort_order" step="1" value="<%= editCatalogItem ? editCatalogItem.sort_order : 0 %>" />
+        </label>
+        <label class="checkbox-row" for="is_active">
+          <span>Direkt aktiv</span>
+          <input id="is_active" name="is_active" type="checkbox" <%= !editCatalogItem || editCatalogItem.is_active ? 'checked' : '' %> />
+        </label>
+      </div>
+
+      <div class="catalog-form-actions">
+        <button type="submit" class="save-btn"><%= editCatalogItem ? 'Änderung speichern' : 'Katalogeintrag speichern' %></button>
+        <% if (editCatalogItem) { %>
+          <a href="/spiess-board" class="cancel-btn">Abbrechen</a>
+        <% } %>
+      </div>
+    </form>
+
+    <div class="catalog-list">
+      <details class="catalog-drawer-board" <%= editCatalogItem ? 'open' : '' %>>
+        <summary class="catalog-drawer-board-summary">
+          <span>Alle Strafen ausfahren</span>
+          <span class="catalog-count-chip"><%= (penaltiesCatalog || []).length %></span>
+        </summary>
+
+        <div class="catalog-list-scroll">
+          <% if (!penaltiesCatalog || penaltiesCatalog.length === 0) { %>
+            <p class="empty-note">Noch keine Katalogeinträge vorhanden.</p>
+          <% } %>
+
+          <% (penaltiesCatalog || []).forEach(item => { %>
+            <div class="catalog-item <%= item.is_active ? 'active' : 'inactive' %>">
+              <div class="catalog-main">
+                <strong><%= item.label %></strong>
+                <span>U18: <%= Number(item.amount_under18).toFixed(2) %> €</span>
+                <span>Ü18: <%= Number(item.amount_over18).toFixed(2) %> €</span>
+              </div>
+              <div class="catalog-actions">
+                <a href="/spiess-board?edit=<%= item.id %>" class="mini-btn">Bearbeiten</a>
+                <form action="/spiess-board/penalty-catalog/<%= item.id %>/toggle" method="POST">
+                  <button type="submit" class="mini-btn">
+                    <%= item.is_active ? 'Deaktivieren' : 'Aktivieren' %>
+                  </button>
+                </form>
+                <form action="/spiess-board/penalty-catalog/<%= item.id %>/delete" method="POST" onsubmit="return confirm('Eintrag wirklich löschen?')">
+                  <button type="submit" class="mini-btn danger">Löschen</button>
+                </form>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </details>
+    </div>
+  </article>
+
+  <article class="board-card">
+    <h2>Veranstaltungskatalog</h2>
+    <p>Hier pflegst du Veranstaltungen vor. Bei der Strafenvergabe erscheinen sie als Vorschlag im Veranstaltungsfeld.</p>
+
+    <form action="<%= editEventItem ? '/spiess-board/event-catalog/' + editEventItem.id + '/edit' : '/spiess-board/event-catalog' %>" method="POST" class="board-form catalog-form">
+      <label>
+        <span>Bezeichnung</span>
+        <input type="text" name="label" required placeholder="z.B. Schützenfest Musterstadt"
+          value="<%= editEventItem ? editEventItem.label : '' %>" />
+      </label>
+      <label>
+        <span>Sortierung</span>
+        <input type="number" name="sort_order" step="1" value="<%= editEventItem ? editEventItem.sort_order : 0 %>" />
+      </label>
+      <div class="catalog-form-actions">
+        <button type="submit" class="save-btn"><%= editEventItem ? 'Änderung speichern' : 'Veranstaltung speichern' %></button>
+        <% if (editEventItem) { %>
+          <a href="/spiess-board" class="cancel-btn">Abbrechen</a>
+        <% } %>
+      </div>
+    </form>
+
+    <div class="catalog-list">
+      <details class="catalog-drawer-board">
+        <summary class="catalog-drawer-board-summary">
+          <span>Alle Veranstaltungen ausfahren</span>
+          <span class="catalog-count-chip"><%= (eventCatalog || []).length %></span>
+        </summary>
+        <div class="catalog-list-scroll">
+          <% if (!eventCatalog || eventCatalog.length === 0) { %>
+            <p class="empty-note">Noch keine Veranstaltungen vorhanden.</p>
+          <% } %>
+          <% (eventCatalog || []).forEach(item => { %>
+            <div class="catalog-item active">
+              <div class="catalog-main">
+                <strong><%= item.label %></strong>
+              </div>
+              <div class="catalog-actions">
+                <a href="/spiess-board?edit_event=<%= item.id %>" class="mini-btn">Bearbeiten</a>
+                <form action="/spiess-board/event-catalog/<%= item.id %>/delete" method="POST" onsubmit="return confirm('Veranstaltung wirklich löschen?')">
+                  <button type="submit" class="mini-btn danger">Löschen</button>
+                </form>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </details>
+    </div>
+  </article>
+</section>
+
+<style>
+  .board-settings {
+    max-width: 760px;
+    margin: 0 auto;
+    color: #203327;
+  }
+
+  .board-settings-header h1 {
+    margin: 0.15rem 0 0.35rem;
+    font-size: 2.1rem;
+    color: #1f6c3f;
+  }
+
+  .board-kicker {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #3e8b63;
+  }
+
+  .board-subtitle {
+    margin: 0;
+    color: #4d6957;
+    font-weight: 600;
+  }
+
+  .board-alert {
+    margin-top: 1rem;
+    border-radius: 0.9rem;
+    background: #e9faee;
+    border: 1px solid #b9e2c2;
+    color: #205f3a;
+    font-weight: 700;
+    padding: 0.75rem 1rem;
+  }
+
+  .board-alert-error {
+    background: #fff0f0;
+    border-color: #f0b9b9;
+    color: #812f2f;
+  }
+
+  .board-card {
+    margin-top: 1.2rem;
+    border-radius: 1.2rem;
+    border: 1px solid #d6e6d6;
+    background: linear-gradient(140deg, #ffffff, #f4faf5);
+    box-shadow: 0 10px 30px rgba(36, 90, 50, 0.08);
+    padding: 1.25rem;
+  }
+
+  .board-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .board-card p {
+    color: #3f5947;
+    font-weight: 600;
+  }
+
+  .board-form {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid #d8e8da;
+    border-radius: 0.9rem;
+    background: #fbfffc;
+    padding: 0.8rem 0.9rem;
+    font-weight: 700;
+  }
+
+  .toggle-row input[type='checkbox'] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: #2f9b5e;
+    cursor: pointer;
+  }
+
+  .save-btn {
+    border: 0;
+    border-radius: 0.9rem;
+    padding: 0.7rem 1rem;
+    font-weight: 800;
+    font-size: 0.98rem;
+    color: #fff;
+    background: linear-gradient(125deg, #2d8d56, #56b87c);
+    cursor: pointer;
+    width: fit-content;
+    box-shadow: 0 8px 20px rgba(48, 138, 84, 0.3);
+  }
+
+  .save-btn:hover {
+    filter: brightness(1.05);
+  }
+
+  .catalog-form label {
+    display: grid;
+    gap: 0.3rem;
+    font-weight: 700;
+    color: #2a4d37;
+  }
+
+  .catalog-form input[type='text'],
+  .catalog-form input[type='number'] {
+    border: 1px solid #cfe4d2;
+    border-radius: 0.7rem;
+    padding: 0.55rem 0.7rem;
+    font: inherit;
+    background: #fff;
+  }
+
+  .catalog-amount-grid {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .checkbox-row {
+    border: 1px solid #d8e8da;
+    border-radius: 0.9rem;
+    background: #fbfffc;
+    padding: 0.8rem 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .catalog-list {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .catalog-drawer-board {
+    border: 1px solid #d8e8da;
+    border-radius: 0.9rem;
+    background: #fcfffd;
+  }
+
+  .catalog-drawer-board-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.72rem 0.82rem;
+    font-weight: 800;
+    color: #24573b;
+    user-select: none;
+  }
+
+  .catalog-drawer-board-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .catalog-drawer-board-summary::after {
+    content: '▾';
+    font-size: 0.95rem;
+    opacity: 0.75;
+    transform: rotate(-90deg);
+    transition: transform 0.18s ease;
+  }
+
+  .catalog-drawer-board[open] .catalog-drawer-board-summary::after {
+    transform: rotate(0deg);
+  }
+
+  .catalog-count-chip {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4d7a60;
+    background: #ebf8ef;
+    border: 1px solid #cde8d5;
+    border-radius: 999px;
+    padding: 0.16rem 0.48rem;
+  }
+
+  .catalog-list-scroll {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0 0.6rem 0.6rem;
+  }
+
+  .catalog-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cancel-btn {
+    border: 1px solid #bdd9c4;
+    background: #fff;
+    color: #26583d;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    padding: 0.45rem 0.65rem;
+    text-decoration: none;
+  }
+
+  .catalog-item {
+    border: 1px solid #d8e8da;
+    border-radius: 0.85rem;
+    padding: 0.7rem 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .catalog-item.active {
+    background: #f7fcf8;
+  }
+
+  .catalog-item.inactive {
+    background: #fbfbfb;
+    opacity: 0.8;
+  }
+
+  .catalog-main {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .catalog-main span {
+    color: #4a6655;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  .catalog-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .mini-btn {
+    display: inline-block;
+    border: 1px solid #bdd9c4;
+    background: #fff;
+    color: #26583d;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    padding: 0.45rem 0.65rem;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .mini-btn.danger {
+    border-color: #e5bbbb;
+    color: #8e2f2f;
+  }
+
+  .empty-note {
+    color: #4d6957;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .katalog-pdf-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .katalog-pdf-badge {
+    background: #e9faee;
+    border: 1px solid #b9e2c2;
+    color: #205f3a;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 2rem;
+  }
+
+  .katalog-pdf-missing {
+    color: #7a5c3a;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0 0 0.5rem;
+  }
+
+  @media (max-width: 680px) {
+    .board-settings { max-width: 100%; margin: 0; }
+  }
+  @media (max-width: 640px) {
+    .board-settings-header h1 {
+      font-size: 1.7rem;
+    }
+
+    .toggle-row {
+      align-items: flex-start;
+    }
+
+    .catalog-amount-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .board-card {
+      padding: 0.95rem;
+      border-radius: 1rem;
+    }
+
+    .board-form {
+      gap: 0.65rem;
+    }
+
+    .catalog-list-scroll {
+      max-height: 52vh;
+      overflow: auto;
+      padding: 0 0.45rem 0.45rem;
+    }
+
+    .catalog-item {
+      padding: 0.58rem 0.62rem;
+      gap: 0.6rem;
+    }
+
+    .mini-btn,
+    .cancel-btn {
+      font-size: 0.82rem;
+      padding: 0.36rem 0.52rem;
+    }
+
+    .save-btn {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+</style>

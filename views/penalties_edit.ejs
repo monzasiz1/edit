@@ -1,199 +1,337 @@
+<% if (error) { %>
+  <div class="pe-error"><%= error %></div>
+<% } %>
+
+<div class="pe-wrap">
+
+  <% if (penaltyCatalog && penaltyCatalog.length > 0) { %>
+  <div class="pe-section">
+    <div class="pe-section-label">Schnellauswahl</div>
+    <div class="pe-catalog-card">
+      <div class="pe-catalog-head">
+        <span class="pe-catalog-title">Aus Katalog übernehmen</span>
+        <select id="catalog_tariff_edit" class="pe-tariff-select">
+          <option value="under18">Unter 18</option>
+          <option value="over18" selected>Über 18</option>
+        </select>
+      </div>
+      <div class="pe-catalog-chips">
+        <% penaltyCatalog.forEach(item => { %>
+          <button type="button" class="pe-chip"
+            data-label="<%= item.label %>"
+            data-under="<%= item.amount_under18 %>"
+            data-over="<%= item.amount_over18 %>">
+            <%= item.label %>
+          </button>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <form method="POST">
+
+    <div class="pe-section">
+      <div class="pe-section-label">Mitglied</div>
+      <div class="pe-group">
+        <div class="pe-row">
+          <label class="pe-row-label" for="user_id">Nutzer</label>
+          <select name="user_id" id="user_id" class="pe-select" required>
+            <% users.forEach(u => { %>
+              <option value="<%= u.id %>" <%= (penalty.user_id == u.id ? 'selected' : '') %>><%= u.username %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="pe-section">
+      <div class="pe-section-label">Strafe</div>
+      <div class="pe-group">
+        <div class="pe-row">
+          <label class="pe-row-label" for="type">Grund</label>
+          <input type="text" name="type" id="type" class="pe-input" required value="<%= penalty.type %>" placeholder="z.B. Zu spät kommen">
+        </div>
+        <div class="pe-divider"></div>
+        <div class="pe-row">
+          <label class="pe-row-label" for="event_select">Veranstaltung</label>
+          <div style="flex:1;display:flex;flex-direction:column;gap:0.3rem;min-width:0">
+            <% if (eventCatalog && eventCatalog.length > 0) { %>
+              <% const matchedEvent = eventCatalog.some(e => e.label === penalty.event); %>
+              <select id="event_select" class="pe-select" style="width:100%" onchange="peEventSelectChange(this)">
+                <% eventCatalog.forEach(e => { %>
+                  <option value="<%= e.label %>" <%= penalty.event === e.label ? 'selected' : '' %>><%= e.label %></option>
+                <% }) %>
+                <option value="__manual__" <%= !matchedEvent ? 'selected' : '' %>>&#9998; Manuell eingeben&hellip;</option>
+              </select>
+            <% } %>
+            <input type="text" name="event" id="event" class="pe-input" required
+              value="<%= penalty.event %>"
+              placeholder="Veranstaltung eingeben"
+              style="margin-top:0.2rem;display:<%= (!eventCatalog || eventCatalog.length === 0 || !eventCatalog.some(e => e.label === penalty.event)) ? 'block' : 'none' %>">
+          </div>
+        </div>
+        <div class="pe-divider"></div>
+        <div class="pe-row">
+          <label class="pe-row-label" for="amount">Betrag</label>
+          <div class="pe-amount-wrap">
+            <input type="number" name="amount" id="amount" class="pe-input pe-input-amount" min="0" step="0.01" required value="<%= penalty.amount %>" placeholder="0.00">
+            <span class="pe-currency">€</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pe-section">
+      <div class="pe-section-label">Details</div>
+      <div class="pe-group">
+        <div class="pe-row">
+          <label class="pe-row-label" for="date">Datum</label>
+          <input type="date" name="date" id="date" class="pe-input pe-input-date" required
+            value="<%= penalty.date ? (penalty.date.toISOString ? penalty.date.toISOString().slice(0,10) : penalty.date) : '' %>">
+        </div>
+        <div class="pe-divider"></div>
+        <div class="pe-row">
+          <label class="pe-row-label" for="status">Status</label>
+          <select name="status" id="status" class="pe-select" required>
+            <option value="offen" <%= penalty.status === 'offen' ? 'selected' : '' %>>Offen</option>
+            <option value="bezahlt" <%= penalty.status === 'bezahlt' ? 'selected' : '' %>>Bezahlt</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="pe-btn-save">Speichern</button>
+    <a href="/penalties" class="pe-btn-cancel">Abbrechen</a>
+
+  </form>
+</div>
+
 <style>
-  :root {
-    --green: #4B6F28;
-    --green-soft: #7FAB57;
-    --green-glow: rgba(123, 168, 92, 0.3);
-    --red: #FF3B30;
-    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  html, body {
+    background: #f2f2f7;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-
-  .page-header {
-    text-align: center;
-    margin-bottom: 2.4rem;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .page-title {
-    font-size: clamp(2.4rem, 6vw, 3.4rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    background: linear-gradient(to right, #4b6f28, #7fab57);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-    font-family: var(--font);
-    margin: 0;
-    transition: all 0.3s ease;
-  }
-
-  .page-subline {
-    font-size: 1.12rem;
-    color: rgba(44, 60, 34, 0.58);
-    font-style: italic;
-    margin-top: 0.6rem;
-    font-family: var(--font);
-    transition: all 0.3s ease;
-    opacity: 1;
-  }
-
-  .form-card {
+  .pe-wrap {
     max-width: 540px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.65);
-    padding: 2.6rem 2.3rem;
-    border-radius: 2rem;
-    box-shadow: 0 22px 60px rgba(71, 85, 59, 0.12), inset 0 0 14px rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    font-family: var(--font);
+    padding: 1.5rem 1rem 3rem 1rem;
   }
-
-  .form-card label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.4rem;
-    font-size: 1.02rem;
-    color: #2f3e1a;
-    letter-spacing: 0.015em;
-    opacity: 0.85;
-  }
-
-  .form-card input,
-  .form-card select {
-    width: 100%;
-    padding: 1rem 1.15rem;
-    font-size: 1.06rem;
-    border-radius: 1.2rem;
-    border: 1.5px solid #b3cba0;
-    background: #f9fbf8;
-    margin-bottom: 1.6rem;
-    transition: border-color 0.25s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    font-family: var(--font);
-  }
-
-  .form-card input:focus,
-  .form-card select:focus {
-    outline: none;
-    border-color: var(--green);
-    box-shadow: 0 0 0 4px var(--green-glow);
-    transform: scale(1.015);
-  }
-
-  .form-card button[type="submit"] {
-    width: 100%;
-    padding: 0.9em;
-    font-size: 1.2rem;
-    font-weight: 700;
+  .pe-error {
+    max-width: 540px;
+    margin: 1rem auto 0 auto;
+    background: #ff3b30;
     color: #fff;
-    background: linear-gradient(135deg, var(--green), var(--green-soft));
+    font-weight: 600;
+    border-radius: 1rem;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.92rem;
+    text-align: center;
+  }
+  .pe-section { margin-bottom: 1.5rem; }
+  .pe-section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8e8e93;
+    margin-bottom: 0.4rem;
+    padding-left: 0.2rem;
+  }
+  .pe-group {
+    background: #fff;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .pe-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.78rem 1rem;
+    gap: 0.75rem;
+    min-height: 48px;
+  }
+  .pe-row-label {
+    font-size: 0.97rem;
+    font-weight: 500;
+    color: #1c1c1e;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .pe-divider {
+    height: 1px;
+    background: #e5e5ea;
+    margin: 0 1rem;
+  }
+  .pe-input {
     border: none;
-    border-radius: 2rem;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.97rem;
+    color: #3a3a3c;
+    text-align: right;
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+  }
+  .pe-input::placeholder { color: #c7c7cc; }
+  .pe-input-amount { max-width: 90px; }
+  .pe-input-date { max-width: 150px; }
+  .pe-amount-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    justify-content: flex-end;
+    flex: 1;
+  }
+  .pe-currency {
+    font-size: 0.97rem;
+    color: #8e8e93;
+    flex-shrink: 0;
+  }
+  .pe-select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.97rem;
+    color: #3a3a3c;
+    text-align: right;
+    flex: 1;
+    min-width: 0;
     cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 12px 32px rgba(76, 117, 55, 0.28);
-    font-family: var(--font);
+    -webkit-appearance: none;
+    appearance: none;
   }
-
-  .form-card button[type="submit"]:hover {
-    background: linear-gradient(135deg, #3a581d, var(--green));
-    box-shadow: 0 14px 36px rgba(76, 117, 55, 0.4);
+  .pe-catalog-card {
+    background: #fff;
+    border-radius: 1.1rem;
+    padding: 0.85rem 1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   }
-
-  .form-card button[type="submit"]:active {
-    transform: scale(0.985);
+  .pe-catalog-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+    gap: 0.5rem;
   }
-
-  .form-card .btn-cancel {
+  .pe-catalog-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1c1c1e;
+  }
+  .pe-tariff-select {
+    border: 1px solid #e5e5ea;
+    border-radius: 0.6rem;
+    padding: 0.28rem 0.55rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #f2f2f7;
+    color: #1c1c1e;
+    cursor: pointer;
+  }
+  .pe-catalog-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .pe-chip {
+    border: 1.5px solid #e5e5ea;
+    border-radius: 999px;
+    background: #f2f2f7;
+    color: #1c1c1e;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .pe-chip.active,
+  .pe-chip:active {
+    background: #d1f0e2;
+    border-color: #34c759;
+    color: #1a6e3e;
+  }
+  .pe-btn-save {
     display: block;
-    margin-top: 1.2rem;
-    text-align: center;
+    width: 100%;
+    padding: 0.9rem;
+    background: #34c759;
+    color: #fff;
+    font-family: inherit;
     font-size: 1.05rem;
-    font-weight: 600;
-    border-radius: 2rem;
-    padding: 0.75em;
-    color: var(--green-soft);
-    border: 2px solid var(--green-soft);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-family: var(--font);
+    font-weight: 700;
+    border: none;
+    border-radius: 1.1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 18px rgba(52,199,89,0.28);
+    transition: background 0.15s, transform 0.1s;
   }
-
-  .form-card .btn-cancel:hover {
-    background: var(--green-soft);
-    color: white;
-  }
-
-  .error-box {
-    background: var(--red);
-    color: white;
+  .pe-btn-save:active { transform: scale(0.98); background: #28a745; }
+  .pe-btn-cancel {
+    display: block;
+    width: 100%;
+    padding: 0.85rem;
+    background: #fff;
+    color: #3a3a3c;
+    font-family: inherit;
+    font-size: 1rem;
     font-weight: 600;
-    border-radius: 1.5rem;
-    padding: 1rem 1.3rem;
-    margin: 0 auto 2rem;
-    max-width: 520px;
+    border: none;
+    border-radius: 1.1rem;
+    cursor: pointer;
+    margin-top: 0.6rem;
     text-align: center;
-    box-shadow: 0 4px 14px rgba(255, 59, 48, 0.4);
-    font-family: var(--font);
+    text-decoration: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: background 0.15s;
+  }
+  .pe-btn-cancel:active { background: #f2f2f7; }
+
+  @media (max-width: 600px) {
+    .pe-wrap { padding: 1rem 0.5rem 2.5rem 0.5rem; }
+    .pe-row { padding: 0.7rem 0.85rem; }
+    .pe-divider { margin: 0 0.85rem; }
   }
 </style>
 
-<div class="page-header" id="header">
-  <h1 class="page-title" id="title">🧾 Strafe bearbeiten</h1>
-  <p class="page-subline" id="subline">Bearbeite Strafen im modernen iOS-Look.</p>
-</div>
-
-<% if (error) { %>
-  <div class="error-box"><%= error %></div>
-<% } %>
-
-<form method="POST" class="form-card">
-  <label for="user_id">Nutzer</label>
-  <select name="user_id" id="user_id" required>
-    <% users.forEach(u => { %>
-      <option value="<%= u.id %>" <%= (penalty.user_id == u.id ? 'selected' : '') %>><%= u.username %></option>
-    <% }) %>
-  </select>
-
-  <label for="type">Grund</label>
-  <input type="text" name="type" id="type" required value="<%= penalty.type %>">
-
-  <label for="event">Veranstaltung</label>
-  <input type="text" name="event" id="event" required value="<%= penalty.event %>">
-
-  <label for="amount">Betrag (€)</label>
-  <input type="number" name="amount" id="amount" min="0" step="0.01" required value="<%= penalty.amount %>" placeholder="z.B. 3.50">
-
-  <label for="date">Datum</label>
-  <input type="date" name="date" id="date" required value="<%= penalty.date ? penalty.date.toISOString ? penalty.date.toISOString().slice(0,10) : penalty.date : '' %>">
-
-  <label for="status">Status</label>
-  <select name="status" id="status" required>
-    <option value="offen" <%= penalty.status === 'offen' ? 'selected' : '' %>>🔴 offen</option>
-    <option value="bezahlt" <%= penalty.status === 'bezahlt' ? 'selected' : '' %>>🟢 bezahlt</option>
-  </select>
-
-  <button type="submit">💾 Speichern</button>
-  <a href="/penalties" class="btn-cancel">Abbrechen</a>
-</form>
-
 <script>
-  // Apple-Header Animation beim Scroll
-  const title = document.getElementById("title");
-  const subline = document.getElementById("subline");
+  // Strafenkatalog-Chips
+  (() => {
+    const buttons = Array.from(document.querySelectorAll('.pe-chip'));
+    const tariffSelect = document.getElementById('catalog_tariff_edit');
+    const typeInput = document.getElementById('type');
+    const amountInput = document.getElementById('amount');
+    if (!buttons.length || !tariffSelect) return;
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amount = tariffSelect.value === 'under18' ? btn.dataset.under : btn.dataset.over;
+        if (typeInput) typeInput.value = btn.dataset.label || '';
+        if (amountInput) amountInput.value = parseFloat(amount || '0').toFixed(2);
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  })();
 
-  window.addEventListener("scroll", () => {
-    const y = window.scrollY;
-    if (y > 15) {
-      title.style.fontSize = "2.2rem";
-      title.style.letterSpacing = "-0.01em";
-      subline.style.opacity = "0";
-      subline.style.transform = "translateY(-10px)";
+  // Veranstaltungs-Select
+  function peEventSelectChange(sel) {
+    const textInput = document.getElementById('event');
+    if (!textInput) return;
+    if (sel.value === '__manual__') {
+      textInput.style.display = 'block';
+      textInput.value = '';
+      textInput.focus();
     } else {
-      title.style.fontSize = "";
-      title.style.letterSpacing = "";
-      subline.style.opacity = "1";
-      subline.style.transform = "translateY(0)";
+      textInput.style.display = 'none';
+      textInput.value = sel.value;
     }
-  });
+  }
 </script>

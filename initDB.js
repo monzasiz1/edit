@@ -2,17 +2,15 @@ require('dotenv').config();
 const pool = require('./db');
 
 async function init() {
-  // --- ALTE Tabellen löschen (NUR beim ersten sauberen Setup nötig) ---
-  await pool.query('DROP TABLE IF EXISTS penalties CASCADE;');
-  await pool.query('DROP TABLE IF EXISTS users CASCADE;');
-  // -------------------------------------------------------
-
   await pool.query(`
   CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(200) NOT NULL,
-    is_admin BOOLEAN DEFAULT FALSE
+    is_admin BOOLEAN DEFAULT FALSE,
+    is_board BOOLEAN DEFAULT FALSE,
+    avatar VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW()
   );
 `);
 
@@ -21,9 +19,11 @@ await pool.query(`
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     reason TEXT NOT NULL,
+    amount DECIMAL(10,2) DEFAULT 0,
     date DATE DEFAULT CURRENT_DATE,
     type VARCHAR(100),                -- Art der Strafe
     event VARCHAR(100),               -- Veranstaltung
+    event_id INTEGER,                 -- Veranstaltung ID für Gruppierung
     created_at TIMESTAMP DEFAULT NOW() -- Zeitpunkt der Eintragung
   );
     

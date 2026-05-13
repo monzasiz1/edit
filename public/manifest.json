@@ -1,12 +1,15 @@
 {
-  "name": "GutSchlag – Dein Spießbuch",
+  "name": "GutSchlag Spießbuch",
   "short_name": "Spießbuch",
-  "description": "Verwalte deine Spieß‑Strafen übersichtlich",
-  "start_url": "/",
+  "description": "Das digitale Spießbuch für GutSchlag – Strafen verwalten, immer dabei.",
+  "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#3da973",
+  "lang": "de",
+  "categories": ["utilities"],
   "icons": [
     {
       "src": "/icons/logo-192.png",
@@ -19,6 +22,14 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "Meine Strafen"
     }
   ]
 }

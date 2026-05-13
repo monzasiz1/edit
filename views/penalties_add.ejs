@@ -1,92 +1,499 @@
-<h2 style="font-weight: 700; font-size: 1.9rem; color: #3A3A3C; margin-bottom: 1.8rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  Neue Strafe vergeben
-</h2>
+﻿<style>
+  :root {
+    --pform-bg: linear-gradient(140deg, rgba(255,255,255,0.52) 0%, rgba(200,238,212,0.28) 100%);
+    --pform-border: rgba(80,200,150,0.22);
+    --pform-input-bg: rgba(255,255,255,0.82);
+    --pform-input-border: rgba(100,190,150,0.3);
+    --pform-accent: #1ae68d;
+    --pform-accent-dark: #0d8a55;
+  }
 
-<% if (error) { %>
-  <div style="background: #FF3B30; color: white; padding: 1rem 1.25rem; border-radius: 1rem; font-weight: 600; margin-bottom: 2rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <%= error %>
+  .pform-page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem 1rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    box-sizing: border-box;
+  }
+
+  /* ---- Header ---- */
+  .pform-header {
+    position: relative;
+    border-radius: 1.8em;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    padding: 1.4rem 1.5rem 1.3rem 1.5rem;
+  }
+  .pform-header-glass {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(140deg, rgba(255,255,255,0.50) 0%, rgba(200,238,212,0.28) 100%);
+    border: 1.2px solid var(--pform-border);
+    border-radius: 1.8em;
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    box-shadow: 0 6px 32px #1ae68d18;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .pform-header-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.45;
+    filter: blur(36px);
+    width: 130px; height: 130px;
+    background: radial-gradient(circle, #a8f4d2 0%, transparent 70%);
+    top: -30px; right: -20px;
+  }
+  .pform-header-inner {
+    position: relative;
+    z-index: 1;
+  }
+  .pform-kicker {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #13c074;
+    opacity: 0.85;
+    margin-bottom: 0.3rem;
+  }
+  .pform-title {
+    font-size: 1.75rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    background: linear-gradient(91deg, #0d8a55 55%, #1ae68d 120%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 1px 6px #c9eed877);
+  }
+
+  /* ---- Error ---- */
+  .pform-error {
+    background: linear-gradient(91deg, #ff3b30, #ff6b6b);
+    color: #fff;
+    padding: 0.85rem 1.2rem;
+    border-radius: 1.1em;
+    font-weight: 600;
+    font-size: 0.93rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 14px #ff3b3030;
+  }
+
+  /* ---- Card ---- */
+  .pform-card {
+    background: var(--pform-bg);
+    border: 1.3px solid var(--pform-border);
+    border-radius: 2em;
+    padding: 0;
+    box-shadow: 0 8px 40px #1ae68d18, 0 1.5px 10px #39c9ff12;
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    overflow: hidden;
+  }
+
+  /* ---- Field Groups ---- */
+  .pform-group {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid rgba(100,190,150,0.14);
+  }
+  .pform-group:last-of-type {
+    border-bottom: none;
+  }
+  .pform-field {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.85rem 1.3rem;
+    border-bottom: 1px solid rgba(100,190,150,0.1);
+    transition: background 0.12s;
+  }
+  .pform-field:last-child {
+    border-bottom: none;
+  }
+  .pform-field:focus-within {
+    background: rgba(26,230,141,0.05);
+  }
+  .pform-field-icon {
+    flex-shrink: 0;
+    width: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pform-field-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .pform-field label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #0d6e43;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  .pform-field input,
+  .pform-field select {
+    width: 100%;
+    padding: 0;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: #1b2e2b;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-shadow: none;
+    min-height: 1.5rem;
+  }
+  .pform-field input::placeholder {
+    color: #b0cfc0;
+    font-weight: 400;
+  }
+  .pform-field select option {
+    background: #fff;
+    color: #1b2e2b;
+  }
+
+  .catalog-quick {
+    padding: 0.9rem 1.1rem 0.6rem;
+    border-bottom: 1px solid rgba(100,190,150,0.14);
+  }
+
+  .catalog-drawer {
+    border-bottom: 1px solid rgba(100,190,150,0.14);
+  }
+
+  .catalog-drawer-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.85rem 1.1rem;
+    font-weight: 800;
+    color: #1a583b;
+    user-select: none;
+  }
+
+  .catalog-drawer-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .catalog-drawer-summary::after {
+    content: '▾';
+    font-size: 1rem;
+    opacity: 0.75;
+    transform: rotate(-90deg);
+    transition: transform 0.18s ease;
+  }
+
+  .catalog-drawer[open] .catalog-drawer-summary::after {
+    transform: rotate(0deg);
+  }
+
+  .catalog-count {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4d7a60;
+    background: #ebf8ef;
+    border: 1px solid #cde8d5;
+    border-radius: 999px;
+    padding: 0.16rem 0.48rem;
+  }
+
+  .catalog-quick-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .catalog-quick-head label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0d6e43;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .catalog-quick-head select {
+    border: 1px solid #d0e7d6;
+    background: #fff;
+    border-radius: 0.7rem;
+    padding: 0.35rem 0.5rem;
+    font-weight: 700;
+  }
+
+  .catalog-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .catalog-btn {
+    border: 1px solid #cde5d3;
+    background: #fff;
+    border-radius: 999px;
+    padding: 0.42rem 0.72rem;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1f5e3f;
+    cursor: pointer;
+  }
+
+  .catalog-btn:hover {
+    background: #f0fbf4;
+  }
+
+  .catalog-btn.active {
+    border-color: #27a063;
+    background: #e8f8ee;
+  }
+
+  /* ---- Actions ---- */
+  .pform-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1.2rem 1.3rem 1.3rem 1.3rem;
+  }
+  .pform-btn-submit {
+    flex: 1;
+    padding: 0.82rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 1.3em;
+    background: linear-gradient(120deg, #1ae68d 8%, #17c97d 92%);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 5px 18px #1ae68d35;
+    transition: background 0.13s, box-shadow 0.13s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    letter-spacing: 0.02em;
+  }
+  .pform-btn-submit:hover {
+    background: linear-gradient(120deg, #0ed377, #14b872);
+    box-shadow: 0 9px 22px #1ae68d45;
+    transform: translateY(-1px);
+  }
+  .pform-btn-submit:active { transform: scale(0.97); box-shadow: 0 3px 8px #1ae68d25; }
+  .pform-btn-cancel {
+    padding: 0.82rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1.4px solid rgba(80,200,150,0.35);
+    border-radius: 1.3em;
+    background: rgba(255,255,255,0.65);
+    color: #0d8a55;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.13s, border-color 0.13s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pform-btn-cancel:hover {
+    background: rgba(26,230,141,0.1);
+    border-color: #1ae68d;
+    transform: translateY(-1px);
+  }
+  .pform-btn-cancel:active { transform: scale(0.97); }
+
+  @media (max-width: 680px) {
+    .pform-page { max-width: 100%; margin: 0; padding: 0 0 2.5rem 0; }
+  }
+  @media (max-width: 480px) {
+    .pform-page { padding: 0 0 2.5rem 0; }
+    .pform-header { padding: 1.15rem 1.1rem 1.1rem 1.1rem; border-radius: 1.4em; }
+    .pform-title { font-size: 1.45rem; }
+    .pform-card { border-radius: 1.5em; }
+    .pform-field { padding: 0.75rem 1rem; }
+    .catalog-drawer-summary { padding: 0.72rem 0.9rem; font-size: 0.95rem; }
+    .catalog-quick { padding: 0.7rem 0.85rem 0.5rem; }
+    .catalog-quick-head { margin-bottom: 0.55rem; }
+    .catalog-quick-head label { font-size: 0.66rem; }
+    .catalog-btn { font-size: 0.8rem; padding: 0.35rem 0.58rem; }
+    .pform-actions { padding: 1rem 1rem 1.1rem 1rem; flex-direction: column; }
+    .pform-btn-cancel { text-align: center; }
+  }
+</style>
+
+<div class="pform-page">
+  <div class="pform-header">
+    <div class="pform-header-glass"></div>
+    <div class="pform-header-orb"></div>
+    <div class="pform-header-inner">
+      <div class="pform-kicker">Strafen</div>
+      <h2 class="pform-title">Neue Strafe vergeben</h2>
+    </div>
   </div>
-<% } %>
 
-<form method="POST" class="form-card" style="max-width: 480px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  
-  <label for="user_id" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
-    Nutzer:
-  </label>
-  <select id="user_id" name="user_id" required
-    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; appearance: none; -webkit-appearance: none; -moz-appearance: none; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem;">
-    <% users.forEach(u => { %>
-      <option value="<%= u.id %>"><%= u.username %></option>
-    <% }) %>
-  </select>
+  <% if (error) { %>
+    <div class="pform-error"><%= error %></div>
+  <% } %>
 
-  <label for="type" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
-    Grund:
-  </label>
-  <input type="text" id="type" name="type" required placeholder="z.B. Verspätung"
-    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
-  
-  <label for="event" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
-    Veranstaltung:
-  </label>
-  <input type="text" id="event" name="event" required placeholder="z.B. Stammtisch"
-    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
-  
-  <label for="amount" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
-    Betrag (€):
-  </label>
-  <input type="number" id="amount" name="amount" required min="0" step="0.01" placeholder="z.B. 3.50"
-    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
+  <form method="POST" class="pform-card">
 
-  <label for="date" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
-    Datum:
-  </label>
-  <input type="date" id="date" name="date" required
-    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 1.8rem; outline-offset: 2px;">
+    <% if (penaltyCatalog && penaltyCatalog.length > 0) { %>
+      <details class="catalog-drawer">
+        <summary class="catalog-drawer-summary">
+          <span>Strafenkatalog ausklappen</span>
+          <span class="catalog-count"><%= penaltyCatalog.length %></span>
+        </summary>
+        <div class="catalog-quick">
+          <div class="catalog-quick-head">
+            <label for="catalog_tariff">Schnellauswahl Strafenkatalog</label>
+            <select id="catalog_tariff" aria-label="Tarif auswählen">
+              <option value="under18">Unter 18</option>
+              <option value="over18" selected>Über 18</option>
+            </select>
+          </div>
+          <div class="catalog-buttons">
+            <% penaltyCatalog.forEach(item => { %>
+              <button
+                type="button"
+                class="catalog-btn"
+                data-label="<%= item.label %>"
+                data-under="<%= item.amount_under18 %>"
+                data-over="<%= item.amount_over18 %>"
+              >
+                <%= item.label %>
+              </button>
+            <% }) %>
+          </div>
+        </div>
+      </details>
+    <% } %>
 
-  <label for="status" style="display: block; margin-bottom: 6px; font-weight: 600; color: #3A3A3C; font-size: 1.05rem;">
-    Status:
-  </label>
-  <select id="status" name="status" required
-    style="width: 100%; padding: 14px 16px; font-size: 1.1rem; border-radius: 14px; border: 1.5px solid #C7C7CC; background-color: #F2F2F7; color: #3A3A3C; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.06); margin-bottom: 2.4rem; appearance: none; cursor: pointer;">
-    <option value="offen" selected>🔴 offen</option>
-    <option value="bezahlt">🟢 bezahlt</option>
-  </select>
+    <div class="pform-field">
+      <span class="pform-field-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b7a5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <div class="pform-field-body">
+        <label for="user_id">Nutzer</label>
+        <select id="user_id" name="user_id" required>
+          <% users.forEach(u => { %>
+            <option value="<%= u.id %>"><%= u.username %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
 
-  <div style="display: flex; gap: 1.2rem; justify-content: flex-start;">
-    <button type="submit" style="
-      background-color: #007AFF;
-      color: white;
-      border: none;
-      border-radius: 17px;
-      font-size: 1.18rem;
-      font-weight: 700;
-      padding: 14px 30px;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0, 122, 255, 0.45);
-      transition: background-color 0.3s ease;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
-    " onmouseenter="this.style.backgroundColor='#005BBB'; this.style.boxShadow='0 8px 16px rgba(0, 91, 187, 0.6)';" onmouseleave="this.style.backgroundColor='#007AFF'; this.style.boxShadow='0 6px 12px rgba(0, 122, 255, 0.45)';">
-      ➕ Eintragen
-    </button>
-    <a href="/penalties" style="
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 28px;
-      font-size: 1.16rem;
-      font-weight: 600;
-      border-radius: 17px;
-      border: 2px solid #007AFF;
-      color: #007AFF;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
-    " onmouseenter="this.style.backgroundColor='#007AFF'; this.style.color='white';" onmouseleave="this.style.backgroundColor='transparent'; this.style.color='#007AFF';">
-      Abbrechen
-    </a>
-  </div>
-</form>
+    <div class="pform-field">
+      <span class="pform-field-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+      <div class="pform-field-body">
+        <label for="type">Grund</label>
+        <input type="text" id="type" name="type" required placeholder="z.B. Versp&auml;tung">
+      </div>
+    </div>
+
+    <div class="pform-field">
+      <span class="pform-field-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e05a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      <div class="pform-field-body">
+        <label for="event_select">Veranstaltung</label>
+        <% if (eventCatalog && eventCatalog.length > 0) { %>
+          <select id="event_select" style="width:100%;padding:0;font-size:1rem;font-family:inherit;font-weight:600;border:none;background:transparent;color:#1b2e2b;outline:none;appearance:none;-webkit-appearance:none;min-height:1.5rem" onchange="addEventSelectChange(this)">
+            <option value="" disabled selected>Veranstaltung w&auml;hlen&hellip;</option>
+            <% eventCatalog.forEach(e => { %>
+              <option value="<%= e.label %>"><%= e.label %></option>
+            <% }) %>
+            <option value="__manual__">&#9998; Manuell eingeben&hellip;</option>
+          </select>
+        <% } %>
+        <input type="text" id="event" name="event" required
+          placeholder="Veranstaltung eingeben"
+          style="<%= (eventCatalog && eventCatalog.length > 0) ? 'display:none;' : '' %>width:100%;padding:0;font-size:1rem;font-family:inherit;font-weight:600;border:none;background:transparent;color:#1b2e2b;outline:none;min-height:1.5rem">
+      </div>
+    </div>
+
+    <div class="pform-field">
+      <span class="pform-field-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22a06b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+      <div class="pform-field-body">
+        <label for="amount">Betrag (&euro;)</label>
+        <input type="number" id="amount" name="amount" required min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+      </div>
+    </div>
+
+    <div class="pform-field">
+      <span class="pform-field-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7db3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+      <div class="pform-field-body">
+        <label for="date">Datum</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+    </div>
+
+    <div class="pform-field">
+      <span class="pform-field-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"/><circle cx="16" cy="12" r="3"/></svg></span>
+      <div class="pform-field-body">
+        <label for="status">Status</label>
+        <select id="status" name="status" required>
+          <option value="offen" selected>&#128308; Offen</option>
+          <option value="bezahlt">&#128994; Bezahlt</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="pform-actions">
+      <button type="submit" class="pform-btn-submit">&#10133;&nbsp;Eintragen</button>
+      <a href="/penalties" class="pform-btn-cancel">Abbrechen</a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Strafenkatalog-Chips
+  (() => {
+    const buttons = Array.from(document.querySelectorAll('.catalog-btn'));
+    const tariffSelect = document.getElementById('catalog_tariff');
+    const typeInput = document.getElementById('type');
+    const amountInput = document.getElementById('amount');
+
+    if (!buttons.length || !tariffSelect || !typeInput || !amountInput) return;
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amount = tariffSelect.value === 'under18' ? btn.dataset.under : btn.dataset.over;
+        typeInput.value = btn.dataset.label || '';
+        amountInput.value = Number.parseFloat(amount || '0').toFixed(2);
+
+        buttons.forEach(other => other.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  })();
+
+  // Veranstaltungs-Select
+  function addEventSelectChange(sel) {
+    const textInput = document.getElementById('event');
+    if (!textInput) return;
+    if (sel.value === '__manual__') {
+      textInput.style.display = 'block';
+      textInput.value = '';
+      textInput.focus();
+    } else {
+      textInput.style.display = 'none';
+      textInput.value = sel.value;
+    }
+  }
+</script>

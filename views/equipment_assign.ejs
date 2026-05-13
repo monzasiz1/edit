@@ -1,0 +1,395 @@
+<style>
+  .assign-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+  @media (min-width: 820px) {
+    .assign-grid { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  }
+  .assign-card-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .assign-card-title svg { width: 18px; height: 18px; color: #1a7a45; flex-shrink: 0; }
+
+  .assign-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .assign-item {
+    padding: 0.8rem 0.9rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .assign-item-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .assign-item-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.95rem;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+  }
+  .assign-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.55rem;
+    font-size: 0.78rem;
+    color: #6b7280;
+  }
+  .assign-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #fff;
+    border: 1px solid #e2e8e0;
+    border-radius: 999px;
+    padding: 0.1rem 0.55rem;
+  }
+  .assign-meta strong { color: #1a7a45; }
+  .assign-note {
+    font-size: 0.8rem;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.4rem 0.55rem;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .assign-return-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.55rem;
+    border: 1px solid #0e9f6e;
+    background: linear-gradient(135deg, #10b981 0%, #0e9f6e 100%);
+    color: #fff;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: transform 0.1s, box-shadow 0.14s;
+  }
+  .assign-return-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+  }
+  .assign-return-btn svg { width: 14px; height: 14px; }
+
+  .assign-empty {
+    text-align: center;
+    padding: 1.6rem 1rem;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    background: #f9fafb;
+    border: 1px dashed #e5e7eb;
+    border-radius: 10px;
+  }
+
+  /* Inline neuen Lagerort anlegen */
+  .new-holder-toggle {
+    margin-top: 0.4rem;
+    background: none;
+    border: 0;
+    color: #1a7a45;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.2rem 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .new-holder-toggle svg { width: 13px; height: 13px; }
+  .new-holder-toggle:hover { text-decoration: underline; }
+
+  .new-holder-form {
+    display: none;
+    margin-top: 0.6rem;
+    padding: 0.7rem 0.8rem;
+    background: #f6faf3;
+    border: 1px solid #d9ead9;
+    border-radius: 10px;
+    gap: 0.5rem;
+    flex-direction: column;
+  }
+  .new-holder-form.open { display: flex; }
+  .new-holder-form label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1b2e2b;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .new-holder-form .nh-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .new-holder-form input,
+  .new-holder-form select {
+    flex: 1 1 120px;
+    min-width: 0;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid #d4dfcf;
+    border-radius: 0.55rem;
+    background: #fff;
+    font-size: 0.9rem;
+    color: #1b2e2b;
+    outline: none;
+  }
+  .new-holder-form input:focus,
+  .new-holder-form select:focus {
+    border-color: #3da973;
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.15);
+  }
+  .new-holder-form .nh-actions {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .new-holder-form button[type="submit"] {
+    background: linear-gradient(135deg, #3da973 0%, #2d8f55 100%);
+    color: #fff;
+    border: 0;
+    border-radius: 0.55rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .new-holder-form button[type="button"] {
+    background: #fff;
+    color: #6b7280;
+    border: 1px solid #d4dfcf;
+    border-radius: 0.55rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Typ-Badges in Liste */
+  .holder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    margin-left: 0.35rem;
+    vertical-align: middle;
+  }
+  .holder-badge svg { width: 10px; height: 10px; }
+  .holder-badge.is-user     { color: #1a7a45; background: #e6f4ec; border: 1px solid #c5e8d2; }
+  .holder-badge.is-place    { color: #92500a; background: #fff7e6; border: 1px solid #fde2a8; }
+  .holder-badge.is-vehicle  { color: #3a5ec0; background: #e8edfb; border: 1px solid #c8d3f4; }
+  .holder-badge.is-external { color: #6b21a8; background: #f3e8fb; border: 1px solid #e0c6f6; }
+  .holder-badge.is-other    { color: #4b5563; background: #f1f5f9; border: 1px solid #d4dde6; }
+</style>
+
+<%- include('partials/zeugwart_page_styles') %>
+
+<main class="apple-dashboard">
+  <header class="page-hero">
+    <div class="page-hero-clip">
+      <div class="page-hero-orb page-hero-orb-1"></div>
+      <div class="page-hero-orb page-hero-orb-2"></div>
+    </div>
+    <div class="page-hero-content">
+      <div class="page-hero-title-wrap">
+        <span class="page-hero-kicker">Zuweisung</span>
+        <h1 class="page-hero-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <%= equipment.name %>
+        </h1>
+      </div>
+      <div class="page-hero-actions">
+        <a href="/equipment" class="page-hero-btn ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Zurück
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="apple-alert alert-success" style="margin-bottom: 16px;"><%= success %></div>
+  <% } %>
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="apple-alert alert-error" style="margin-bottom: 16px;"><%= error %></div>
+  <% } %>
+
+  <div class="assign-grid">
+    <!-- Neue Zuweisung -->
+    <div class="dev-card">
+      <h2 class="assign-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Neue Zuweisung
+      </h2>
+      <form method="POST" action="/equipment/<%= equipment.id %>/assign">
+        <div class="apple-form-group">
+          <label>Zuweisen an *</label>
+          <select name="target" class="apple-input" required>
+            <option value="">-- Ziel wählen --</option>
+            <% if (members && members.length) { %>
+              <optgroup label="Mitglieder">
+                <% members.forEach(member => { %>
+                  <option value="user:<%= member.id %>">
+                    <%= member.full_name || member.username %>
+                  </option>
+                <% }) %>
+              </optgroup>
+            <% } %>
+            <% if (holders && holders.length) { %>
+              <optgroup label="Lagerorte / Externe">
+                <% holders.forEach(h => {
+                     const typeLabel = h.holder_type === 'place' ? 'Ort'
+                                     : h.holder_type === 'vehicle' ? 'Fahrzeug'
+                                     : h.holder_type === 'external' ? 'Extern'
+                                     : 'Sonstige';
+                %>
+                  <option value="holder:<%= h.id %>">
+                    <%= h.name %> (<%= typeLabel %>)
+                  </option>
+                <% }) %>
+              </optgroup>
+            <% } %>
+          </select>
+          <button type="button" class="new-holder-toggle" id="newHolderToggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            Neuen Lagerort / Fahrzeug anlegen
+          </button>
+        </div>
+
+        <div class="apple-form-group">
+          <label>Anzahl</label>
+          <input type="number" name="quantity" class="apple-input" value="1" min="1" max="<%= equipment.quantity %>">
+          <small style="color: #6b7280;">Verfügbar: <%= equipment.quantity %></small>
+        </div>
+
+        <div class="apple-form-group">
+          <label>Notiz</label>
+          <textarea name="notes" class="apple-input" rows="2" placeholder="Optional"></textarea>
+        </div>
+
+        <button type="submit" class="dev-btn-primary">Zuweisen</button>
+      </form>
+
+      <!-- Inline-Form für neuen Lagerort/Halter -->
+      <form method="POST" action="/equipment/<%= equipment.id %>/assign/holder" class="new-holder-form" id="newHolderForm">
+        <label for="newHolderName">Neuer Lagerort / Fahrzeug / Externer</label>
+        <div class="nh-row">
+          <input type="text" name="name" id="newHolderName" placeholder="z.B. Zeughaus, Schrank A, VW T6" required maxlength="150">
+          <select name="holder_type">
+            <option value="place">Ort / Lager</option>
+            <option value="vehicle">Fahrzeug</option>
+            <option value="external">Externer (Verleih, Reparatur)</option>
+            <option value="other">Sonstiges</option>
+          </select>
+        </div>
+        <div class="nh-actions">
+          <button type="submit">Anlegen</button>
+          <button type="button" id="newHolderCancel">Abbrechen</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Aktuelle Zuweisungen -->
+    <div class="dev-card">
+      <h2 class="assign-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Aktuelle Zuweisungen (<%= assignments.length %>)
+      </h2>
+
+      <% if (assignments.length === 0) { %>
+        <div class="assign-empty">Noch keine Zuweisungen</div>
+      <% } else { %>
+        <div class="assign-list">
+          <% assignments.forEach(assignment => {
+               const isHolder = !!assignment.holder_id;
+               const targetName = isHolder
+                 ? assignment.holder_name
+                 : (assignment.full_name || assignment.username);
+               const htype = isHolder ? (assignment.holder_type || 'other') : 'user';
+               const badgeClass = 'is-' + htype;
+               const badgeLabel = htype === 'user' ? 'Mitglied'
+                                : htype === 'place' ? 'Ort'
+                                : htype === 'vehicle' ? 'Fahrzeug'
+                                : htype === 'external' ? 'Extern'
+                                : 'Sonstige';
+          %>
+            <div class="assign-item">
+              <div class="assign-item-head">
+                <span class="assign-item-name">
+                  <strong><%= targetName %></strong>
+                  <span class="holder-badge <%= badgeClass %>">
+                    <% if (htype === 'user') { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+                    <% } else if (htype === 'place') { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-7h6v7"/></svg>
+                    <% } else if (htype === 'vehicle') { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 17h22"/><path d="M3 17V9a2 2 0 0 1 2-2h11l4 4v6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+                    <% } else if (htype === 'external') { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <% } else { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01M12 8v4"/></svg>
+                    <% } %>
+                    <%= badgeLabel %>
+                  </span>
+                </span>
+                <form method="POST" action="/equipment/assignment/<%= assignment.id %>/return" style="margin: 0; flex-shrink: 0;">
+                  <button type="submit" class="assign-return-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Zurück
+                  </button>
+                </form>
+              </div>
+              <div class="assign-meta">
+                <span>Anzahl:&nbsp;<strong><%= assignment.quantity %></strong></span>
+                <span>Seit:&nbsp;<%= new Date(assignment.assigned_at).toLocaleDateString('de-DE') %></span>
+              </div>
+              <% if (assignment.notes) { %>
+                <div class="assign-note"><%= assignment.notes %></div>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<script>
+  (() => {
+    const toggle = document.getElementById('newHolderToggle');
+    const form   = document.getElementById('newHolderForm');
+    const cancel = document.getElementById('newHolderCancel');
+    if (!toggle || !form) return;
+    toggle.addEventListener('click', () => {
+      form.classList.toggle('open');
+      if (form.classList.contains('open')) {
+        const input = form.querySelector('input[name="name"]');
+        if (input) input.focus();
+      }
+    });
+    if (cancel) cancel.addEventListener('click', () => form.classList.remove('open'));
+  })();
+</script>

@@ -14,15 +14,18 @@
     Admin
   </label>
 
+  <label class="checkbox-label">
+    <input type="checkbox" name="is_board" id="is_board" <% if (userToEdit.is_board) { %>checked<% } %> />
+    Vorstand
+  </label>
+
   <button type="submit" class="ios-btn">Speichern</button>
 </form>
 <a href="/users" class="ios-link">← Zurück</a>
 
 <style>
-  @import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/sf-pro-display@latest/index.min.css');
-
   .ios-title {
-    font-family: 'SF Pro Display Variable', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     font-weight: 900;
     font-size: 2.3rem;
     margin-bottom: 2rem;
@@ -68,7 +71,7 @@
     border-radius: 1.4rem;
     border: 1.5px solid #a6d7bb;
     font-size: 1rem;
-    font-family: 'SF Pro Display Variable', 'SF Pro Display', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     color: #1b2e2b;
     background: #f7faf7;
     outline-offset: 2px;
@@ -131,7 +134,7 @@
     font-weight: 700;
     color: #16e080;
     text-decoration: none;
-    font-family: 'SF Pro Display Variable', 'SF Pro Display', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     user-select: text;
     transition: color 0.22s ease;
   }

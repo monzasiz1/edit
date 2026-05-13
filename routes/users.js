@@ -8,13 +8,18 @@ function requireAdmin(req, res, next) {
   return res.redirect('/login');
 }
 
-router.get('/', requireAdmin, async (req, res) => {
-  const users = (await db.query('SELECT id, username, is_admin FROM users ORDER BY username')).rows;
+function requireAdminOrBoard(req, res, next) {
+  if (req.session.user && (req.session.user.is_admin || req.session.user.is_board)) return next();
+  return res.redirect('/login');
+}
+
+router.get('/', requireAdminOrBoard, async (req, res) => {
+  const users = (await db.query('SELECT id, username, is_admin, is_board FROM users ORDER BY username')).rows;
   res.render('users', { user: req.session.user, users });
 });
 
-router.get('/edit/:id', requireAdmin, async (req, res) => {
-  const { rows } = await db.query('SELECT id, username, is_admin FROM users WHERE id=$1', [req.params.id]);
+router.get('/edit/:id', requireAdminOrBoard, async (req, res) => {
+  const { rows } = await db.query('SELECT id, username, is_admin, is_board FROM users WHERE id=$1', [req.params.id]);
   res.render('users_edit', {
     user: req.session.user,
     userToEdit: rows[0],
@@ -22,26 +27,29 @@ router.get('/edit/:id', requireAdmin, async (req, res) => {
   });
 });
 
-router.post('/edit/:id', requireAdmin, async (req, res) => {
-  const { username, password, is_admin } = req.body;
+router.post('/edit/:id', requireAdminOrBoard, async (req, res) => {
+  const { username, password, is_admin, is_board } = req.body;
   if (!username) {
-    return res.render('users_edit', { user: req.session.user, userToEdit: { id: req.params.id, username, is_admin }, error: 'Benutzername darf nicht leer sein!' });
+    return res.render('users_edit', { user: req.session.user, userToEdit: { id: req.params.id, username, is_admin, is_board }, error: 'Benutzername darf nicht leer sein!' });
   }
+
+  const isAdminChecked = is_admin === 'on';
+  const isBoardChecked = is_board === 'on';
 
   if (password) {
     const hash = await bcrypt.hash(password, 10);
-    await db.query('UPDATE users SET username=$1, password=$2, is_admin=$3 WHERE id=$4',
-                   [username, hash, is_admin === 'on', req.params.id]);
+    await db.query('UPDATE users SET username=$1, password=$2, is_admin=$3, is_board=$4 WHERE id=$5',
+                   [username, hash, isAdminChecked, isBoardChecked, req.params.id]);
   } else {
-    await db.query('UPDATE users SET username=$1, is_admin=$2 WHERE id=$3',
-                   [username, is_admin === 'on', req.params.id]);
+    await db.query('UPDATE users SET username=$1, is_admin=$2, is_board=$3 WHERE id=$4',
+                   [username, isAdminChecked, isBoardChecked, req.params.id]);
   }
 
   // Session updaten, falls eigener Account
   if (String(req.session.user.id) === String(req.params.id)) {
-    const { rows } = await db.query('SELECT id, username, is_admin FROM users WHERE id=$1', [req.params.id]);
+    const { rows } = await db.query('SELECT id, username, is_admin, is_board FROM users WHERE id=$1', [req.params.id]);
     const u = rows[0];
-    req.session.user = { id: u.id, username: u.username, is_admin: u.is_admin };
+    req.session.user = { id: u.id, username: u.username, is_admin: u.is_admin, is_board: u.is_board };
     await new Promise(r => req.session.save(r));
   }
 
@@ -58,7 +66,7 @@ router.get('/add', requireAdmin, (req, res) => {
 });
 
 router.post('/add', requireAdmin, async (req, res) => {
-  const { username, password, is_admin } = req.body;
+  const { username, password, is_admin, is_board } = req.body;
   if (!username || !password) {
     return res.render('users_add', { user: req.session.user, error: 'Benutzername und Passwort dürfen nicht leer sein!' });
   }
@@ -67,7 +75,7 @@ router.post('/add', requireAdmin, async (req, res) => {
     return res.render('users_add', { user: req.session.user, error: 'Benutzername existiert bereits!' });
   }
   const hash = await bcrypt.hash(password, 10);
-  await db.query('INSERT INTO users(username,password,is_admin) VALUES($1,$2,$3)', [username, hash, is_admin === 'on']);
+  await db.query('INSERT INTO users(username,password,is_admin,is_board) VALUES($1,$2,$3,$4)', [username, hash, is_admin === 'on', is_board === 'on']);
   res.redirect('/users');
 });
 

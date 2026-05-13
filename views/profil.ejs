@@ -1,162 +1,1633 @@
-<div class="profil-card ios-fadein">
-  <h2 class="ios-title">Profil bearbeiten</h2>
+<style>
+  /* ===== Moderne Profilseite ===== */
+  .profil-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 0 5rem;
+    position: relative;
+  }
 
-  <!-- Name ändern -->
-  <form action="/profil/name" method="POST" class="ios-form" novalidate>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" value="<%= user.username %>" required autocomplete="name" />
-    <% if (nameMsg) { %>
-      <div class="msg-success" role="alert"><%= nameMsg %></div>
+  /* --- Profil-Header --- */
+  .profil-header {
+    background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+    border-radius: 1.35rem 1.35rem 2rem 2rem;
+    padding: 2rem 1.4rem 1.8rem;
+    margin: -0.55rem -0.25rem 1.8rem;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    border: 1px solid rgba(160, 212, 183, 0.35);
+    box-shadow: 0 12px 28px rgba(27, 88, 58, 0.28), 0 3px 10px rgba(0, 0, 0, 0.08);
+  }
+  .profil-header::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .profil-header::after {
+    content: '';
+    position: absolute;
+    left: 1.2rem;
+    right: 1.2rem;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.55), rgba(255,255,255,0.02));
+    pointer-events: none;
+  }
+
+  /* Avatar Upload Bereich */
+  .profil-avatar-section {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  .profil-avatar-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .profil-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.3);
+    background: linear-gradient(135deg, #3dba78 0%, #1e6b42 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+  .profil-avatar:hover { transform: scale(1.05); }
+  .profil-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .profil-avatar-upload {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+  }
+  .profil-avatar-upload:hover { transform: scale(1.1); }
+  .profil-avatar-upload svg {
+    width: 18px;
+    height: 18px;
+    color: #2d6a45;
+  }
+
+  .profil-name {
+    position: relative;
+    display: inline-block;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: #d6e6dc;
+    margin: 0 0 0.5rem;
+    padding-bottom: 4px;
+    text-shadow:
+      0 -1px 0 rgba(0,0,0,0.55),
+      0 -2px 2px rgba(0,0,0,0.25),
+      0 1px 0 rgba(255,255,255,0.32),
+      0 2px 2px rgba(255,255,255,0.14);
+  }
+  .profil-name::after {
+    content: '';
+    position: absolute;
+    left: 4px; right: 4px; bottom: -2px;
+    height: 2px; border-radius: 99px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.06) 70%, transparent 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.30);
+  }
+  .profil-role {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.15);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+  }
+
+  /* --- Stats --- */
+  .profil-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 1.6rem;
+    padding: 0.7rem;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 1.1rem;
+    backdrop-filter: blur(8px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .profil-stat {
+    text-align: center;
+    position: relative;
+    padding: 0.5rem 0.3rem;
+  }
+  .profil-stat + .profil-stat::before {
+    content: '';
+    position: absolute; left: 0; top: 18%; bottom: 18%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent);
+  }
+  .profil-stat-val {
+    display: block;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 1.7rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #e8f4ec;
+    text-shadow:
+      0 -1px 0 rgba(0,0,0,0.55),
+      0 1px 0 rgba(255,255,255,0.22),
+      0 2px 6px rgba(0,0,0,0.30);
+    font-variant-numeric: tabular-nums;
+  }
+  .profil-stat-label {
+    display: block;
+    font-size: 0.66rem;
+    color: rgba(255,255,255,0.72);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-top: 0.35rem;
+  }
+
+  /* --- Content Cards --- */
+  .profil-content {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .profil-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 1.2rem;
+    border: 1px solid rgba(100,170,130,0.15);
+    box-shadow: 0 4px 24px rgba(61,169,115,0.08);
+    padding: 0;
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+  }
+  /* <details> Reset */
+  details.profil-card > summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+  }
+  details.profil-card > summary::-webkit-details-marker { display: none; }
+  details.profil-card > summary::marker { display: none; }
+
+  .profil-card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1a3d2a;
+    margin: 0;
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+    transition: background 0.15s;
+  }
+  details.profil-card > summary.profil-card-title:hover {
+    background: rgba(61,169,115,0.05);
+  }
+  .profil-card-title svg.profil-card-icon {
+    width: 22px;
+    height: 22px;
+    color: #2d6a45;
+    flex-shrink: 0;
+  }
+  .profil-card-chevron {
+    margin-left: auto;
+    width: 20px;
+    height: 20px;
+    color: #6b8c75;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+  details.profil-card[open] .profil-card-chevron { transform: rotate(180deg); }
+  .profil-card-body {
+    padding: 0.2rem 1.4rem 1.4rem;
+    border-top: 1px solid rgba(100,170,130,0.10);
+    animation: profil-card-fade 0.22s ease;
+  }
+  @keyframes profil-card-fade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Formulare */
+  .profil-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .profil-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .profil-form-label {
+    font-weight: 600;
+    color: #2d6a45;
+    font-size: 0.9rem;
+  }
+  .profil-form-input {
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(100,170,130,0.2);
+    border-radius: 0.8rem;
+    background: #f8fdf9;
+    font-size: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+  }
+  .profil-form-input:focus {
+    border-color: #3d8c5e;
+    background: #fff;
+  }
+  .profil-form-btn {
+    background: linear-gradient(135deg, #3d8c5e 0%, #2d6a45 100%);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 0.8rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    align-self: flex-start;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  .profil-form-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(61,140,94,0.3);
+  }
+  .profil-form-btn:active { transform: translateY(0); }
+
+  /* Messages */
+  .profil-msg {
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+  .profil-msg.success {
+    background: rgba(34,197,94,0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34,197,94,0.2);
+  }
+  .profil-msg.error {
+    background: rgba(239,68,68,0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239,68,68,0.2);
+  }
+
+  /* Aktivitäten */
+  .profil-activity {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .profil-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(100,170,130,0.05);
+    border-radius: 0.6rem;
+    border-left: 3px solid #3d8c5e;
+  }
+  .profil-activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(61,140,94,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .profil-activity-icon svg,
+  .profil-activity-icon-svg svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    color: #2d6a45;
+  }
+  .profil-activity-icon-emoji {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .profil-activity-content {
+    flex: 1;
+  }
+  .profil-activity-text {
+    font-size: 0.9rem;
+    color: #374151;
+    margin: 0;
+  }
+  .profil-activity-time {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.2rem;
+  }
+
+  /* Equipment Grid (Mein zugewiesenes Equipment) */
+  .profil-equipment-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.7rem;
+  }
+  .profil-equipment-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 0.95rem;
+    background: linear-gradient(135deg, #f7fbf8 0%, #eef6f1 100%);
+    border: 1px solid #d9ead9;
+    border-radius: 0.95rem;
+    box-shadow: 0 2px 6px rgba(60,120,80,0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .profil-equipment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(60,120,80,0.13);
+    border-color: #b8d8c0;
+  }
+  .profil-equipment-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3da973 0%, #2d8f55 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(45,143,85,0.28);
+  }
+  .profil-equipment-icon svg,
+  .profil-equipment-icon-svg svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+    color: #fff;
+  }
+  .profil-equipment-icon-emoji { font-size: 1.4rem; line-height: 1; }
+  .profil-equipment-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .profil-equipment-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+  .profil-equipment-name {
+    font-size: 0.98rem;
+    color: #15301f;
+    line-height: 1.25;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    hyphens: none;
+  }
+  .profil-equipment-qty {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #1a7a45;
+    background: #e6f4ec;
+    border: 1px solid #c5e8d2;
+    border-radius: 999px;
+    padding: 0.05rem 0.5rem;
+  }
+  .profil-equipment-cat {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #3da973;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .profil-equipment-meta {
+    font-size: 0.82rem;
+    color: #4b5563;
+    line-height: 1.35;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .profil-equipment-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.32rem;
+    margin-top: 0.18rem;
+  }
+  .profil-equipment-tag {
+    font-size: 0.7rem;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e2efe6;
+    border-radius: 999px;
+    padding: 0.08rem 0.55rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .profil-equipment-tag-warn {
+    color: #92500a;
+    background: #fff7e6;
+    border-color: #fde2a8;
+  }
+  .profil-equipment-notes {
+    font-size: 0.76rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin-top: 0.2rem;
+  }
+  @media (max-width: 640px) {
+    .profil-equipment-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+    .profil-equipment-card {
+      padding: 0.65rem 0.7rem;
+      gap: 0.55rem;
+    }
+    .profil-equipment-icon { width: 38px; height: 38px; border-radius: 10px; }
+    .profil-equipment-icon svg,
+    .profil-equipment-icon-svg svg { width: 20px; height: 20px; }
+    .profil-equipment-name { font-size: 0.85rem; }
+    .profil-equipment-cat { font-size: 0.6rem; letter-spacing: 0.05em; }
+    .profil-equipment-meta { font-size: 0.72rem; }
+    .profil-equipment-tag { font-size: 0.62rem; padding: 0.05rem 0.4rem; }
+  }
+  @media (max-width: 460px) {
+    .profil-equipment-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Rollen-Chips */
+  .profil-roles-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+  }  .profil-role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    background: linear-gradient(135deg, #3da973 0%, #1a7a45 100%);
+    color: #fff;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    box-shadow: 0 3px 10px rgba(26, 122, 69, 0.22);
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .profil-role-chip::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 6px rgba(255,255,255,0.7);
+  }
+  .profil-role-chip-admin {
+    background: linear-gradient(135deg, #e85a4f 0%, #c53b1f 100%);
+    box-shadow: 0 3px 10px rgba(197, 59, 31, 0.28);
+  }
+  .profil-role-chip-board {
+    background: linear-gradient(135deg, #4a89ee 0%, #1a56b8 100%);
+    box-shadow: 0 3px 10px rgba(26, 86, 184, 0.26);
+  }
+  .profil-role-badge {
+    display: inline-flex; align-items: center;
+    font-size: 0.62rem; font-weight: 800;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.12em 0.5em; border-radius: 999px;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.35);
+    margin-left: 0.15rem;
+  }
+  .profil-role-badge-admin { background: rgba(255,255,255,0.28); }
+  .profil-role-badge-board { background: rgba(255,255,255,0.28); }
+  .profil-roles-desc {
+    list-style: none;
+    padding: 0;
+    margin: 0.7rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .profil-roles-desc li {
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.4;
+    padding-left: 0.7rem;
+    border-left: 2px solid #c5e8d2;
+  }
+  .profil-roles-desc li strong { color: #1a3d2a; }
+
+  /* Hidden File Input */
+  .profil-avatar-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .profil-page { padding: 0 0 4rem; }
+    .profil-header {
+      border-radius: 0.9rem 0.9rem 1.4rem 1.4rem;
+      padding: 1.3rem 0.9rem 1.1rem;
+      margin: -0.25rem -0.1rem 1rem;
+    }
+    .profil-avatar { width: 88px; height: 88px; font-size: 1.7rem; border-width: 3px; }
+    .profil-avatar-upload { width: 30px; height: 30px; border-width: 2px; }
+    .profil-avatar-upload svg { width: 15px; height: 15px; }
+    .profil-avatar-section { margin-bottom: 1rem; }
+    .profil-avatar-container { margin-bottom: 0.7rem; }
+    .profil-name { font-size: 1.3rem; margin-bottom: 0.25rem; }
+    .profil-role { font-size: 0.72rem; padding: 0.22rem 0.65rem; }
+    .profil-stats {
+      gap: 0;
+      margin-top: 1.1rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 0.85rem;
+      padding: 0.55rem 0;
+      backdrop-filter: blur(6px);
+    }
+    .profil-stat { flex: 1; padding: 0 0.3rem; position: relative; }
+    .profil-stat + .profil-stat::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 18%; bottom: 18%;
+      width: 1px;
+      background: rgba(255,255,255,0.18);
+    }
+    .profil-stat-val { font-size: 1.25rem; }
+    .profil-stat-label { font-size: 0.62rem; margin-top: 0.12rem; }
+    .profil-content { gap: 0.7rem; }
+    .profil-card { border-radius: 0.95rem; }
+    .profil-card-title { padding: 0.9rem 1rem; font-size: 1rem; gap: 0.5rem; }
+    .profil-card-title svg.profil-card-icon { width: 19px; height: 19px; }
+    .profil-card-chevron { width: 17px; height: 17px; }
+    .profil-card-body { padding: 0.4rem 1rem 1rem; }
+    .profil-form { gap: 0.75rem; }
+    .profil-form-input { padding: 0.65rem 0.85rem; font-size: 0.95rem; border-radius: 0.7rem; }
+    .profil-form-btn { width: 100%; padding: 0.75rem 1.2rem; align-self: stretch; text-align: center; }
+    .profil-form-label { font-size: 0.82rem; }
+    .profil-role-chip { font-size: 0.75rem; padding: 0.32rem 0.7rem; }
+    .profil-activity-item { padding: 0.6rem; gap: 0.6rem; }
+    .profil-activity-icon { width: 28px; height: 28px; }
+    .profil-activity-icon svg { width: 15px; height: 15px; }
+    .profil-activity-text { font-size: 0.82rem; }
+    .profil-activity-time { font-size: 0.7rem; }
+  }
+</style>
+
+<div class="profil-page">
+
+  <!-- Profil Header -->
+  <div class="profil-header">
+    <div class="profil-avatar-section">
+      <div class="profil-avatar-container">
+        <div class="profil-avatar" id="profil-avatar">
+          <% if (user.avatar) { %>
+            <img src="<%= user.avatar %>" alt="Avatar" />
+          <% } else { %>
+            <%= user.username.slice(0,2).toUpperCase() %>
+          <% } %>
+        </div>
+        <div class="profil-avatar-upload" onclick="document.getElementById('avatar-input').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h1.586a1 1 0 0 1 .707.293l.707.707A1 1 0 0 0 12.414 11H13m-3 3v3m0 0v3m0-3h3m-3 0H6"/>
+          </svg>
+        </div>
+      </div>
+      <h1 class="profil-name"><%= user.username %></h1>
+      <span class="profil-role">
+        <%= user.is_board ? 'Vorstand' : user.is_admin ? 'Spieß' : 'Mitglied' %>
+      </span>
+    </div>
+
+    <div class="profil-stats">
+      <div class="profil-stat">
+        <span class="profil-stat-val"><%= userStats ? userStats.penalties : 0 %></span>
+        <span class="profil-stat-label">Strafen</span>
+      </div>
+      <div class="profil-stat">
+        <span class="profil-stat-val"><%= userStats ? userStats.events : 0 %></span>
+        <span class="profil-stat-label">Events</span>
+      </div>
+      <div class="profil-stat">
+        <span class="profil-stat-val"><%= userStats ? userStats.amount : 0 %>€</span>
+        <span class="profil-stat-label">Gesamt</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="profil-content">
+
+    <!-- Persönliche Informationen -->
+    <details class="profil-card" open>
+      <summary class="profil-card-title">
+        <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/>
+        </svg>
+        Persönliche Informationen
+        <svg class="profil-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div class="profil-card-body">
+
+      <form action="/profil/name" method="POST" class="profil-form">
+        <div class="profil-form-group">
+          <label class="profil-form-label">Benutzername</label>
+          <input type="text" name="name" value="<%= user.username %>" class="profil-form-input" required />
+        </div>
+        <% if (nameMsg) { %>
+          <div class="profil-msg success"><%= nameMsg %></div>
+        <% } %>
+        <% if (nameErr) { %>
+          <div class="profil-msg error"><%= nameErr %></div>
+        <% } %>
+        <button type="submit" class="profil-form-btn">Speichern</button>
+      </form>
+      </div>
+    </details>
+
+    <!-- Sicherheit -->
+    <details class="profil-card">
+      <summary class="profil-card-title">
+        <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <circle cx="12" cy="16" r="1"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Sicherheit
+        <svg class="profil-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div class="profil-card-body">
+
+      <form action="/profil/passwort" method="POST" class="profil-form">
+        <div class="profil-form-group">
+          <label class="profil-form-label">Altes Passwort</label>
+          <input type="password" name="oldpw" class="profil-form-input" required />
+        </div>
+        <div class="profil-form-group">
+          <label class="profil-form-label">Neues Passwort</label>
+          <input type="password" name="newpw" class="profil-form-input" minlength="6" required />
+        </div>
+        <% if (pwMsg) { %>
+          <div class="profil-msg success"><%= pwMsg %></div>
+        <% } %>
+        <% if (pwErr) { %>
+          <div class="profil-msg error"><%= pwErr %></div>
+        <% } %>
+        <button type="submit" class="profil-form-btn">Passwort ändern</button>
+      </form>
+      </div>
+    </details>
+
+    <!-- Equipment-Männchen (Vereinsausstattung) -->
+    <% if (assignedEquipment && assignedEquipment.length > 0) { %>
+      <details class="profil-card">
+        <summary class="profil-card-title">
+          <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="5" r="3"/>
+            <path d="M12 8v6"/>
+            <path d="M9 11l-3 3"/>
+            <path d="M15 11l3 3"/>
+            <path d="M12 14l-3 7"/>
+            <path d="M12 14l3 7"/>
+          </svg>
+          Meine Vereinsausstattung
+          <svg class="profil-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="profil-card-body">
+
+        <%
+          const _slotOrder = ['head','neck','torso','handLeft','handRight','hands','legs','feet'];
+          const _equippedAny = _slotOrder.some(k => (equipmentSlots[k] || []).length > 0);
+        %>
+
+        <div class="equip-figure-wrap">
+          <!-- Männchen (puppe.png + Overlay-Dots) -->
+          <div class="equip-figure">
+            <div class="equip-puppet-wrap" id="equip-puppet-wrap">
+              <img src="/puppe.png" alt="Vereinsausstattung" class="equip-puppet-img" />
+
+              <!-- Floating Tooltip -->
+              <div class="puppet-tooltip" id="puppet-tooltip" role="tooltip" aria-hidden="true">
+                <button class="puppet-tooltip-close" id="puppet-tooltip-close" type="button" aria-label="Schließen">✕</button>
+                <div class="puppet-tooltip-body" id="puppet-tooltip-body"></div>
+              </div>
+
+              <!-- Körperteil-Overlays -->
+              <div class="puppet-dot puppet-dot-head  <%= equipmentSlots.head.length   ? 'equipped' : '' %>" data-slot="head"      data-label="Kopf"        <%= equipmentSlots.head.length   ? 'tabindex="0"' : '' %>></div>
+              <div class="puppet-dot puppet-dot-neck  <%= equipmentSlots.neck.length   ? 'equipped' : '' %>" data-slot="neck"      data-label="Hals"        <%= equipmentSlots.neck.length   ? 'tabindex="0"' : '' %>></div>
+              <div class="puppet-dot puppet-dot-torso <%= equipmentSlots.torso.length  ? 'equipped' : '' %>" data-slot="torso"     data-label="Oberkörper"  <%= equipmentSlots.torso.length  ? 'tabindex="0"' : '' %>></div>
+              <div class="puppet-dot puppet-dot-hleft <%= (equipmentSlots.handLeft.length || equipmentSlots.hands.length) ? 'equipped' : '' %>" data-slot="handLeft"  data-label="Linke Hand"  <%= (equipmentSlots.handLeft.length || equipmentSlots.hands.length) ? 'tabindex="0"' : '' %>></div>
+              <div class="puppet-dot puppet-dot-hright <%= (equipmentSlots.handRight.length || equipmentSlots.hands.length) ? 'equipped' : '' %>" data-slot="handRight" data-label="Rechte Hand" <%= (equipmentSlots.handRight.length || equipmentSlots.hands.length) ? 'tabindex="0"' : '' %>></div>
+              <div class="puppet-dot puppet-dot-legs  <%= equipmentSlots.legs.length   ? 'equipped' : '' %>" data-slot="legs"      data-label="Beine"       <%= equipmentSlots.legs.length   ? 'tabindex="0"' : '' %>></div>
+              <div class="puppet-dot puppet-dot-feet  <%= equipmentSlots.feet.length   ? 'equipped' : '' %>" data-slot="feet"      data-label="Füße"        <%= equipmentSlots.feet.length   ? 'tabindex="0"' : '' %>></div>
+            </div>
+            <!-- Equipment-Daten für JS -->
+            <script id="equip-slots-data" type="application/json"><%- JSON.stringify({
+              head:      (equipmentSlots.head      || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              neck:      (equipmentSlots.neck      || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              torso:     (equipmentSlots.torso     || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              handLeft:  (equipmentSlots.handLeft  || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              handRight: (equipmentSlots.handRight || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              hands:     (equipmentSlots.hands     || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              legs:      (equipmentSlots.legs      || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};}),
+              feet:      (equipmentSlots.feet      || []).map(function(i){return{name:i.name,description:i.description,serial_number:i.serial_number,quantity:i.quantity};})
+            }).replace(/<\/script/gi, '<\\/script') %></script>
+          </div>
+
+          <!-- Legende -->
+          <div class="equip-legend">
+            <%
+              const _totalItems = _slotOrder.reduce((s, k) => s + (equipmentSlots[k] || []).length, 0)
+                                + (equipmentSlots.other || []).length;
+              const _slotsCount = _slotOrder.filter(k => (equipmentSlots[k] || []).length).length
+                                + ((equipmentSlots.other || []).length ? 1 : 0);
+            %>
+            <div class="equip-summary">
+              <div class="equip-summary-stat">
+                <span class="equip-summary-value"><%= _totalItems %></span>
+                <span class="equip-summary-label"><%= _totalItems === 1 ? 'Gegenstand' : 'Gegenstände' %></span>
+              </div>
+              <div class="equip-summary-divider"></div>
+              <div class="equip-summary-stat">
+                <span class="equip-summary-value"><%= _slotsCount %></span>
+                <span class="equip-summary-label"><%= _slotsCount === 1 ? 'Position' : 'Positionen' %></span>
+              </div>
+            </div>
+
+            <% if (!_equippedAny && !(equipmentSlots.other || []).length) { %>
+              <p class="equip-legend-empty">
+                Es konnten keine Items einem Körperteil zugeordnet werden.<br>
+                Tipp: Items wie „Jacke", „Hose", „Schuhe", „Hut" oder Instrumente werden automatisch erkannt.
+              </p>
+            <% } %>
+
+            <ul class="equip-slot-list">
+              <% _slotOrder.forEach(slot => { %>
+                <% const items = equipmentSlots[slot] || []; %>
+                <% if (items.length) { %>
+                  <li class="equip-slot" data-slot="<%= slot %>">
+                    <div class="equip-slot-head">
+                      <span class="equip-slot-dot" aria-hidden="true"></span>
+                      <span class="equip-slot-label"><%= bodyPartLabels[slot] %></span>
+                      <span class="equip-slot-count"><%= items.length %></span>
+                    </div>
+                    <ul class="equip-slot-items">
+                      <% items.forEach(it => { %>
+                        <li class="equip-item">
+                          <div class="equip-item-name">
+                            <span><%= it.name %></span>
+                            <% if (it.quantity > 1) { %><span class="equip-qty">×<%= it.quantity %></span><% } %>
+                          </div>
+                          <% if (it.description) { %><div class="equip-item-desc"><%= it.description %></div><% } %>
+                          <% const _tags = []; if (it.serial_number) _tags.push({ k: 'SN', v: it.serial_number }); if (it.condition && it.condition !== 'gut') _tags.push({ k: 'Zustand', v: it.condition, warn: true }); %>
+                          <% if (_tags.length) { %>
+                            <div class="equip-item-tags">
+                              <% _tags.forEach(t => { %>
+                                <span class="equip-tag <%= t.warn ? 'equip-tag-warn' : '' %>"><span class="equip-tag-k"><%= t.k %></span><span class="equip-tag-v"><%= t.v %></span></span>
+                              <% }) %>
+                            </div>
+                          <% } %>
+                          <% if (it.notes) { %><div class="equip-item-notes"><%= it.notes %></div><% } %>
+                        </li>
+                      <% }) %>
+                    </ul>
+                  </li>
+                <% } %>
+              <% }) %>
+              <% if ((equipmentSlots.other || []).length) { %>
+                <li class="equip-slot equip-slot-other">
+                  <div class="equip-slot-head">
+                    <span class="equip-slot-dot equip-slot-dot-other" aria-hidden="true"></span>
+                    <span class="equip-slot-label">Sonstiges</span>
+                    <span class="equip-slot-count"><%= equipmentSlots.other.length %></span>
+                  </div>
+                  <ul class="equip-slot-items">
+                    <% equipmentSlots.other.forEach(it => { %>
+                      <li class="equip-item">
+                        <div class="equip-item-name">
+                          <span><%= it.name %></span>
+                          <% if (it.quantity > 1) { %><span class="equip-qty">×<%= it.quantity %></span><% } %>
+                        </div>
+                        <% if (it.description) { %><div class="equip-item-desc"><%= it.description %></div><% } %>
+                        <% const _tags2 = []; if (it.serial_number) _tags2.push({ k: 'SN', v: it.serial_number }); if (it.condition && it.condition !== 'gut') _tags2.push({ k: 'Zustand', v: it.condition, warn: true }); %>
+                        <% if (_tags2.length) { %>
+                          <div class="equip-item-tags">
+                            <% _tags2.forEach(t => { %>
+                              <span class="equip-tag <%= t.warn ? 'equip-tag-warn' : '' %>"><span class="equip-tag-k"><%= t.k %></span><span class="equip-tag-v"><%= t.v %></span></span>
+                            <% }) %>
+                          </div>
+                        <% } %>
+                        <% if (it.notes) { %><div class="equip-item-notes"><%= it.notes %></div><% } %>
+                      </li>
+                    <% }) %>
+                  </ul>
+                </li>
+              <% } %>
+            </ul>
+          </div>
+        </div>
+        </div>
+      </details>
     <% } %>
-    <% if (nameErr) { %>
-      <div class="msg-error" role="alert"><%= nameErr %></div>
+
+    <style>
+      .equip-figure-wrap {
+        display: grid;
+        grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+        gap: 1.5rem;
+        align-items: start;
+        padding: 0.75rem 1rem 1rem;
+      }
+      .equip-figure {
+        display: flex;
+        justify-content: center;
+        background: #f5f7f5;
+        border-radius: 20px;
+        border: 1px solid #d5e8dd;
+        padding: 0.75rem 0.5rem 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      }
+
+      /* Puppe + Overlay-Dots */
+      .equip-puppet-wrap {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        max-width: 340px;
+        pointer-events: auto;
+      }
+      .equip-puppet-img {
+        width: 100%;
+        height: auto;
+        display: block;
+        user-select: none;
+        pointer-events: none;
+        border-radius: 10px;
+      }
+
+      /* Overlay-Dot: Basis */
+      .puppet-dot {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: rgba(200,220,210,0.2);
+        border: 1px solid rgba(100,180,140,0.15);
+        transform: translate(-50%, -50%);
+        transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+        pointer-events: none;
+        cursor: default;
+        z-index: 1;
+      }
+      /* Ausgerüstet: klickbar + Glow-Puls */
+      .puppet-dot.equipped {
+        background: #3da973;
+        border-color: #1a7a45;
+        box-shadow: 0 0 0 3px rgba(61,169,115,0.28), 0 0 12px rgba(61,169,115,0.5);
+        animation: dot-pulse 2s infinite;
+        pointer-events: auto;
+        cursor: pointer;
+        z-index: 10;
+      }
+      .puppet-dot.equipped:hover,
+      .puppet-dot.equipped:focus-visible {
+        transform: translate(-50%, -50%) scale(1.6);
+        background: #1a7a45;
+        outline: none;
+        animation: none;
+        box-shadow: 0 0 0 5px rgba(61,169,115,0.35), 0 0 18px rgba(61,169,115,0.6);
+        z-index: 20;
+      }
+      .puppet-dot.active {
+        transform: translate(-50%, -50%) scale(1.65) !important;
+        background: #1a7a45 !important;
+        box-shadow: 0 0 0 5px rgba(61,169,115,0.35), 0 0 18px rgba(61,169,115,0.6) !important;
+        animation: none !important;
+        z-index: 20 !important;
+      }
+      @keyframes dot-pulse {
+        0%, 100% { box-shadow: 0 0 0 3px rgba(61,169,115,0.25), 0 0 10px rgba(61,169,115,0.4); }
+        50%       { box-shadow: 0 0 0 7px rgba(61,169,115,0.15), 0 0 16px rgba(61,169,115,0.55); }
+      }
+
+      /* Positionen (Prozent relativ zur Bildgröße) */
+      .puppet-dot-head   { left: 50%;  top: 10%; }
+      .puppet-dot-neck   { left: 50%;  top: 19%; }
+      .puppet-dot-torso  { left: 50%;  top: 33%; }
+      .puppet-dot-hleft  { left: 28%;  top: 46%; }
+      .puppet-dot-hright { left: 68%;  top: 46%; }
+      .puppet-dot-legs   { left: 50%;  top: 65%; }
+      .puppet-dot-feet   { left: 50%;  top: 88%; }
+
+      /* Floating Tooltip */
+      .puppet-tooltip {
+        position: absolute;
+        z-index: 100;
+        background: #fff;
+        border: 1px solid #c5e8d2;
+        border-radius: 12px;
+        padding: 0.65rem 2rem 0.65rem 0.9rem;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.06);
+        min-width: 140px;
+        max-width: 210px;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.18s, visibility 0s linear 0.18s, transform 0.18s;
+        transform: scale(0.94) translateY(3px);
+        pointer-events: none;
+        font-size: 0.82rem;
+        color: #1b2e2b;
+        line-height: 1.4;
+      }
+      .puppet-tooltip.visible {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.18s, visibility 0s linear 0s, transform 0.18s;
+        transform: scale(1) translateY(0);
+        pointer-events: all;
+      }
+      .puppet-tooltip-label {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: #3da973;
+        margin-bottom: 0.4rem;
+      }
+      .puppet-tooltip ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.28rem;
+      }
+      .puppet-tooltip li strong { font-size: 0.87rem; }
+      .puppet-tooltip li small {
+        display: block;
+        color: #6b7280;
+        font-size: 0.74rem;
+      }
+      .puppet-tooltip-close {
+        position: absolute;
+        top: 0.3rem;
+        right: 0.32rem;
+        width: 20px; height: 20px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 0.72rem;
+        color: #9ca3af;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        line-height: 1;
+        transition: background 0.14s, color 0.14s;
+      }
+      .puppet-tooltip-close:hover { background: #f3f4f6; color: #374151; }
+
+      /* Desktop: Figur größer */
+      @media (min-width: 681px) {
+        .equip-figure-wrap {
+          grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+        }
+        .equip-puppet-wrap {
+          max-width: 360px;
+        }
+        .puppet-dot {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .equip-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+      }
+
+      /* Summary-Header */
+      .equip-summary {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        background: linear-gradient(135deg, #f7fbf8 0%, #eaf5ee 100%);
+        border: 1px solid #d5e8dd;
+        border-radius: 14px;
+        padding: 0.65rem 0.9rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      }
+      .equip-summary-stat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.05rem;
+        min-width: 0;
+      }
+      .equip-summary-value {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #1a7a45;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .equip-summary-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7c70;
+      }
+      .equip-summary-divider {
+        width: 1px;
+        background: linear-gradient(to bottom, transparent, #c5d8cc, transparent);
+        margin: 0 0.35rem;
+        flex-shrink: 0;
+      }
+
+      .equip-legend-empty {
+        margin: 0;
+        padding: 0.85rem 1rem;
+        background: #fff7e6;
+        border: 1px solid #fde2a8;
+        border-radius: 12px;
+        color: #8a5a14;
+        font-size: 0.85rem;
+        line-height: 1.45;
+      }
+
+      .equip-slot-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .equip-slot {
+        background: #fff;
+        border: 1px solid #e2efe6;
+        border-radius: 14px;
+        padding: 0.65rem 0.9rem 0.7rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.025);
+        min-width: 0;
+        transition: border-color 0.18s, box-shadow 0.18s;
+      }
+      .equip-slot:hover {
+        border-color: #b8d8c0;
+        box-shadow: 0 4px 14px rgba(60,120,80,0.08);
+      }
+      .equip-slot-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+      }
+      .equip-slot-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: #3da973;
+        box-shadow: 0 0 0 3px rgba(61,169,115,0.18);
+        flex-shrink: 0;
+      }
+      .equip-slot-dot-other {
+        background: #94a3a3;
+        box-shadow: 0 0 0 3px rgba(148,163,163,0.18);
+      }
+      .equip-slot-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #1b2e2b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+        flex: 1;
+      }
+      .equip-slot-count {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #1a7a45;
+        background: #e6f4ec;
+        border: 1px solid #c5e8d2;
+        border-radius: 999px;
+        padding: 0.08rem 0.5rem;
+        flex-shrink: 0;
+      }
+      .equip-slot-other .equip-slot-count {
+        color: #475569;
+        background: #f1f5f4;
+        border-color: #d8e2df;
+      }
+
+      /* Items innerhalb eines Slots */
+      .equip-slot-items {
+        list-style: none;
+        margin: 0.5rem 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .equip-item {
+        position: relative;
+        padding: 0.45rem 0.65rem 0.5rem 0.85rem;
+        background: #fafdfb;
+        border-radius: 10px;
+        border-left: 3px solid #c5e8d2;
+        min-width: 0;
+      }
+      .equip-slot-other .equip-item { border-left-color: #d8e2df; }
+
+      .equip-item-name {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #1b2e2b;
+        line-height: 1.25;
+        word-break: break-word;
+      }
+      .equip-qty {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #fff;
+        background: #1a7a45;
+        padding: 0.05rem 0.4rem;
+        border-radius: 999px;
+        flex-shrink: 0;
+      }
+      .equip-item-desc {
+        margin-top: 0.18rem;
+        font-size: 0.8rem;
+        color: #4b5563;
+        line-height: 1.4;
+      }
+      .equip-item-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        margin-top: 0.35rem;
+      }
+      .equip-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 0.22rem 0.45rem 0.22rem 0.4rem;
+        border-radius: 6px;
+        background: #f1f5f4;
+        color: #475569;
+        border: 1px solid #e1eae3;
+      }
+      .equip-tag .equip-tag-k {
+        font-size: 0.62rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+      }
+      .equip-tag .equip-tag-v {
+        color: #1b2e2b;
+        font-weight: 700;
+      }
+      .equip-tag.equip-tag-warn {
+        background: #fff4e6;
+        border-color: #fde2a8;
+      }
+      .equip-tag.equip-tag-warn .equip-tag-k { color: #b45309; }
+      .equip-tag.equip-tag-warn .equip-tag-v { color: #92400e; }
+
+      .equip-item-notes {
+        margin-top: 0.35rem;
+        padding: 0.32rem 0.55rem;
+        background: #fffdf5;
+        border: 1px dashed #f0d99a;
+        border-radius: 6px;
+        font-size: 0.76rem;
+        font-style: italic;
+        color: #8a6a14;
+        line-height: 1.35;
+      }
+
+      /* Mobile: gestapelt */
+      @media (max-width: 640px) {
+        .equip-figure-wrap {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          padding: 0.6rem 0.85rem 0.85rem;
+        }
+        .equip-figure {
+          padding: 0.5rem;
+        }
+        .equip-puppet-wrap {
+          max-width: 280px;
+          margin: 0 auto;
+        }
+      }
+    </style>
+
+    <script>
+    (function () {
+      var wrap    = document.getElementById('equip-puppet-wrap');
+      var tooltip = document.getElementById('puppet-tooltip');
+      var tipBody = document.getElementById('puppet-tooltip-body');
+      var tipClose= document.getElementById('puppet-tooltip-close');
+      if (!wrap || !tooltip) return;
+
+      // Equipment-Daten lesen
+      var dataEl = document.getElementById('equip-slots-data');
+      var equipData = {};
+      try { equipData = JSON.parse(dataEl ? dataEl.textContent : '{}'); } catch(e) {}
+
+      var hideTimer = null;
+
+      function esc(s) {
+        return String(s || '')
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      function buildHtml(slot, label) {
+        var items = (equipData[slot] || []).slice();
+        // handLeft / handRight bekommen auch allgemeine 'hands'-Items
+        if (slot === 'handLeft' || slot === 'handRight') {
+          (equipData.hands || []).forEach(function(i) { items.push(i); });
+        }
+        var h = '<div class="puppet-tooltip-label">' + esc(label) + '</div>';
+        if (!items.length) {
+          h += '<em style="color:#9ca3af;font-size:0.78rem;">Kein Equipment zugewiesen</em>';
+        } else {
+          h += '<ul>';
+          items.forEach(function(it) {
+            h += '<li><strong>' + esc(it.name) + (it.quantity > 1 ? ' &times;' + it.quantity : '') + '</strong>';
+            if (it.description)   h += '<small>' + esc(it.description) + '</small>';
+            if (it.serial_number) h += '<small>SN: ' + esc(it.serial_number) + '</small>';
+            h += '</li>';
+          });
+          h += '</ul>';
+        }
+        return h;
+      }
+
+      function position(dot) {
+        var wR = wrap.getBoundingClientRect();
+        var dR = dot.getBoundingClientRect();
+        var dLeft = dR.left - wR.left + dR.width / 2;
+        var dTop  = dR.top  - wR.top  + dR.height / 2;
+        var wW = wrap.offsetWidth;
+        var wH = wrap.offsetHeight;
+
+        // Horizontal: Tooltip links oder rechts vom Dot
+        tooltip.style.left = tooltip.style.right = '';
+        if (dLeft < wW * 0.55) {
+          tooltip.style.left = Math.min(dLeft + 14, wW - 220) + 'px';
+        } else {
+          tooltip.style.right = Math.min(wW - dLeft + 14, wW - 220) + 'px';
+        }
+        // Vertikal: oben oder unten
+        tooltip.style.top = tooltip.style.bottom = '';
+        if (dTop < wH * 0.55) {
+          tooltip.style.top = (dTop + 10) + 'px';
+        } else {
+          tooltip.style.bottom = (wH - dTop + 10) + 'px';
+        }
+      }
+
+      function show(dot) {
+        cancelHide();
+        tipBody.innerHTML = buildHtml(dot.dataset.slot, dot.dataset.label || dot.dataset.slot);
+        position(dot);
+        tooltip.classList.add('visible');
+        tooltip.setAttribute('aria-hidden', 'false');
+        wrap.querySelectorAll('.puppet-dot').forEach(function(d) { d.classList.remove('active'); });
+        dot.classList.add('active');
+      }
+
+      function hide() {
+        tooltip.classList.remove('visible');
+        tooltip.setAttribute('aria-hidden', 'true');
+        wrap.querySelectorAll('.puppet-dot.active').forEach(function(d) { d.classList.remove('active'); });
+      }
+
+      function scheduleHide() { hideTimer = setTimeout(hide, 120); }
+      function cancelHide()   { clearTimeout(hideTimer); }
+
+      wrap.querySelectorAll('.puppet-dot.equipped').forEach(function(dot) {
+        // Desktop Hover
+        dot.addEventListener('mouseenter', function() { show(dot); });
+        dot.addEventListener('mouseleave', function(e) {
+          if (!tooltip.contains(e.relatedTarget)) scheduleHide();
+        });
+        // Alle Geräte: Tap/Click
+        dot.addEventListener('click', function(e) {
+          e.stopPropagation();
+          dot.classList.contains('active') ? hide() : show(dot);
+        });
+        // Tastatur
+        dot.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(dot); }
+          if (e.key === 'Escape') hide();
+        });
+      });
+
+      // Tooltip selbst: Maus drauf → nicht schließen
+      tooltip.addEventListener('mouseenter', cancelHide);
+      tooltip.addEventListener('mouseleave', scheduleHide);
+
+      // Schließ-Button
+      if (tipClose) tipClose.addEventListener('click', function(e) { e.stopPropagation(); hide(); });
+
+      // Klick außerhalb
+      document.addEventListener('click', hide);
+      wrap.addEventListener('click', function(e) { e.stopPropagation(); });
+    })();
+    </script>
+
+    <!-- Zugewiesenes Equipment -->
+    <% if (assignedEquipment && assignedEquipment.length > 0) { %>
+      <details class="profil-card">
+        <summary class="profil-card-title">
+          <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          Mein zugewiesenes Equipment
+          <svg class="profil-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="profil-card-body">
+
+        <ul class="profil-equipment-grid">
+          <% assignedEquipment.forEach(item => { %>
+            <li class="profil-equipment-card">
+              <div class="profil-equipment-icon">
+                <% if (item.category_icon_svg) { %>
+                  <span class="profil-equipment-icon-svg" aria-hidden="true"><%- item.category_icon_svg %></span>
+                <% } else if (item.category_icon_emoji) { %>
+                  <span class="profil-equipment-icon-emoji" aria-hidden="true"><%= item.category_icon_emoji %></span>
+                <% } else { %>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                  </svg>
+                <% } %>
+              </div>
+              <div class="profil-equipment-body">
+                <div class="profil-equipment-head">
+                  <strong class="profil-equipment-name"><%= item.name %></strong>
+                  <% if (item.quantity > 1) { %>
+                    <span class="profil-equipment-qty">×<%= item.quantity %></span>
+                  <% } %>
+                </div>
+                <% if (item.category_name) { %>
+                  <span class="profil-equipment-cat"><%= item.category_name %></span>
+                <% } %>
+                <% if (item.description) { %>
+                  <span class="profil-equipment-meta"><%= item.description %></span>
+                <% } %>
+                <div class="profil-equipment-tags">
+                  <% if (item.serial_number) { %>
+                    <span class="profil-equipment-tag">SN: <%= item.serial_number %></span>
+                  <% } %>
+                  <% if (item.condition && item.condition !== 'gut') { %>
+                    <span class="profil-equipment-tag profil-equipment-tag-warn">Zustand: <%= item.condition %></span>
+                  <% } %>
+                </div>
+                <% if (item.notes) { %>
+                  <span class="profil-equipment-notes"><%= item.notes %></span>
+                <% } %>
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+        </div>
+      </details>
     <% } %>
-    <button type="submit" class="ios-btn ios-btn-small">Name speichern</button>
+
+    <!-- Meine Rollen -->
+    <% if (userRoles && userRoles.length > 0) { %>
+      <details class="profil-card">
+        <summary class="profil-card-title">
+          <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Meine Rollen
+          <svg class="profil-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="profil-card-body">
+
+        <div class="profil-roles-wrap">
+          <% userRoles.forEach(role => { %>
+            <span class="profil-role-chip <%= role.is_admin ? 'profil-role-chip-admin' : (role.is_board ? 'profil-role-chip-board' : '') %>">
+              <%= role.name %>
+              <% if (role.is_admin) { %><span class="profil-role-badge profil-role-badge-admin">Admin</span><% } %>
+              <% if (role.is_board) { %><span class="profil-role-badge profil-role-badge-board">Vorstand</span><% } %>
+            </span>
+          <% }) %>
+        </div>
+
+        <% if (userRoles.some(r => r.description)) { %>
+          <ul class="profil-roles-desc">
+            <% userRoles.filter(r => r.description).forEach(role => { %>
+              <li><strong><%= role.name %>:</strong> <%= role.description %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+        </div>
+      </details>
+    <% } %>
+
+    <!-- Letzte Aktivitäten -->
+    <details class="profil-card">
+      <summary class="profil-card-title">
+        <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Letzte Aktivitäten
+        <svg class="profil-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div class="profil-card-body">
+
+      <ul class="profil-activity">
+        <% if (recentActivities && recentActivities.length > 0) { %>
+          <%
+            const ACT_ICONS = {
+              'Notiz':      { color: '#3b82f6', bg: '#dbeafe', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>' },
+              'Aufgabe':    { color: '#16a34a', bg: '#dcfce7', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' },
+              'Warnung':    { color: '#d97706', bg: '#fef3c7', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' },
+              'Erinnerung': { color: '#7c3aed', bg: '#ede9fe', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' },
+              'Belohnung':  { color: '#ca8a04', bg: '#fef9c3', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>' }
+            };
+            const ACT_DEFAULT = { color: '#dc2626', bg: '#fee2e2', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' };
+          %>
+          <% recentActivities.forEach(activity => { %>
+            <% const ic = ACT_ICONS[activity.type] || ACT_DEFAULT; %>
+            <li class="profil-activity-item" style="border-left-color: <%= ic.color %>;">
+              <div class="profil-activity-icon" style="background: <%= ic.bg %>; color: <%= ic.color %>;">
+                <%- ic.svg %>
+              </div>
+              <div class="profil-activity-content">
+                <p class="profil-activity-text"><%= activity.text %></p>
+                <span class="profil-activity-time"><%= activity.time %></span>
+              </div>
+            </li>
+          <% }); %>
+        <% } else { %>
+          <li class="profil-activity-item">
+            <div class="profil-activity-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <path d="M12 17h.01"/>
+              </svg>
+            </div>
+            <div class="profil-activity-content">
+              <p class="profil-activity-text">Noch keine Aktivitäten</p>
+              <span class="profil-activity-time">Beginne mit dem ersten Eintrag!</span>
+            </div>
+          </li>
+        <% } %>
+      </ul>
+      </div>
+    </details>
+
+  </div>
+
+  <!-- Hidden Avatar Upload Form -->
+  <form id="avatar-form" action="/profil/avatar" method="POST" enctype="multipart/form-data" style="display:none;">
+    <input type="file" id="avatar-input" name="avatar" accept="image/*" class="profil-avatar-input" />
   </form>
 
-  <hr class="ios-separator">
-
-  <!-- Passwort ändern -->
-  <form action="/profil/passwort" method="POST" autocomplete="off" class="ios-form" novalidate>
-    <label for="oldpw">Altes Passwort:</label>
-    <input type="password" id="oldpw" name="oldpw" required autocomplete="current-password" />
-    <label for="newpw">Neues Passwort:</label>
-    <input type="password" id="newpw" name="newpw" minlength="6" required autocomplete="new-password" />
-    <% if (pwMsg) { %>
-      <div class="msg-success" role="alert"><%= pwMsg %></div>
-    <% } %>
-    <% if (pwErr) { %>
-      <div class="msg-error" role="alert"><%= pwErr %></div>
-    <% } %>
-    <button type="submit" class="ios-btn ios-btn-small">Passwort ändern</button>
-  </form>
 </div>
 
-<style>
-.profil-card {
-  background: rgba(255,255,255,0.97);
-  border-radius: 1.7em;
-  box-shadow: 0 6px 32px #c9eed877, 0 1.5px 14px #54dc9737;
-  border: 1.2px solid #c8eed4;
-  padding: 2.2em 2em 1.7em 2em;
-  max-width: 390px;
-  margin: 2.5em auto 2.2em auto;
-  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, system-ui, sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 2em;
-  animation: fadein-user 0.98s both;
-}
-.ios-fadein { animation: fadein-user 0.98s both; }
+<script>
+  // Desktop: alle Karten auf-, Mobile: zusammenklappen (Pers. Infos bleibt offen)
+  (function () {
+    var isMobile = window.matchMedia('(max-width: 640px)').matches;
+    var cards = document.querySelectorAll('details.profil-card');
+    cards.forEach(function (card, idx) {
+      if (isMobile) {
+        card.open = (idx === 0);
+      } else {
+        card.open = true;
+      }
+    });
+  })();
 
-@keyframes fadein-user {
-  from { opacity: 0; transform: translateY(18px);}
-  to   { opacity: 1; transform: none;}
-}
+  // Avatar Upload Handling
+  document.getElementById('avatar-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      // Basic validation
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('Datei zu groß! Max. 5MB erlaubt.');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        alert('Bitte nur Bilddateien auswählen.');
+        return;
+      }
 
-.ios-title {
-  font-size: 2.1rem;
-  font-weight: 900;
-  color: #17432b;
-  letter-spacing: -1.1px;
-  margin: 0 0 1.3em 0;
-  background: linear-gradient(91deg, #28543a 60%, #a2ffe2 120%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 1px 10px #c9eed877);
-  text-shadow: 0 2px 5px #c8eed48c;
-}
+      // Show loading state
+      const avatar = document.getElementById('profil-avatar');
+      avatar.innerHTML = '<div style="width:40px;height:40px;border:3px solid #fff;border-top:3px solid transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>';
+      document.getElementById('avatar-form').submit();
+    }
+  });
 
-.ios-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75em;
-  background: none;
-  margin-bottom: 0;
-}
-.ios-form label {
-  font-weight: 600;
-  color: #2fa770;
-  font-size: 1.06em;
-  margin-bottom: 0.11em;
-  letter-spacing: 0.01em;
-}
-.ios-form input[type="text"],
-.ios-form input[type="password"] {
-  width: 100%;
-  padding: 0.66em 1.1em;
-  border: 1.2px solid #c8eed4;
-  border-radius: 1.1em;
-  background: #f7fdf8;
-  font-size: 1.08em;
-  font-family: inherit;
-  margin-bottom: 0.13em;
-  transition: border 0.13s, background 0.13s;
-  outline: none;
-}
-.ios-form input:focus {
-  border-color: #21a85d;
-  background: #f1fff6;
-}
+  // Drag & Drop für Avatar
+  const avatar = document.getElementById('profil-avatar');
+  avatar.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    avatar.style.borderColor = '#3d8c5e';
+  });
+  avatar.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    avatar.style.borderColor = 'rgba(255,255,255,0.3)';
+  });
+  avatar.addEventListener('drop', function(e) {
+    e.preventDefault();
+    avatar.style.borderColor = 'rgba(255,255,255,0.3)';
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      document.getElementById('avatar-input').files = files;
+      document.getElementById('avatar-input').dispatchEvent(new Event('change'));
+    }
+  });
 
-.ios-btn {
-  background: linear-gradient(91deg, #21a85d 0%, #2fa770 95%);
-  color: #fff;
-  font-weight: 800;
-  border: none;
-  border-radius: 1.3em;
-  font-size: 1.09em;
-  padding: 0.7em 1.55em;
-  margin-top: 0.7em;
-  box-shadow: 0 4px 18px #1ae68d17;
-  cursor: pointer;
-  transition: background 0.14s, box-shadow 0.14s, transform 0.12s;
-  font-family: inherit;
-  letter-spacing: 0.01em;
-}
-.ios-btn-small { font-size: 1em; padding: 0.55em 1.15em; margin-top: 0.5em; }
-.ios-btn:hover {
-  background: linear-gradient(91deg, #18984d 0%, #1bbf6c 95%);
-  box-shadow: 0 7px 26px #2fa77033;
-  transform: translateY(-2px) scale(1.03);
-}
-
-.ios-separator {
-  border: none;
-  border-top: 1.2px solid #e2efe9;
-  margin: 2em 0 2em 0;
-  opacity: 0.75;
-  background: none;
-}
-
-.msg-success, .msg-error {
-  font-size: 1em;
-  border-radius: 1em;
-  padding: 0.85em 1em;
-  margin-bottom: 0.23em;
-  margin-top: 0.2em;
-  font-weight: 600;
-  text-align: center;
-  letter-spacing: 0.01em;
-}
-.msg-success {
-  background: #f1fff3;
-  color: #20a85a;
-  border: 1.2px solid #c8eed4;
-  box-shadow: 0 1px 6px #c8eed48c;
-}
-.msg-error {
-  background: #ffe8e8;
-  color: #a02020;
-  border: 1.1px solid #ffd6d6;
-  box-shadow: 0 1px 6px #fdcaca44;
-}
-
-/* Responsive */
-@media (max-width: 700px) {
-  .profil-card { padding: 1.2em 0.7em 1.1em 0.7em; max-width: 97vw; border-radius: 1.06em;}
-  .ios-title { font-size: 1.25rem; }
-  .ios-btn, .ios-btn-small { font-size: 1em; padding: 0.51em 1em;}
-}
-</style>
+  // Loading Animation
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+  document.head.appendChild(style);
+</script>

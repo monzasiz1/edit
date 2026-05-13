@@ -1,0 +1,190 @@
+<main class="ideas-page">
+  <section class="ideas-hero">
+    <span class="ideas-kicker">Anonym</span>
+    <h1>Ideen und Vorschläge</h1>
+    <p>Hier kannst du deine Ideen und Vorschläge für unsere Gemeinschaft anonym teilen. Gespeichert wird nur der Nachrichtentext.</p>
+  </section>
+
+  <section class="ideas-panel">
+    <% if (suggestionStatus === 'sent') { %>
+      <div class="ideas-feedback success">Dein Vorschlag wurde anonym gesendet.</div>
+    <% } else if (suggestionStatus === 'empty') { %>
+      <div class="ideas-feedback error">Bitte gib zuerst einen Text ein.</div>
+    <% } else if (suggestionStatus === 'error') { %>
+      <div class="ideas-feedback error">Der Vorschlag konnte gerade nicht gespeichert werden.</div>
+    <% } %>
+
+    <form action="/suggestions" method="POST" class="ideas-form">
+      <label class="ideas-label" for="suggestion-message">Deine Idee oder dein Vorschlag</label>
+      <textarea
+        id="suggestion-message"
+        name="message"
+        class="ideas-textarea"
+        maxlength="1000"
+        rows="8"
+        placeholder="Schreib hier anonym, was verbessert, geändert oder neu umgesetzt werden sollte."
+        required
+      ></textarea>
+      <div class="ideas-actions">
+        <button type="submit" class="ideas-submit">Anonym senden</button>
+        <span class="ideas-note">Keine Nutzer-ID, kein Name, nur dein Text.</span>
+      </div>
+    </form>
+  </section>
+</main>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+
+.ideas-page {
+  max-width: 860px;
+  margin: 2.5rem auto;
+  padding: 0 1rem 2rem;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.ideas-hero {
+  padding: 2rem 2rem 1.4rem;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, rgba(240, 248, 241, 0.96), rgba(224, 240, 229, 0.96));
+  border: 1px solid #d2e5d7;
+  box-shadow: 0 14px 40px rgba(72, 120, 86, 0.12);
+}
+
+.ideas-kicker {
+  display: inline-flex;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: #e7f7ea;
+  color: #2f7a47;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ideas-hero h1 {
+  margin: 0.7rem 0 0.45rem;
+  font-size: 2.5rem;
+  line-height: 1.05;
+  color: #183b26;
+}
+
+.ideas-hero p {
+  margin: 0;
+  max-width: 640px;
+  color: #4f6858;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.ideas-panel {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 1.8rem;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #ddeae0;
+  box-shadow: 0 12px 34px rgba(86, 126, 95, 0.1);
+}
+
+.ideas-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.ideas-label {
+  font-weight: 800;
+  color: #20412d;
+}
+
+.ideas-textarea {
+  width: 100%;
+  min-height: 220px;
+  box-sizing: border-box;
+  padding: 1rem 1.1rem;
+  border-radius: 1.15rem;
+  border: 1px solid #cadecf;
+  background: #fbfdfb;
+  color: #20352a;
+  font: inherit;
+  resize: vertical;
+}
+
+.ideas-textarea:focus {
+  outline: none;
+  border-color: #5a9c6a;
+  box-shadow: 0 0 0 4px rgba(90, 156, 106, 0.14);
+}
+
+.ideas-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ideas-submit {
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.3rem;
+  background: linear-gradient(135deg, #2b7f4a, #66b56f);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ideas-note {
+  color: #617867;
+  font-size: 0.95rem;
+}
+
+.ideas-feedback {
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+}
+
+.ideas-feedback.success {
+  background: #eaf9ef;
+  color: #1f6a39;
+}
+
+.ideas-feedback.error {
+  background: #fff0f0;
+  color: #973030;
+}
+
+@media (max-width: 680px) {
+  .ideas-page { max-width: 100%; margin: 0; padding: 0 0 1.5rem 0; }
+}
+@media (max-width: 700px) {
+  .ideas-page {
+    margin-top: 1.4rem;
+    padding: 0 0.6rem 1.5rem;
+  }
+
+  .ideas-hero,
+  .ideas-panel {
+    border-radius: 1.2rem;
+    padding: 1rem;
+  }
+
+  .ideas-hero h1 {
+    font-size: 1.85rem;
+  }
+
+  .ideas-hero p {
+    font-size: 0.86rem;
+  }
+
+  .ideas-textarea {
+    min-height: 180px;
+  }
+
+  .ideas-submit {
+    width: 100%;
+  }
+}
+</style>

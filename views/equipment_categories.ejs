@@ -1,0 +1,281 @@
+<%- include('partials/zeugwart_page_styles') %>
+
+<main class="apple-dashboard">
+  <header class="page-hero">
+    <div class="page-hero-clip">
+      <div class="page-hero-orb page-hero-orb-1"></div>
+      <div class="page-hero-orb page-hero-orb-2"></div>
+    </div>
+    <div class="page-hero-content">
+      <div class="page-hero-title-wrap">
+        <span class="page-hero-kicker">Zeugwart</span>
+        <h1 class="page-hero-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Kategorien
+        </h1>
+      </div>
+      <div class="page-hero-actions">
+        <a href="/equipment" class="page-hero-btn ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Zurück
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <% if (success) { %>
+    <div class="apple-alert alert-success" style="margin-bottom: 16px;"><%= success %></div>
+  <% } %>
+  <% if (error) { %>
+    <div class="apple-alert alert-error" style="margin-bottom: 16px;"><%= error %></div>
+  <% } %>
+
+  <style>
+    /* Layout: Desktop 2 Spalten, Mobile gestapelt */
+    .cat-layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) 2fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .cat-layout { grid-template-columns: 1fr; gap: 0.85rem; }
+    }
+
+    /* Card-Titel kompakter */
+    .cat-card-title {
+      margin: 0 0 0.85rem 0;
+      font-size: 1.02rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .cat-card-title svg { width: 18px; height: 18px; color: #1a7a45; flex-shrink: 0; }
+
+    /* Icon-Picker: kompaktes Grid */
+    .icon-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+    }
+    @media (max-width: 640px) {
+      .icon-picker-grid { grid-template-columns: repeat(7, 1fr); gap: 0.32rem; }
+    }
+    @media (max-width: 420px) {
+      .icon-picker-grid { grid-template-columns: repeat(6, 1fr); }
+    }
+    @media (max-width: 340px) {
+      .icon-picker-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    .icon-picker-btn {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f6faf3;
+      border: 2px solid #e2efe6;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all .15s;
+      color: #2a3e32;
+      padding: 0;
+      min-height: 0;
+      max-height: 48px;
+    }
+    .icon-picker-btn svg { width: 19px; height: 19px; }
+    .icon-picker-btn:hover {
+      border-color: #3da973;
+      background: #e6f4ec;
+      transform: translateY(-1px);
+    }
+    .icon-picker-btn.selected {
+      background: #3da973;
+      border-color: #2d8f55;
+      color: white;
+      box-shadow: 0 3px 10px rgba(61, 169, 115, 0.32);
+    }
+    .icon-picker-hint {
+      font-size: 0.74rem;
+      color: #5a7a6a;
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    /* Kategorien-Liste */
+    .cat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.75rem;
+      background: linear-gradient(135deg, #f8fbf6 0%, #ebf3e6 100%);
+      border-radius: 10px;
+      border: 1px solid #e2efe6;
+    }
+    .cat-row-main {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+      flex: 1;
+    }
+    .cat-row-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px solid #e2efe6;
+      border-radius: 9px;
+      color: #3da973;
+    }
+    .cat-row-icon svg { width: 18px; height: 18px; }
+    .cat-row-meta { min-width: 0; flex: 1; }
+    .cat-row-meta strong {
+      display: block;
+      font-size: 0.92rem;
+      color: #1b2e2b;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.25;
+    }
+    .cat-row-meta small {
+      color: #5a7a6a;
+      font-size: 0.76rem;
+    }
+    .cat-row-del {
+      flex-shrink: 0;
+    }
+    .cat-row-del button {
+      background: transparent;
+      color: #b21414;
+      border: 1px solid #f6c6c6;
+      border-radius: 8px;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: background 0.14s;
+    }
+    .cat-row-del button:hover { background: #fde8e8; }
+    .cat-row-del button svg { width: 13px; height: 13px; }
+
+    .cat-empty {
+      padding: 1.6rem 1rem;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      background: #f9fafb;
+      border: 1px dashed #e5e7eb;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .cat-row { padding: 0.5rem 0.6rem; gap: 0.5rem; }
+      .cat-row-icon { width: 32px; height: 32px; border-radius: 8px; }
+      .cat-row-icon svg { width: 16px; height: 16px; }
+      .cat-row-meta strong { font-size: 0.88rem; }
+      .cat-row-meta small { font-size: 0.72rem; }
+    }
+  </style>
+
+  <div class="cat-layout">
+    <!-- Neue Kategorie -->
+    <div class="dev-card">
+      <h2 class="cat-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Neue Kategorie
+      </h2>
+      <form method="POST" action="/equipment/categories/add" id="catForm">
+        <div class="apple-form-group">
+          <label>Name *</label>
+          <input type="text" name="name" class="apple-input" placeholder="z.B. Saiteninstrumente" required>
+        </div>
+
+        <div class="apple-form-group">
+          <label>Icon</label>
+          <input type="hidden" name="icon" id="iconInput" value="box" required>
+          <div class="icon-picker-grid" role="radiogroup" aria-label="Icon auswählen">
+            <% availableIcons.forEach((ic, idx) => { %>
+              <button
+                type="button"
+                class="icon-picker-btn<%= idx === 0 ? ' selected' : '' %>"
+                data-key="<%= ic.key %>"
+                title="<%= ic.label %>"
+                aria-label="<%= ic.label %>"
+                role="radio"
+                aria-checked="<%= idx === 0 ? 'true' : 'false' %>"
+              ><%- ic.svg %></button>
+            <% }) %>
+          </div>
+          <small class="icon-picker-hint">Tippe ein Icon zum Auswählen.</small>
+        </div>
+
+        <button type="submit" class="dev-btn-primary">Erstellen</button>
+      </form>
+    </div>
+
+    <!-- Kategorien-Liste -->
+    <div class="dev-card">
+      <h2 class="cat-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Kategorien (<%= categories.length %>)
+      </h2>
+
+      <% if (categories.length === 0) { %>
+        <div class="cat-empty">Noch keine Kategorien angelegt.</div>
+      <% } else { %>
+        <div class="cat-list">
+          <% categories.forEach(cat => { %>
+            <div class="cat-row">
+              <div class="cat-row-main">
+                <span class="cat-row-icon"><%- cat.icon_svg %></span>
+                <div class="cat-row-meta">
+                  <strong><%= cat.name %></strong>
+                  <small><%= cat.equipment_count %> Einträge</small>
+                </div>
+              </div>
+              <% if (cat.equipment_count == 0) { %>
+                <form method="POST" action="/equipment/categories/<%= cat.id %>/delete" class="cat-row-del" onsubmit="return confirm('Kategorie <%= cat.name %> löschen?');">
+                  <button type="submit" aria-label="Löschen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  </button>
+                </form>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const grid = document.querySelector('.icon-picker-grid');
+      const input = document.getElementById('iconInput');
+      if (!grid || !input) return;
+      grid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.icon-picker-btn');
+        if (!btn) return;
+        grid.querySelectorAll('.icon-picker-btn').forEach(b => {
+          b.classList.remove('selected');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('selected');
+        btn.setAttribute('aria-checked', 'true');
+        input.value = btn.dataset.key;
+      });
+    })();
+  </script>
+</main>

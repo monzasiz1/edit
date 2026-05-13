@@ -1,0 +1,1528 @@
+<style>
+  /* Equipment Liste – mobile first */
+  .eq-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+    align-items: stretch;
+  }
+  .eq-toolbar .eq-search,
+  .eq-toolbar .eq-cat {
+    flex: 1 1 140px;
+    min-width: 0;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid #d4dfcf;
+    border-radius: 0.7rem;
+    background: #fff;
+    font-size: 0.92rem;
+    color: #1b2e2b;
+    outline: none;
+    transition: border-color 0.16s, box-shadow 0.16s;
+  }
+  .eq-toolbar .eq-search:focus,
+  .eq-toolbar .eq-cat:focus {
+    border-color: #3da973;
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.15);
+  }
+  .eq-toolbar button,
+  .eq-toolbar a.eq-reset {
+    flex-shrink: 0;
+  }
+
+  .eq-meta {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-bottom: 0.85rem;
+  }
+  .eq-meta strong { color: #1a7a45; }
+
+  .eq-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.65rem;
+  }
+  .eq-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.85rem 0.9rem;
+    background: linear-gradient(135deg, #f7fbf8 0%, #eef6f1 100%);
+    border: 1px solid #d9ead9;
+    border-radius: 0.95rem;
+    box-shadow: 0 2px 6px rgba(60,120,80,0.05);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  }
+  .eq-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(60,120,80,0.13);
+    border-color: #b8d8c0;
+  }
+
+  .eq-card-head {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+  .eq-card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3da973 0%, #2d8f55 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(45,143,85,0.28);
+  }
+  .eq-card-icon svg { width: 20px; height: 20px; color: #fff; }
+  .eq-card-title {
+    flex: 1;
+    min-width: 0;
+  }
+  .eq-card-title strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #15301f;
+    line-height: 1.25;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .eq-card-cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #3da973;
+    margin-top: 0.12rem;
+  }
+  .eq-card-cat svg { width: 12px; height: 12px; }
+
+  .eq-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.32rem;
+  }
+  .eq-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e2efe6;
+    border-radius: 999px;
+    padding: 0.1rem 0.55rem;
+    white-space: nowrap;
+  }
+  .eq-tag svg { width: 11px; height: 11px; }
+  .eq-tag-cond-gut    { color: #1a7a45; background: #e6f4ec; border-color: #c5e8d2; }
+  .eq-tag-cond-defekt { color: #b21414; background: #fde8e8; border-color: #f6c6c6; }
+  .eq-tag-cond-andere { color: #92500a; background: #fff7e6; border-color: #fde2a8; }
+  .eq-tag-qty   { color: #1a7a45; background: #e6f4ec; border-color: #c5e8d2; }
+
+  .eq-card-assigned {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+    margin-top: 0.15rem;
+  }
+  .eq-card-assigned-label {
+    width: 100%;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 0.1rem;
+  }
+  .eq-assignee {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: #eef6f1;
+    border: 1px solid #cfe5d8;
+    color: #1f4d33;
+    max-width: 100%;
+  }
+  .eq-assignee.is-holder { background: #f1ecfd; border-color: #d9ccfa; color: #4427a3; }
+  .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .eq-assignee-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .eq-assignee-qty { opacity: 0.7; font-weight: 500; }
+
+  .eq-card-actions {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+  .eq-action {
+    flex: 1;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.42rem 0.6rem;
+    border-radius: 0.55rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background 0.14s, border-color 0.14s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .eq-action svg { width: 14px; height: 14px; }
+  .eq-action-assign { background: #e6f4ec; color: #1a7a45; border-color: #c5e8d2; }
+  .eq-action-assign:hover { background: #d3ecdc; transform: translateY(-1px); }
+  .eq-action-edit   { background: #fff; color: #1b2e2b; border-color: #d4dfcf; }
+  .eq-action-edit:hover { background: #f3f6f1; transform: translateY(-1px); }
+
+  .eq-empty {
+    padding: 2.4rem 1rem;
+    text-align: center;
+    color: #6b7280;
+    background: #f9fafb;
+    border: 1px dashed #d4dfcf;
+    border-radius: 0.9rem;
+  }
+  .eq-empty svg { width: 38px; height: 38px; color: #cbd5d1; margin-bottom: 0.5rem; }
+  .eq-empty p { margin: 0.3rem 0 0; font-size: 0.92rem; }
+
+  /* MOBIL: kompakte Listen-Reihen statt Cards */
+  @media (max-width: 640px) {
+    .eq-grid {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+    .eq-card {
+      padding: 0.55rem 0.65rem;
+      gap: 0.4rem;
+      border-radius: 0.7rem;
+    }
+    .eq-card-head { gap: 0.55rem; align-items: center; }
+    .eq-card-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(45,143,85,0.22);
+    }
+    .eq-card-icon svg { width: 17px; height: 17px; }
+    .eq-card-title strong { font-size: 0.9rem; line-height: 1.2; }
+    .eq-card-cat { font-size: 0.6rem; margin-top: 0.05rem; }
+    .eq-card-cat svg { width: 10px; height: 10px; }
+
+    /* Tags & Aktionen in einer kompakten Zeile zusammenfassen */
+    .eq-card-tags {
+      gap: 0.25rem;
+      padding-left: 42px; /* unter Titel ausrichten (Icon 32 + gap 10) */
+    }
+    .eq-tag {
+      font-size: 0.65rem;
+      padding: 0.05rem 0.45rem;
+      gap: 0.22rem;
+    }
+    .eq-tag svg { width: 10px; height: 10px; }
+
+    /* SN-Tag auf Mobil ausblenden (zu lang) */
+    .eq-card-tags .eq-tag-sn { display: none; }
+
+    .eq-card-actions {
+      gap: 0.3rem;
+      padding-left: 42px;
+    }
+    .eq-action {
+      font-size: 0.72rem;
+      padding: 0.32rem 0.5rem;
+      gap: 0.22rem;
+      border-radius: 0.45rem;
+    }
+    .eq-action svg { width: 12px; height: 12px; }
+  }
+
+  /* ── Mitglieder-Übersicht ─────────────────────────────────────── */
+  .eq-section-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b8a76;
+    margin: 1.4rem 0 0.55rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .eq-section-title svg { width: 14px; height: 14px; color: #1a7a45; }
+
+  .users-grid {
+    list-style: none;
+    margin: 0 0 0.5rem 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.55rem;
+  }
+  @media (max-width: 480px) {
+    .users-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; }
+  }
+  @media (max-width: 340px) {
+    .users-grid { grid-template-columns: 1fr; }
+  }
+
+  .user-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem 0.55rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f3faf6 100%);
+    border: 1px solid #d9ead9;
+    border-radius: 0.85rem;
+    box-shadow: 0 2px 6px rgba(60,120,80,0.04);
+    cursor: pointer;
+    transition: transform 0.16s, box-shadow 0.16s, border-color 0.16s;
+    text-align: center;
+    color: inherit;
+    font: inherit;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .user-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(60,120,80,0.14);
+    border-color: #b8d8c0;
+  }
+  .user-tile-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3da973 0%, #2d8f55 100%);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(45,143,85,0.22);
+  }
+  .user-tile-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .user-tile-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #15301f;
+    line-height: 1.25;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .user-tile-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #1a7a45;
+    background: #e6f4ec;
+    border: 1px solid #c5e8d2;
+    border-radius: 999px;
+    padding: 0.12rem 0.55rem;
+  }
+  /* Holder-Tiles (Lagerort / Fahrzeug) */
+  .holder-tile-avatar {
+    background: linear-gradient(135deg, #6b7c93 0%, #4a5a6f 100%) !important;
+    box-shadow: 0 3px 10px rgba(74,90,111,0.25) !important;
+  }
+  .holder-tile-avatar svg { width: 26px; height: 26px; color: #fff; }
+  .holder-tile[data-holder-type="vehicle"] .holder-tile-avatar {
+    background: linear-gradient(135deg, #d97757 0%, #b15a3b 100%) !important;
+    box-shadow: 0 3px 10px rgba(177,90,59,0.25) !important;
+  }
+  .user-tile-count svg { width: 11px; height: 11px; }
+
+  /* ── Modal mit Puppe ──────────────────────────────────────────── */
+  .ueq-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 28, 22, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1000;
+    display: none;
+    align-items: stretch;
+    justify-content: stretch;
+    overflow: hidden;
+    padding: 0;
+  }
+  .ueq-modal-backdrop.open { display: flex; }
+  .ueq-modal {
+    background: #fff;
+    border-radius: 0;
+    width: 100vw;
+    max-width: none;
+    box-shadow: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    transform: translateY(0);
+    transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: transform;
+  }
+  .ueq-modal.dragging { transition: none; }
+  .ueq-modal.closing { transform: translateY(100%); }
+  .ueq-modal-head {
+    position: relative;
+    padding: calc(env(safe-area-inset-top, 0px) + 1.2rem) 1.1rem 1rem;
+    background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .ueq-modal-head:active { cursor: grabbing; }
+  .ueq-modal-head .drag-handle {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 0.45rem);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 42px; height: 4px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 999px;
+    z-index: 2;
+  }
+  .ueq-modal-head::before {
+    content: '';
+    position: absolute;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #a8f4d2 0%, transparent 70%);
+    opacity: 0.32;
+    filter: blur(30px);
+    top: -60px; right: -40px;
+    pointer-events: none;
+  }
+  .ueq-modal-head::after {
+    content: '';
+    position: absolute;
+    left: 1rem; right: 1rem; top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.5), rgba(255,255,255,0.02));
+    pointer-events: none;
+  }
+  .ueq-modal-head > * { position: relative; z-index: 1; }
+  .ueq-modal-head .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.16);
+    border: 2px solid rgba(255,255,255,0.45);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .ueq-modal-head .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .ueq-modal-head .info { flex: 1; min-width: 0; }
+  .ueq-modal-head .info strong {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  .ueq-modal-head .info span {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+    margin-top: 0.1rem;
+  }
+  .ueq-modal-close {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.28);
+    color: #fff;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .ueq-modal-close:hover { background: rgba(255,255,255,0.3); }
+  .ueq-modal-close:active { transform: scale(0.94); }
+
+  .ueq-modal-body {
+    padding: 1rem 1rem calc(env(safe-area-inset-bottom, 0px) + 1.2rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    gap: 1.25rem;
+    align-items: start;
+    justify-items: center;
+  }
+  @media (max-width: 600px) {
+    .ueq-modal-body { grid-template-columns: 1fr; justify-items: stretch; }
+  }
+
+  .ueq-puppet-wrap {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+  @media (max-width: 600px) {
+    .ueq-puppet-wrap { max-width: 320px; }
+  }
+  .ueq-puppet-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+  .ueq-dot {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: rgba(150, 150, 150, 0.45);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    display: none;
+  }
+  .ueq-dot.equipped {
+    display: block;
+    background: radial-gradient(circle at 35% 30%, #5cd590 0%, #2d8f55 100%);
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.25), 0 2px 6px rgba(0,0,0,0.25);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .ueq-dot.equipped:hover,
+  .ueq-dot.equipped:focus {
+    transform: translate(-50%, -50%) scale(1.25);
+    box-shadow: 0 0 0 5px rgba(61,169,115,0.3), 0 2px 10px rgba(61,169,115,0.45);
+    outline: none;
+  }
+  .ueq-dot.active {
+    transform: translate(-50%, -50%) scale(1.4);
+    background: #1a7a45;
+    box-shadow: 0 0 0 6px rgba(61,169,115,0.35), 0 0 18px rgba(61,169,115,0.55);
+    z-index: 2;
+  }
+  /* Positionen wie in profil.ejs */
+  .ueq-dot[data-slot="head"]      { left: 50%; top: 10%; }
+  .ueq-dot[data-slot="neck"]      { left: 50%; top: 19%; }
+  .ueq-dot[data-slot="torso"]     { left: 50%; top: 33%; }
+  .ueq-dot[data-slot="handLeft"]  { left: 28%; top: 46%; }
+  .ueq-dot[data-slot="handRight"] { left: 68%; top: 46%; }
+  .ueq-dot[data-slot="legs"]      { left: 50%; top: 65%; }
+  .ueq-dot[data-slot="feet"]      { left: 50%; top: 88%; }
+
+  .ueq-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .ueq-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 0.55rem;
+    background: #f8fbf6;
+    border: 1px solid #e2efe6;
+    border-radius: 9px;
+    transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+  }
+  .ueq-item.highlight {
+    background: #e6f4ec;
+    border-color: #3da973;
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.18);
+  }
+  .ueq-item-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: #fff;
+    border: 1px solid #e2efe6;
+    color: #3da973;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ueq-item-icon svg { width: 16px; height: 16px; }
+  .ueq-item-body { flex: 1; min-width: 0; }
+  .ueq-item-body strong {
+    display: block;
+    font-size: 0.88rem;
+    color: #15301f;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+  }
+  .ueq-item-body small {
+    font-size: 0.72rem;
+    color: #6b7280;
+  }
+  .ueq-item-qty {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #1a7a45;
+    background: #e6f4ec;
+    border: 1px solid #c5e8d2;
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    flex-shrink: 0;
+  }
+  .ueq-empty-list {
+    color: #9ca3af;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  @media (max-width: 380px) {
+    .eq-toolbar { flex-direction: column; }
+    .eq-toolbar button, .eq-toolbar a.eq-reset { width: 100%; }
+    .eq-card-tags, .eq-card-actions { padding-left: 0; }
+  }
+
+  /* ── Hero Header (Strikeboard-Style) ────────────────────────── */
+  .page-hero {
+    position: relative;
+    padding: 1.4rem 1.5rem 1.4rem 1.5rem;
+    background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+    border-radius: 1.35rem 1.35rem 2rem 2rem;
+    margin: -0.55rem -0.25rem 1.6rem;
+    overflow: visible;
+    border: 1px solid rgba(160, 212, 183, 0.42);
+    box-shadow: 0 15px 34px rgba(18, 66, 43, 0.34), 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: pageHeroFade 0.7s cubic-bezier(.4,0,0,1.12);
+  }
+  @keyframes pageHeroFade {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-hero-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .page-hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.36;
+    filter: blur(36px);
+  }
+  .page-hero-orb-1 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, #a8f4d2 0%, transparent 70%);
+    top: -50px; right: -30px;
+  }
+  .page-hero-orb-2 {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, #b8e8ff 0%, transparent 70%);
+    bottom: -30px; left: 8%;
+  }
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    left: 1.2rem; right: 1.2rem; top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.55), rgba(255,255,255,0.02));
+    pointer-events: none;
+    z-index: 2;
+  }
+  .page-hero-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .page-hero-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .page-hero-kicker {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+  .page-hero-title {
+    font-size: 1.85rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .page-hero-title svg {
+    width: 26px; height: 26px;
+    flex-shrink: 0;
+    opacity: 0.92;
+  }
+  .page-hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .page-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 2em;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .page-hero-btn:hover {
+    background: rgba(255,255,255,0.28);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+    color: #fff;
+  }
+  .page-hero-btn:active { transform: scale(0.96); }
+  .page-hero-btn.primary {
+    background: #fff;
+    color: #1a7a45;
+    border-color: rgba(255,255,255,0.6);
+  }
+  .page-hero-btn.primary:hover { background: #f0fff7; color: #145d34; }
+  .page-hero-btn.ghost {
+    background: transparent;
+    border-color: rgba(255,255,255,0.4);
+  }
+  .page-hero-btn svg { width: 14px; height: 14px; }
+
+  @media (max-width: 640px) {
+    .page-hero { padding: 1.1rem 1.1rem; border-radius: 1.1rem 1.1rem 1.6rem 1.6rem; margin-bottom: 1.2rem; }
+    .page-hero-content { flex-direction: column; align-items: stretch; gap: 0.85rem; }
+    .page-hero-title { font-size: 1.45rem; }
+    .page-hero-title svg { width: 22px; height: 22px; }
+    .page-hero-actions { width: 100%; }
+    .page-hero-btn { flex: 1 1 auto; justify-content: center; padding: 0.55rem 0.7rem; font-size: 0.82rem; }
+  }
+  @media (max-width: 380px) {
+    .page-hero-actions { flex-direction: column; }
+    .page-hero-btn { width: 100%; }
+  }
+</style>
+
+<main class="apple-dashboard">
+  <header class="page-hero">
+    <div class="page-hero-clip">
+      <div class="page-hero-orb page-hero-orb-1"></div>
+      <div class="page-hero-orb page-hero-orb-2"></div>
+    </div>
+    <div class="page-hero-content">
+      <div class="page-hero-title-wrap">
+        <span class="page-hero-kicker">Equipment-Verwaltung</span>
+        <h1 class="page-hero-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Zeugwart
+        </h1>
+      </div>
+      <div class="page-hero-actions">
+        <button type="button" id="qrScanBtn" class="page-hero-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M20 14v3"/><path d="M14 20h3"/><path d="M17 17h.01"/><path d="M20 20h.01"/></svg>
+          Scannen
+        </button>
+        <a href="/equipment/add" class="page-hero-btn primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Neu
+        </a>
+        <a href="/equipment/categories" class="page-hero-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Kategorien
+        </a>
+        <a href="/dashboard" class="page-hero-btn ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Zurück
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <% if (success) { %>
+    <div class="apple-alert alert-success" style="margin-bottom: 16px;"><%= success %></div>
+  <% } %>
+  <% if (error) { %>
+    <div class="apple-alert alert-error" style="margin-bottom: 16px;"><%= error %></div>
+  <% } %>
+
+  <!-- Toolbar -->
+  <form method="GET" action="/equipment" class="eq-toolbar">
+    <input
+      type="text"
+      name="search"
+      placeholder="Suchen…"
+      value="<%= search %>"
+      class="eq-search"
+    />
+    <select name="category" class="eq-cat">
+      <option value="">Alle Kategorien</option>
+      <% categories.forEach(cat => { %>
+        <option value="<%= cat.id %>" <%= selectedCategory == cat.id ? 'selected' : '' %>>
+          <%= cat.name %>
+        </option>
+      <% }) %>
+    </select>
+    <button type="submit" class="dev-btn-primary">Filter</button>
+    <% if (search || selectedCategory) { %>
+      <a href="/equipment" class="dev-btn-secondary eq-reset">Reset</a>
+    <% } %>
+  </form>
+
+  <div class="eq-meta"><strong><%= equipment.length %></strong> Equipment-Einträge</div>
+
+  <% if (usersWithEquipment && usersWithEquipment.length) { %>
+    <div class="eq-section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      Wer hat was? (<%= usersWithEquipment.length %>)
+    </div>
+    <ul class="users-grid">
+      <% usersWithEquipment.forEach(u => {
+           const displayName = u.full_name || u.username;
+           const initials = (displayName || '?').split(/\s+/).map(s => s[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+      %>
+        <li>
+          <button type="button" class="user-tile" data-user-id="<%= u.id %>">
+            <span class="user-tile-avatar">
+              <%= initials || '?' %>
+            </span>
+            <span class="user-tile-name"><%= displayName %></span>
+            <span class="user-tile-count">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <%= u.count %>
+            </span>
+          </button>
+        </li>
+      <% }) %>
+    </ul>
+    <script type="application/json" id="users-equipment-data">
+      <%- JSON.stringify(usersWithEquipment).replace(/<\/script/gi, '<\\/script') %>
+    </script>
+  <% } %>
+
+  <% if (typeof holdersWithEquipment !== 'undefined' && holdersWithEquipment && holdersWithEquipment.length) { %>
+    <div class="eq-section-title" style="margin-top: 1.2rem;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Lagerorte &amp; Fahrzeuge (<%= holdersWithEquipment.length %>)
+    </div>
+    <ul class="users-grid">
+      <% holdersWithEquipment.forEach(h => {
+           const isVehicle = h.holder_type === 'vehicle';
+           const iconSvg = isVehicle
+             ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h2l1.5-7h11L19 17h2"/><circle cx="7.5" cy="17.5" r="1.7"/><circle cx="16.5" cy="17.5" r="1.7"/></svg>'
+             : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+      %>
+        <li>
+          <button type="button" class="user-tile holder-tile" data-holder-id="<%= h.id %>" data-holder-type="<%= h.holder_type %>">
+            <span class="user-tile-avatar holder-tile-avatar">
+              <%- iconSvg %>
+            </span>
+            <span class="user-tile-name"><%= h.name %></span>
+            <span class="user-tile-count">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <%= h.count %>
+            </span>
+          </button>
+        </li>
+      <% }) %>
+    </ul>
+    <script type="application/json" id="holders-equipment-data">
+      <%- JSON.stringify(holdersWithEquipment).replace(/<\/script/gi, '<\\/script') %>
+    </script>
+  <% } %>
+
+  <div class="eq-section-title" style="margin-top: 1.4rem;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    Alle Einträge
+  </div>
+
+  <% if (equipment.length === 0) { %>
+    <div class="eq-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <p>Kein Equipment gefunden</p>
+    </div>
+  <% } else { %>
+    <ul class="eq-grid">
+      <% equipment.forEach(item => { %>
+        <li class="eq-card">
+          <div class="eq-card-head">
+            <div class="eq-card-icon">
+              <% if (item.category_icon_svg) { %>
+                <%- item.category_icon_svg %>
+              <% } else { %>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <% } %>
+            </div>
+            <div class="eq-card-title">
+              <strong><%= item.name %></strong>
+              <% if (item.category_name) { %>
+                <span class="eq-card-cat">
+                  <%- item.category_icon_svg %>
+                  <%= item.category_name %>
+                </span>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="eq-card-tags">
+            <%
+              const condClass = item.condition === 'gut' ? 'eq-tag-cond-gut'
+                              : item.condition === 'defekt' ? 'eq-tag-cond-defekt'
+                              : 'eq-tag-cond-andere';
+            %>
+            <span class="eq-tag <%= condClass %>">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <%= item.condition %>
+            </span>
+            <span class="eq-tag eq-tag-qty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              <%= item.assigned_count %>/<%= item.quantity %>
+            </span>
+            <% if (item.serial_number) { %>
+              <span class="eq-tag eq-tag-sn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h.01M11 8h.01M15 8h.01M7 12h10M7 16h6"/></svg>
+                SN: <%= item.serial_number %>
+              </span>
+            <% } %>
+          </div>
+
+          <% if (item.assignments && item.assignments.length > 0) { %>
+            <div class="eq-card-assigned">
+              <span class="eq-card-assigned-label">Zugewiesen an</span>
+              <% item.assignments.forEach(a => { %>
+                <span class="eq-assignee <%= a.kind === 'holder' ? 'is-holder' : '' %>" title="<%= a.name %>">
+                  <% if (a.kind === 'holder') { %>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M10 21v-6h4v6"/></svg>
+                  <% } else { %>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <% } %>
+                  <span class="eq-assignee-name"><%= a.name || '—' %></span>
+                  <% if (a.quantity && a.quantity > 1) { %><span class="eq-assignee-qty">×<%= a.quantity %></span><% } %>
+                </span>
+              <% }) %>
+            </div>
+          <% } %>
+
+          <div class="eq-card-actions">
+            <a href="/equipment/<%= item.id %>/assign" class="eq-action eq-action-assign">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              Zuweisen
+            </a>
+            <a href="/equipment/<%= item.id %>/edit" class="eq-action eq-action-edit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+              Bearbeiten
+            </a>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <!-- Modal: Equipment pro Mitglied -->
+  <div class="ueq-modal-backdrop" id="ueqModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="ueq-modal" role="document">
+      <div class="ueq-modal-head">
+        <span class="drag-handle" aria-hidden="true"></span>
+        <span class="avatar" id="ueqAvatar"></span>
+        <div class="info">
+          <strong id="ueqName">—</strong>
+          <span id="ueqCount">0 Items</span>
+        </div>
+        <button type="button" class="ueq-modal-close" id="ueqClose" aria-label="Schließen">✕</button>
+      </div>
+      <div class="ueq-modal-body">
+        <div class="ueq-puppet-wrap">
+          <img src="/puppe.png" alt="Equipment-Visualisierung">
+          <div class="ueq-dot" data-slot="head"      title="Kopf"></div>
+          <div class="ueq-dot" data-slot="neck"      title="Hals"></div>
+          <div class="ueq-dot" data-slot="torso"     title="Oberkörper"></div>
+          <div class="ueq-dot" data-slot="handLeft"  title="Linke Hand"></div>
+          <div class="ueq-dot" data-slot="handRight" title="Rechte Hand"></div>
+          <div class="ueq-dot" data-slot="legs"      title="Beine"></div>
+          <div class="ueq-dot" data-slot="feet"      title="Füße"></div>
+        </div>
+        <div class="ueq-items" id="ueqItems"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  const dataEl = document.getElementById('users-equipment-data');
+  const holdersEl = document.getElementById('holders-equipment-data');
+  if (!dataEl && !holdersEl) return;
+  let users = [];
+  let holders = [];
+  if (dataEl) { try { users = JSON.parse(dataEl.textContent); } catch (e) {} }
+  if (holdersEl) { try { holders = JSON.parse(holdersEl.textContent); } catch (e) {} }
+
+  const modal = document.getElementById('ueqModal');
+  const closeBtn = document.getElementById('ueqClose');
+  const avatarEl = document.getElementById('ueqAvatar');
+  const nameEl = document.getElementById('ueqName');
+  const countEl = document.getElementById('ueqCount');
+  const itemsEl = document.getElementById('ueqItems');
+  const dots = modal.querySelectorAll('.ueq-dot');
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function initials(name) {
+    return String(name || '?').split(/\s+/).map(s => s[0]).filter(Boolean).slice(0,2).join('').toUpperCase() || '?';
+  }
+
+  function openModal(userId) {
+    const u = users.find(x => x.id === userId);
+    if (!u) return;
+    const display = u.full_name || u.username;
+    nameEl.textContent = display;
+    countEl.textContent = u.count + ' Item' + (u.count === 1 ? '' : 's');
+    avatarEl.textContent = initials(display);
+
+    // Dots aktivieren / deaktivieren
+    const slots = u.slots || {};
+    dots.forEach(dot => {
+      const slot = dot.dataset.slot;
+      let items = (slots[slot] || []).slice();
+      if (slot === 'handLeft' || slot === 'handRight') {
+        items = items.concat(slots.hands || []);
+      }
+      dot.classList.toggle('equipped', items.length > 0);
+    });
+
+    // Item-Liste rendern
+    if (!u.items || !u.items.length) {
+      itemsEl.innerHTML = '<div class="ueq-empty-list">Keine aktiven Zuweisungen</div>';
+    } else {
+      itemsEl.innerHTML = u.items.map(it => {
+        const icon = it.category_icon_svg ||
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+        const meta = [
+          it.category_name ? escapeHtml(it.category_name) : '',
+          it.condition ? escapeHtml(it.condition) : '',
+          it.serial_number ? 'SN: ' + escapeHtml(it.serial_number) : ''
+        ].filter(Boolean).join(' · ');
+        const slot = escapeHtml(it.slot || 'other');
+        return '<div class="ueq-item" data-slot="' + slot + '">' +
+                 '<div class="ueq-item-icon">' + icon + '</div>' +
+                 '<div class="ueq-item-body">' +
+                   '<strong>' + escapeHtml(it.name) + '</strong>' +
+                   (meta ? '<small>' + meta + '</small>' : '') +
+                 '</div>' +
+                 (it.quantity > 1 ? '<span class="ueq-item-qty">×' + it.quantity + '</span>' : '') +
+               '</div>';
+      }).join('');
+    }
+
+    // Dot-Klick → Items in der Liste highlighten
+    dots.forEach(dot => {
+      dot.onclick = null;
+      if (!dot.classList.contains('equipped')) return;
+      dot.onclick = () => {
+        const target = dot.dataset.slot;
+        const slots = [target];
+        if (target === 'handLeft' || target === 'handRight') slots.push('hands');
+        modal.querySelectorAll('.ueq-dot.active').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        let first = null;
+        itemsEl.querySelectorAll('.ueq-item').forEach(el => {
+          const match = slots.includes(el.dataset.slot);
+          el.classList.toggle('highlight', match);
+          if (match && !first) first = el;
+        });
+        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      };
+    });
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    // Puppet wieder einblenden (falls von Holder-View ausgeblendet)
+    const puppet = modal.querySelector('.ueq-puppet-wrap');
+    if (puppet) puppet.style.display = '';
+  }
+
+  function openHolderModal(holderId) {
+    const h = holders.find(x => x.id === holderId);
+    if (!h) return;
+    const isVehicle = h.holder_type === 'vehicle';
+    nameEl.textContent = h.name;
+    countEl.textContent = h.count + ' Item' + (h.count === 1 ? '' : 's');
+    avatarEl.innerHTML = isVehicle
+      ? '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h2l1.5-7h11L19 17h2"/><circle cx="7.5" cy="17.5" r="1.7"/><circle cx="16.5" cy="17.5" r="1.7"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+    // Puppet ausblenden — Lagerort/Fahrzeug hat keinen Körper
+    const puppet = modal.querySelector('.ueq-puppet-wrap');
+    if (puppet) puppet.style.display = 'none';
+    // Items rendern
+    if (!h.items || !h.items.length) {
+      itemsEl.innerHTML = '<div class="ueq-empty-list">Keine aktiven Zuweisungen</div>';
+    } else {
+      itemsEl.innerHTML = h.items.map(it => {
+        const icon = it.category_icon_svg ||
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+        const meta = [
+          it.category_name ? escapeHtml(it.category_name) : '',
+          it.condition ? escapeHtml(it.condition) : '',
+          it.serial_number ? 'SN: ' + escapeHtml(it.serial_number) : ''
+        ].filter(Boolean).join(' · ');
+        return '<div class="ueq-item">' +
+                 '<div class="ueq-item-icon">' + icon + '</div>' +
+                 '<div class="ueq-item-body">' +
+                   '<strong>' + escapeHtml(it.name) + '</strong>' +
+                   (meta ? '<small>' + meta + '</small>' : '') +
+                 '</div>' +
+                 (it.quantity > 1 ? '<span class="ueq-item-qty">×' + it.quantity + '</span>' : '') +
+               '</div>';
+      }).join('');
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('.user-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      if (tile.classList.contains('holder-tile')) {
+        const id = parseInt(tile.dataset.holderId, 10);
+        if (Number.isInteger(id)) openHolderModal(id);
+      } else {
+        const id = parseInt(tile.dataset.userId, 10);
+        if (Number.isInteger(id)) openModal(id);
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+
+  // Swipe-down to dismiss (iOS-style)
+  const sheet = modal.querySelector('.ueq-modal');
+  const grabHead = modal.querySelector('.ueq-modal-head');
+  let dragStartY = 0, dragCurrentY = 0, dragging = false, dragStartTime = 0;
+  function onDragStart(e) {
+    if (e.target.closest('.ueq-modal-close')) return;
+    const t = e.touches ? e.touches[0] : e;
+    dragStartY = t.clientY;
+    dragCurrentY = 0;
+    dragStartTime = Date.now();
+    dragging = true;
+    sheet.classList.add('dragging');
+  }
+  function onDragMove(e) {
+    if (!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    dragCurrentY = Math.max(0, t.clientY - dragStartY);
+    sheet.style.transform = 'translateY(' + dragCurrentY + 'px)';
+    if (e.cancelable) e.preventDefault();
+  }
+  function onDragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    sheet.classList.remove('dragging');
+    const dt = Date.now() - dragStartTime;
+    const velocity = dragCurrentY / Math.max(dt, 1);
+    if (dragCurrentY > 120 || velocity > 0.6) {
+      sheet.style.transform = 'translateY(100%)';
+      setTimeout(() => { sheet.style.transform = ''; closeModal(); }, 260);
+    } else {
+      sheet.style.transform = '';
+    }
+  }
+  grabHead.addEventListener('touchstart', onDragStart, { passive: true });
+  grabHead.addEventListener('touchmove', onDragMove, { passive: false });
+  grabHead.addEventListener('touchend', onDragEnd);
+  grabHead.addEventListener('touchcancel', onDragEnd);
+  grabHead.addEventListener('mousedown', (e) => {
+    onDragStart(e);
+    const mm = (ev) => onDragMove(ev);
+    const mu = () => { onDragEnd(); document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); };
+    document.addEventListener('mousemove', mm);
+    document.addEventListener('mouseup', mu);
+  });
+})();
+</script>
+
+<!-- ── QR / Seriennummer Scanner ─────────────────────────────────── -->
+<div class="qr-modal-backdrop" id="qrModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="qr-modal" role="document">
+    <div class="qr-modal-head">
+      <strong>Equipment scannen</strong>
+      <button type="button" class="qr-modal-close" id="qrClose" aria-label="Schließen">✕</button>
+    </div>
+    <div class="qr-modal-body">
+      <div class="qr-video-wrap">
+        <video id="qrVideo" playsinline muted></video>
+        <div class="qr-frame"></div>
+        <div class="qr-hint" id="qrHint">Kamera wird gestartet…</div>
+      </div>
+      <form id="qrManualForm" class="qr-manual">
+        <label for="qrManualInput">Seriennummer manuell eingeben</label>
+        <div class="qr-manual-row">
+          <input type="text" id="qrManualInput" placeholder="z. B. SN-12345" autocomplete="off" />
+          <button type="submit" class="qr-submit">Suchen</button>
+        </div>
+      </form>
+      <div class="qr-status" id="qrStatus" hidden></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .qr-modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(15, 35, 25, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .qr-modal-backdrop.open { display: flex; }
+  .qr-modal {
+    background: #fff;
+    border-radius: 1.1rem;
+    width: 100%;
+    max-width: 460px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  }
+  .qr-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid #e2efe6;
+  }
+  .qr-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #4b5563;
+    padding: 0.2rem 0.5rem;
+    line-height: 1;
+  }
+  .qr-modal-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    overflow-y: auto;
+  }
+  .qr-video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 360px;
+    background: #0b1d14;
+    border-radius: 0.8rem;
+    overflow: hidden;
+  }
+  .qr-video-wrap video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .qr-frame {
+    position: absolute;
+    inset: 14%;
+    border: 2px solid rgba(255,255,255,0.85);
+    border-radius: 0.75rem;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+  .qr-hint {
+    position: absolute;
+    bottom: 0.55rem; left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    background: rgba(0,0,0,0.55);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    pointer-events: none;
+  }
+  .qr-manual { display: flex; flex-direction: column; gap: 0.35rem; }
+  .qr-manual label { font-size: 0.78rem; color: #4b5563; font-weight: 600; }
+  .qr-manual-row { display: flex; gap: 0.45rem; }
+  .qr-manual input {
+    flex: 1; min-width: 0;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid #d1e0d6;
+    border-radius: 0.65rem;
+    font-size: 0.92rem;
+    font-family: inherit;
+  }
+  .qr-manual input:focus { outline: 2px solid #3da973; outline-offset: -1px; border-color: #3da973; }
+  .qr-submit {
+    background: #1a7a45; color: #fff; border: none;
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .qr-submit:hover { background: #156236; }
+  .qr-status {
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.55rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .qr-status.error { background: #fde8e8; color: #b21414; border: 1px solid #f6c6c6; }
+  .qr-status.info  { background: #eef6f1; color: #1f4d33; border: 1px solid #cfe5d8; }
+  .qr-status.success { background: #e6f4ec; color: #1a7a45; border: 1px solid #c5e8d2; }
+</style>
+
+<script>
+(function() {
+  const btn       = document.getElementById('qrScanBtn');
+  const modal     = document.getElementById('qrModal');
+  const closeBtn  = document.getElementById('qrClose');
+  const video     = document.getElementById('qrVideo');
+  const hint      = document.getElementById('qrHint');
+  const status    = document.getElementById('qrStatus');
+  const manualForm = document.getElementById('qrManualForm');
+  const manualInput = document.getElementById('qrManualInput');
+
+  if (!btn) return;
+
+  let stream = null;
+  let scanning = false;
+  let detector = null;
+  let jsqrLoading = null;
+  let lastSubmitted = '';
+  let lastSubmittedAt = 0;
+
+  function setStatus(msg, kind) {
+    if (!msg) { status.hidden = true; status.textContent = ''; return; }
+    status.hidden = false;
+    status.textContent = msg;
+    status.className = 'qr-status ' + (kind || 'info');
+  }
+
+  function loadJsQR() {
+    if (window.jsQR) return Promise.resolve(window.jsQR);
+    if (jsqrLoading) return jsqrLoading;
+    jsqrLoading = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+      s.onload  = () => resolve(window.jsQR);
+      s.onerror = () => reject(new Error('jsQR konnte nicht geladen werden'));
+      document.head.appendChild(s);
+    });
+    return jsqrLoading;
+  }
+
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      video.srcObject = stream;
+      await video.play();
+      hint.textContent = 'Code in den Rahmen halten';
+      scanning = true;
+      scanLoop();
+    } catch (err) {
+      hint.textContent = 'Kein Kamerazugriff';
+      setStatus('Kamera nicht verfügbar – bitte Seriennummer manuell eingeben.', 'info');
+    }
+  }
+
+  async function scanLoop() {
+    if (!scanning) return;
+    try {
+      if ('BarcodeDetector' in window) {
+        if (!detector) {
+          const formats = await window.BarcodeDetector.getSupportedFormats();
+          detector = new window.BarcodeDetector({
+            formats: formats.includes('qr_code')
+              ? ['qr_code']
+              : formats.slice(0, 6),
+          });
+        }
+        const codes = await detector.detect(video);
+        if (codes && codes.length > 0 && codes[0].rawValue) {
+          return handleCode(codes[0].rawValue);
+        }
+      } else {
+        const jsQR = await loadJsQR();
+        const c = document.createElement('canvas');
+        c.width  = video.videoWidth;
+        c.height = video.videoHeight;
+        if (c.width && c.height) {
+          const ctx = c.getContext('2d', { willReadFrequently: true });
+          ctx.drawImage(video, 0, 0, c.width, c.height);
+          const img = ctx.getImageData(0, 0, c.width, c.height);
+          const r = jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+          if (r && r.data) return handleCode(r.data);
+        }
+      }
+    } catch (e) {
+      // ignore single-frame errors
+    }
+    if (scanning) requestAnimationFrame(scanLoop);
+  }
+
+  async function handleCode(value) {
+    const code = (value || '').trim();
+    if (!code) return;
+    const now = Date.now();
+    if (code === lastSubmitted && now - lastSubmittedAt < 3000) {
+      if (scanning) requestAnimationFrame(scanLoop);
+      return;
+    }
+    lastSubmitted = code;
+    lastSubmittedAt = now;
+    scanning = false;
+    hint.textContent = 'Code erkannt – wird gesucht…';
+    setStatus('Suche „' + code + '“…', 'info');
+
+    try {
+      const res = await fetch('/equipment/lookup?code=' + encodeURIComponent(code), {
+        headers: { 'Accept': 'application/json' },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStatus('Gefunden – Weiterleitung zur Zuweisung…', 'success');
+        stopCamera();
+        window.location.href = data.assignUrl;
+        return;
+      }
+      if (res.status === 404) {
+        setStatus('Kein Equipment mit diesem Code gefunden.', 'error');
+      } else {
+        setStatus('Fehler bei der Suche (Status ' + res.status + ').', 'error');
+      }
+    } catch (e) {
+      setStatus('Netzwerkfehler bei der Suche.', 'error');
+    }
+
+    // Resume scanning after short pause so the same code isn't re-fired immediately
+    setTimeout(() => {
+      if (modal.classList.contains('open')) {
+        scanning = true;
+        hint.textContent = 'Nächsten Code halten…';
+        scanLoop();
+      }
+    }, 1500);
+  }
+
+  function stopCamera() {
+    scanning = false;
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+    video.srcObject = null;
+  }
+
+  function openModal() {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    setStatus('');
+    lastSubmitted = '';
+    startCamera();
+    setTimeout(() => manualInput && manualInput.focus({ preventScroll: true }), 50);
+  }
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    stopCamera();
+  }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+
+  manualForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = manualInput.value.trim();
+    if (v) handleCode(v);
+  });
+})();
+</script>

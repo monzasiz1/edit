@@ -1,0 +1,173 @@
+<%- include('partials/zeugwart_page_styles') %>
+
+<main class="apple-dashboard">
+  <header class="page-hero">
+    <div class="page-hero-clip">
+      <div class="page-hero-orb page-hero-orb-1"></div>
+      <div class="page-hero-orb page-hero-orb-2"></div>
+    </div>
+    <div class="page-hero-content">
+      <div class="page-hero-title-wrap">
+        <span class="page-hero-kicker">Rechteverwaltung</span>
+        <h1 class="page-hero-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Neue Rolle
+        </h1>
+      </div>
+      <div class="page-hero-actions">
+        <a href="/roles" class="page-hero-btn ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Zurück
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="dev-card" style="max-width: 700px;">
+    <form method="POST" action="/roles/add">
+      <div class="apple-form-group">
+        <label>Rollenname *</label>
+        <input type="text" name="name" class="apple-input" placeholder="z.B. Kassenwart" required>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Beschreibung</label>
+        <textarea name="description" class="apple-input" rows="3" placeholder="Optionale Beschreibung der Rolle"></textarea>
+      </div>
+
+      <div class="apple-form-group">
+        <label style="margin-bottom: 1rem; display: block; font-weight: 700;">Berechtigungen</label>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+          <label class="perm-chip">
+            <input type="checkbox" name="permissions" value="can_manage_members">
+            <span class="perm-chip-icon" style="background:#dbeafe;color:#1d4ed8;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <span>Mitglieder verwalten</span>
+          </label>
+
+          <label class="perm-chip">
+            <input type="checkbox" name="permissions" value="can_manage_penalties">
+            <span class="perm-chip-icon" style="background:#fef3c7;color:#b45309;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
+            <span>Aktionen verwalten<small>Erstellen, Bearbeiten, Löschen aller Aktionen</small></span>
+          </label>
+
+          <label class="perm-chip">
+            <input type="checkbox" name="permissions" value="can_view_all_penalties">
+            <span class="perm-chip-icon" style="background:#e0e7ff;color:#4338ca;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <span>Alle Aktionen sehen<small>Übersicht über alle Einträge im Verein</small></span>
+          </label>
+
+          <label class="perm-chip">
+            <input type="checkbox" name="permissions" value="can_manage_equipment">
+            <span class="perm-chip-icon" style="background:#dcfce7;color:#15803d;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </span>
+            <span>Equipment verwalten</span>
+          </label>
+
+          <label class="perm-chip">
+            <input type="checkbox" name="permissions" value="can_assign_equipment">
+            <span class="perm-chip-icon" style="background:#cffafe;color:#0e7490;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            </span>
+            <span>Equipment zuweisen</span>
+          </label>
+
+          <label class="perm-chip">
+            <input type="checkbox" name="permissions" value="can_manage_roles">
+            <span class="perm-chip-icon" style="background:#fce7f3;color:#be185d;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </span>
+            <span>Rollen verwalten</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="apple-form-group">
+        <label style="margin-bottom: 1rem; display: block; font-weight: 700;">Besondere Rollen</label>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #fef3c7; border-radius: 8px; cursor: pointer;">
+            <input type="checkbox" name="permissions" value="is_board">
+            <span><strong>Vorstand</strong> - Zugriff auf Vorstandsbereich</span>
+          </label>
+
+          <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #fee2e2; border-radius: 8px; cursor: pointer;">
+            <input type="checkbox" name="permissions" value="is_admin">
+            <span><strong>Administrator</strong> - Volle Rechte im Club</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="dev-btn-primary" style="margin-top: 1.5rem;">Rolle erstellen</button>
+    </form>
+  </div>
+</main>
+
+<style>
+  .perm-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 0.85rem;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    position: relative;
+  }
+  .perm-chip:hover { border-color: #3da973; background: #f3faf6; }
+  .perm-chip:has(input:checked) {
+    border-color: #2d8f55;
+    background: linear-gradient(135deg, #f3faf6 0%, #e6f4ec 100%);
+    box-shadow: 0 2px 10px rgba(45, 143, 85, 0.12);
+  }
+  .perm-chip input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2d8f55;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .perm-chip-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .perm-chip-icon svg {
+    width: 19px;
+    height: 19px;
+    display: block;
+  }
+  .perm-chip > span:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-weight: 700;
+    color: #1a3d2a;
+    font-size: 0.92rem;
+    line-height: 1.25;
+  }
+  .perm-chip > span:last-child small {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.72rem;
+  }
+  @media (max-width: 640px) {
+    .perm-chip { padding: 0.55rem 0.7rem; gap: 0.55rem; }
+    .perm-chip-icon { width: 32px; height: 32px; border-radius: 9px; }
+    .perm-chip-icon svg { width: 17px; height: 17px; }
+    .perm-chip > span:last-child { font-size: 0.85rem; }
+  }
+</style>

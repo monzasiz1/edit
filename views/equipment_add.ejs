@@ -1,0 +1,95 @@
+<%- include('partials/zeugwart_page_styles') %>
+
+<main class="apple-dashboard">
+  <header class="page-hero">
+    <div class="page-hero-clip">
+      <div class="page-hero-orb page-hero-orb-1"></div>
+      <div class="page-hero-orb page-hero-orb-2"></div>
+    </div>
+    <div class="page-hero-content">
+      <div class="page-hero-title-wrap">
+        <span class="page-hero-kicker">Zeugwart</span>
+        <h1 class="page-hero-title">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Equipment hinzufügen
+        </h1>
+      </div>
+      <div class="page-hero-actions">
+        <a href="/equipment" class="page-hero-btn ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Zurück
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="dev-card" style="max-width: 700px;">
+    <form method="POST" action="/equipment/add">
+      <div class="apple-form-group">
+        <label>Name *</label>
+        <input type="text" name="name" class="apple-input" placeholder="z.B. Trompete Yamaha YTR-4335" required>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Kategorie</label>
+        <div class="cat-select" data-cat-select>
+          <input type="hidden" name="category_id" value="" data-cat-input>
+          <button type="button" class="cat-select-btn apple-input" data-cat-toggle aria-haspopup="listbox" aria-expanded="false">
+            <span class="cat-select-label" data-cat-label>
+              <span class="cat-select-icon cat-select-icon--empty"></span>
+              <span>-- Keine Kategorie --</span>
+            </span>
+            <svg class="cat-select-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="cat-select-list" role="listbox" data-cat-list hidden>
+            <li class="cat-select-opt" role="option" data-value="" data-label="-- Keine Kategorie --">
+              <span class="cat-select-icon cat-select-icon--empty"></span>
+              <span>-- Keine Kategorie --</span>
+            </li>
+            <% categories.forEach(cat => { %>
+              <li class="cat-select-opt" role="option" data-value="<%= cat.id %>" data-label="<%= cat.name %>" data-icon='<%- cat.icon_svg %>'>
+                <span class="cat-select-icon"><%- cat.icon_svg %></span>
+                <span><%= cat.name %></span>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Beschreibung</label>
+        <textarea name="description" class="apple-input" rows="3" placeholder="Optionale Beschreibung"></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="apple-form-group">
+          <label>Seriennummer</label>
+          <input type="text" name="serial_number" class="apple-input" placeholder="z.B. 12345678">
+        </div>
+
+        <div class="apple-form-group">
+          <label>Zustand</label>
+          <select name="condition" class="apple-input">
+            <option value="gut">Gut</option>
+            <option value="gebraucht">Gebraucht</option>
+            <option value="reparaturbedürftig">Reparaturbedürftig</option>
+            <option value="defekt">Defekt</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Menge</label>
+        <input type="number" name="quantity" class="apple-input" value="1" min="1">
+      </div>
+
+      <div class="apple-form-group">
+        <label>Notizen</label>
+        <textarea name="notes" class="apple-input" rows="2" placeholder="Interne Notizen"></textarea>
+      </div>
+
+      <button type="submit" class="dev-btn-primary" style="margin-top: 1rem;">Equipment hinzufügen</button>
+    </form>
+  </div>
+<%- include('partials/cat_select_styles') %>
+</main>

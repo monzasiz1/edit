@@ -1,22 +1,33 @@
 <main class="strikeboard-app">
-  <header class="strikeboard-hero glass-hero">
-    <div class="strikeboard-bg-glow"></div>
+  <header class="strikeboard-hero">
+    <div class="strikeboard-glass-bg"></div>
+    <div class="strikeboard-orb strikeboard-orb-1"></div>
+    <div class="strikeboard-orb strikeboard-orb-2"></div>
     <div class="strikeboard-header-content">
-      <span class="strikeboard-icon">📝</span>
-      <div>
-        <h1 class="strikeboard-title">Strafen Übersicht</h1>
-        <div class="strikeboard-subline">Alle Mitglieder · Stand <span><%= new Date().toLocaleDateString('de-DE') %></span></div>
+      <div class="strikeboard-top-row">
+        <span class="strikeboard-kicker">Strafenverwaltung</span>
+        <% if (user.is_admin) { %>
+        <a href="/penalties/add" class="strikeboard-add-btn" title="Strafe hinzuf&uuml;gen">
+          <span class="strikeboard-fab-icon">+</span>
+          <span class="strikeboard-fab-label">Neu</span>
+        </a>
+        <% } %>
       </div>
-      <a href="/penalties/add" class="strikeboard-add-btn" title="Strafe hinzufügen">+</a>
-    </div>
-    <div class="strikeboard-statistics">
-      <div class="strikeboard-stat fadein-up" style="--order:1">
-        <div class="stat-label">Strafen gesamt</div>
-        <div class="stat-value big stat-float-shadow"><%= strafen.length %></div>
-      </div>
-      <div class="strikeboard-stat fadein-up" style="--order:2">
-        <div class="stat-label">Summe</div>
-        <div class="stat-value highlight stat-float-shadow"><%= strafen.reduce((s, p) => s + Number(p.amount), 0).toFixed(2) %> €</div>
+      <h1 class="strikeboard-title">Strafen&shy;&uuml;bersicht</h1>
+      <div class="strikeboard-subline">Alle Mitglieder · Stand <span><%= new Date().toLocaleDateString('de-DE') %></span></div>
+      <div class="strikeboard-stats-row">
+        <div class="strikeboard-stat-chip">
+          <span class="stat-chip-value"><%= strafen.length %></span>
+          <span class="stat-chip-label">Eintr&auml;ge</span>
+        </div>
+        <div class="strikeboard-stat-chip highlight-chip">
+          <span class="stat-chip-value"><%= strafen.reduce((s, p) => s + Number(p.amount), 0).toFixed(2) %> &euro;</span>
+          <span class="stat-chip-label">Gesamt</span>
+        </div>
+        <div class="strikeboard-stat-chip danger-chip">
+          <span class="stat-chip-value"><%= strafen.filter(s => s.status === 'offen').length %></span>
+          <span class="stat-chip-label">Offen</span>
+        </div>
       </div>
     </div>
   </header>
@@ -41,19 +52,24 @@
         <% if (userStrafen.length > 0) { %>
         <ul class="strike-ultra-list">
           <% userStrafen.forEach(strafe => { %>
-            <li class="strike-ultra-row">
-              <span class="strike-status-dot <%= strafe.status %>" aria-label="<%= strafe.status === 'bezahlt' ? 'Bezahlt' : 'Offen' %>"></span>
-              <span class="strike-date"><%= new Date(strafe.created_at).toLocaleDateString('de-DE') %></span>
-              <span class="strike-event"><%= strafe.event || '' %></span>
-              <span class="strike-reason"><%= strafe.reason %></span>
-              <span class="strike-amount"><%= strafe.amount.toFixed(2) %> €</span>
+            <li class="strike-card <%= strafe.status %>">
+              <div class="strike-card-top">
+                <span class="strike-card-dot <%= strafe.status %>"></span>
+                <span class="strike-card-reason"><%= strafe.reason %></span>
+                <span class="strike-card-amount"><%= strafe.amount.toFixed(2) %> €</span>
+              </div>
+              <div class="strike-card-meta">
+                <span class="strike-card-meta-item">📅 <%= new Date(strafe.created_at).toLocaleDateString('de-DE') %></span>
+                <% if (strafe.event) { %><span class="strike-card-meta-item">🎪 <%= strafe.event %></span><% } %>
+                <span class="strike-card-badge <%= strafe.status %>"><%= strafe.status === 'bezahlt' ? 'Bezahlt' : 'Offen' %></span>
+              </div>
               <% if (user.is_admin) { %>
-                <span class="strike-row-actions">
-                  <a href="/penalties/edit/<%= strafe.id %>" class="strike-action-icon" title="Bearbeiten">✏️</a>
+                <div class="strike-card-actions">
+                  <a href="/penalties/edit/<%= strafe.id %>" class="strike-card-btn edit">✏️ Bearbeiten</a>
                   <form action="/penalties/delete/<%= strafe.id %>" method="POST" style="display:inline">
-                    <button type="submit" class="strike-action-icon danger" onclick="return confirm('Wirklich löschen?')" title="Löschen">🗑️</button>
+                    <button type="submit" class="strike-card-btn delete" onclick="return confirm('Wirklich löschen?')">🗑️ Löschen</button>
                   </form>
-                </span>
+                </div>
               <% } %>
             </li>
           <% }) %>
@@ -68,20 +84,6 @@
 </main>
 
 <style>
-  @font-face {
-    font-family: 'SF Pro Display';
-    font-style: normal;
-    font-weight: 400;
-    src: local('SF Pro Display'), url('https://cdn.jsdelivr.net/npm/@fontsource/sf-pro-display/files/sf-pro-display-latin-400-normal.woff2') format('woff2');
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'SF Pro Display';
-    font-style: normal;
-    font-weight: 900;
-    src: local('SF Pro Display'), url('https://cdn.jsdelivr.net/npm/@fontsource/sf-pro-display/files/sf-pro-display-latin-900-normal.woff2') format('woff2');
-    font-display: swap;
-  }
   :root {
     --apple-bg: linear-gradient(112deg,#f7fff9 0%,#eaf8ff 100%);
     --glass-blur: 22px;
@@ -97,7 +99,7 @@
   html, body {
     background: var(--apple-bg);
     min-height: 100vh;
-    font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     letter-spacing: -0.22px;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -107,43 +109,71 @@
     max-width: 900px;
     margin: 2.3rem auto 2rem auto;
     padding: 0 1.4rem;
+    position: relative;
   }
 
+  /* === HERO HEADER === */
   .strikeboard-hero {
     position: relative;
-    padding: 2.15rem 1.35rem 2.1rem 1.35rem;
-    border-radius: 2.2em;
-    box-shadow: var(--widget-shadow);
-    background: var(--widget-grad);
-    margin-bottom: 2.3rem;
+    padding: 1.5rem 1.6rem 1.5rem 1.6rem;
+    background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+    border-radius: 1.35rem 1.35rem 2rem 2rem;
+    margin: -0.55rem -0.25rem 2.3rem;
     overflow: hidden;
     isolation: isolate;
+    border: 1px solid rgba(160, 212, 183, 0.42);
+    box-shadow: 0 15px 34px rgba(18, 66, 43, 0.34), 0 4px 12px rgba(0, 0, 0, 0.1);
     animation: fadein 1.0s cubic-bezier(.4,0,0,1.12);
-    backdrop-filter: blur(34px) saturate(1.14);
-    -webkit-backdrop-filter: blur(34px) saturate(1.14);
-    border: 1.6px solid rgba(116, 236, 194, 0.21);
   }
-  .strikeboard-bg-glow {
+  .strikeboard-hero::after {
+    content: '';
     position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 82% 15%, #b8f7ff 0%,#e0ffe7 100%);
-    filter: blur(42px) brightness(1.13);
-    opacity: 0.59;
-    z-index: 1;
+    left: 1.2rem;
+    right: 1.2rem;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.55), rgba(255,255,255,0.02));
     pointer-events: none;
+    z-index: 2;
+  }
+  .strikeboard-glass-bg {
+    display: none;
+  }
+  .strikeboard-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.36;
+    filter: blur(36px);
+  }
+  .strikeboard-orb-1 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, #a8f4d2 0%, transparent 70%);
+    top: -50px; right: -30px;
+  }
+  .strikeboard-orb-2 {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, #b8e8ff 0%, transparent 70%);
+    bottom: -30px; left: 8%;
   }
   .strikeboard-header-content {
     position: relative; z-index: 2;
-    display: flex; align-items: flex-start; gap: 1.15rem; margin-bottom: 0.7rem;
   }
-  .strikeboard-icon {
-    font-size: 2.5em; margin-right: 0.22em; margin-top: -0.09em;
-    background: linear-gradient(120deg,#38e2ff 10%, #31ffa6 80%);
-    border-radius: 1.1em; box-shadow: 0 4px 18px #3bffae1a;
-    padding: 0.29em 0.23em 0.14em 0.29em;
-    color: #222;
-    animation: fadein-top 1.2s cubic-bezier(.18,0,.33,1.18);
-    filter: drop-shadow(0 2px 15px #9cf8ff49);
+  .strikeboard-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    gap: 0.7rem;
+  }
+  .strikeboard-kicker {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.68);
+    opacity: 1;
   }
   .strikeboard-title {
     font-size: 2.23rem;
@@ -151,91 +181,86 @@
     margin: 0 0 0.13em 0;
     letter-spacing: -1.1px;
     line-height: 1.09;
-    font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
-    color: #1b2e2b;
-    text-shadow: 0 2.5px 18px #eaf8ff20, 0 1.5px 0px #fff, 0 0.5px 0px #31ffa610;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
   }
   .strikeboard-subline {
-    font-size: 1.13rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #23b889;
-    opacity: 0.93;
+    color: rgba(234, 255, 242, 0.9);
+    opacity: 1;
     letter-spacing: 0.02em;
-    text-shadow: 0 1px 5px #c8f5fa33;
+    margin-bottom: 0.1em;
   }
+  /* Stat-Chips */
+  .strikeboard-stats-row {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .strikeboard-stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: 1.1em;
+    padding: 0.35rem 0.9rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    min-width: 56px;
+  }
+  .strikeboard-stat-chip .stat-chip-value {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    filter: none;
+  }
+  .strikeboard-stat-chip .stat-chip-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(245,255,248,0.75);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.82;
+    margin-top: 0.08em;
+  }
+  .highlight-chip .stat-chip-value { color: #ecfff4; }
+  .danger-chip .stat-chip-value { color: #ffd9dd; filter: none; }
+  .danger-chip { border-color: rgba(255, 194, 200, 0.44); background: rgba(140, 24, 36, 0.2); }
+
+  /* FAB Pill */
   .strikeboard-add-btn {
-    margin-left: auto;
-    font-size: 1.4rem; /* kleiner als vorher */
-    font-weight: 800;
-    width: 1.75em; height: 1.75em;
-    background: linear-gradient(120deg,#1ae68d 8%,#39c9ff 92%);
-    box-shadow: 0 6px 20px #1ae68d19;
-    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3em;
+    background: rgba(255,255,255,0.18);
     color: #fff;
-    border: none;
-    display: flex; align-items: center; justify-content: center;
+    border-radius: 2em;
+    padding: 0.5rem 1.05rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255,255,255,0.28);
     text-decoration: none;
-    transition: background 0.15s, box-shadow 0.13s, transform 0.14s;
-    animation: fadein-right 1.08s cubic-bezier(.14,.2,0,1.2);
-    will-change: transform;
-    border: 1.2px solid #b4e9df55;
+    transition: background 0.13s, box-shadow 0.13s, transform 0.1s;
     outline: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
   }
   .strikeboard-add-btn:hover {
-    background: linear-gradient(118deg,#0ed377,#3dcfff 82%);
-    box-shadow: 0 10px 30px #31ffa61c;
-    transform: scale(1.07) rotate(-2deg);
+    background: rgba(255,255,255,0.28);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
   }
-
-  .strikeboard-statistics {
-    display: flex; gap: 1.68rem; margin-top: 0.84rem;
-  }
-  .strikeboard-stat {
-    background: rgba(255,255,255,0.91);
-    border-radius: 1.7em; min-width: 138px; min-height: 64px;
-    box-shadow: 0 2px 18px #23d6be14;
-    padding: 0.82em 1.57em 0.84em 1.19em;
-    display: flex; flex-direction: column; align-items: flex-start;
-    font-weight: 600; font-size: 1.13em; position: relative; margin-right: 0.12em;
-    border: 1.6px solid #e9f3f3;
-    opacity: 0;
-    transform: translateY(22px);
-    animation: fadein-up 0.86s cubic-bezier(.28,.7,0,1.2) forwards;
-    animation-delay: calc(var(--order, 1) * 0.09s);
-    background: linear-gradient(115deg, #f7fff9 60%, #e6fafe 100%);
-    filter: drop-shadow(0 2px 16px #cffef544);
-  }
-  .stat-label { color: #90c0a7; font-size: 1em; margin-bottom: 0.19em; font-weight: 600;}
-  .stat-value {
-    font-size: 2.15em;
-    font-weight: 900;
-    color: #13c074;
-    letter-spacing: -0.06em;
-    font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
-    text-shadow: 0 2px 20px #16e08033;
-    line-height: 1;
-    transition: color 0.14s, text-shadow 0.14s;
-  }
-  .stat-value.big { font-size: 2.45em; color: #222; text-shadow: 0 2px 18px #b6b6f930, 0 1px 0px #f5fffa;}
-  .stat-value.highlight { color: var(--highlight); text-shadow: 0 2px 14px #2cfeb085, 0 1px 0px #e3fff2;}
-  .stat-float-shadow { filter: drop-shadow(0 1px 18px #bffef699);}
-
-  @keyframes fadein-up {
-    from { opacity:0; transform: translateY(22px);}
-    to { opacity:1; transform: translateY(0);}
-  }
-  @keyframes fadein-top {
-    from { opacity:0; transform: translateY(-44px);}
-    to { opacity:1; transform: translateY(0);}
-  }
-  @keyframes fadein-right {
-    from { opacity:0; transform: translateX(44px);}
-    to { opacity:1; transform: translateX(0);}
-  }
-  @keyframes fadein {
-    from { opacity:0; }
-    to { opacity:1; }
-  }
+  .strikeboard-add-btn:active { transform: scale(0.96); }
+  .strikeboard-fab-icon { font-size: 1.4rem; font-weight: 800; line-height: 1; }
+  .strikeboard-fab-label { font-size: 0.88rem; font-weight: 700; letter-spacing: 0.04em; }
 
   .strikeboard-list {
     display: flex; flex-direction: column; gap: 1.32rem;
@@ -264,7 +289,7 @@
     gap: 1.09rem; padding: 1.17rem 1.21rem;
     background: none; border: none; outline: none;
     cursor: pointer; font-size: 1.13rem; font-weight: 700; color: #193b27; transition: background 0.18s; position: relative;
-    font-family: 'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     letter-spacing: 0.04em;
   }
   .usercard-head:hover, .strikeboard-user-card.open .usercard-head {
@@ -302,54 +327,128 @@
     opacity: 1;
     transition: max-height 0.73s cubic-bezier(.7,.3,0,1.2), opacity 0.43s;
   }
+  /* === STRIKE CARDS === */
   .strike-ultra-list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0.55rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
   }
-  .strike-ultra-row {
+  .strike-card {
+    background: #fff;
+    border-radius: 1em;
+    padding: 0.75rem 0.9rem 0.6rem 0.9rem;
+    border: 1.5px solid #e8f4ee;
+    box-shadow: 0 2px 10px #1ae68d0d;
+    transition: box-shadow 0.18s, border-color 0.18s;
+  }
+  .strike-card.offen {
+    border-left: 4px solid #fe495c;
+  }
+  .strike-card.bezahlt {
+    border-left: 4px solid #1ae68d;
+  }
+  .strike-card-top {
     display: flex;
     align-items: center;
-    gap: 1.07vw;
-    padding: 0.54em 0.6em;
-    border-bottom: 1px solid #f2f3f4;
-    font-size: 1.05em;
+    gap: 0.5rem;
+    margin-bottom: 0.38rem;
   }
-  .strike-date {
-    min-width: 84px;
-    color: #656874;
-    font-variant-numeric: tabular-nums;
-  }
-  .strike-event {
-    min-width: 94px;
-    color: #13cda4;
-  }
-  .strike-reason {
-    flex: 1;
-    color: #24282b;
-  }
-  .strike-amount {
-    min-width: 75px;
-    color: #183a32;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-  .strike-status-dot {
+  .strike-card-dot {
     display: inline-block;
-    width: 0.7em; /* kleiner */
-    height: 0.7em;
+    width: 0.62em;
+    height: 0.62em;
     border-radius: 50%;
-    margin-left: 0.18em;
-    margin-right: 0.38em;
+    flex-shrink: 0;
   }
-  .strike-status-dot.bezahlt {
-    background: var(--strike-green);
-    box-shadow: 0 0 12px 3px #1ae68d50; /* etwas dezenter */
+  .strike-card-dot.bezahlt {
+    background: #1ae68d;
+    box-shadow: 0 0 8px 2px #1ae68d55;
   }
-  .strike-status-dot.offen {
-    background: var(--strike-red);
-    box-shadow: 0 0 14px 4px #fe495c55;
+  .strike-card-dot.offen {
+    background: #fe495c;
+    box-shadow: 0 0 8px 2px #fe495c55;
     animation: status-pulse 2.4s infinite ease-in-out;
+  }
+  .strike-card-reason {
+    flex: 1;
+    font-weight: 700;
+    font-size: 0.97rem;
+    color: #1a2e22;
+    letter-spacing: -0.3px;
+  }
+  .strike-card-amount {
+    font-weight: 800;
+    font-size: 1.02rem;
+    color: #14774a;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+  .strike-card-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+    color: #6b8070;
+  }
+  .strike-card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.22rem;
+  }
+  .strike-card-badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.18em 0.65em;
+    border-radius: 2em;
+  }
+  .strike-card-badge.bezahlt {
+    background: #e6faf2;
+    color: #12a05e;
+    border: 1px solid #b0ecd4;
+  }
+  .strike-card-badge.offen {
+    background: #fff0f2;
+    color: #d9203a;
+    border: 1px solid #ffc4cd;
+  }
+  .strike-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid #f0f5f2;
+  }
+  .strike-card-btn {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.3em 0.85em;
+    border-radius: 0.7em;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .strike-card-btn.edit {
+    background: #eaf6f1;
+    color: #197a4a;
+  }
+  .strike-card-btn.edit:hover { background: #c8edd8; }
+  .strike-card-btn.delete {
+    background: #fff0f2;
+    color: #c0152a;
+  }
+  .strike-card-btn.delete:hover { background: #ffd8dd; }
+  @keyframes fadein-up {
+    from { opacity: 0; transform: translateY(27px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes status-pulse {
     0%, 100% { box-shadow: 0 0 12px 3px #fe495c77; }
@@ -386,63 +485,75 @@
     font-style: italic;
   }
 
+  @media (max-width: 680px) {
+    .strikeboard-app { max-width: 100%; margin: 0; }
+  }
   @media (max-width: 700px) {
     .strikeboard-app { padding: 0 0.05rem; }
-    .strikeboard-hero { padding: 1.15rem 0.11rem 1.15rem 0.11rem; border-radius: 1.09em; }
-    .strikeboard-header-content { gap: 0.22rem; }
-    .strikeboard-title { font-size: 1.14rem; }
-    .strikeboard-icon { font-size: 1.15em; }
-    .strikeboard-statistics { gap: 0.65rem; }
-    .strikeboard-stat { min-width: 65px; font-size: 0.93em; padding: 0.33em 0.65em 0.33em 0.29em; }
-    .usercard-head { font-size: 0.92rem; padding: 0.58rem 0.09rem; }
+    .strikeboard-hero {
+      padding: 1.2rem 1.1rem 1.2rem 1.1rem;
+      border-radius: 1rem 1rem 1.5rem 1.5rem;
+      margin: -0.25rem -0.1rem 1.4rem;
+      box-shadow: 0 12px 24px rgba(18, 66, 43, 0.28), 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    .strikeboard-title { font-size: 1.55rem; }
+    .strikeboard-stats-row { gap: 0.45rem; margin-top: 0.75rem; }
+    .strikeboard-stat-chip { padding: 0.26rem 0.65rem; min-width: 46px; }
+    .strikeboard-stat-chip .stat-chip-value { font-size: 1.15rem; }
+    .strikeboard-stat-chip .stat-chip-label { font-size: 0.62rem; }
+    .strikeboard-orb-1 { width: 120px; height: 120px; top: -25px; right: -15px; }
+    .strikeboard-orb-2 { width: 90px; height: 90px; }
+    .usercard-head { font-size: 0.92rem; padding: 0.58rem 0.7rem; }
     .user-avatar-lg { width: 1.12em; height: 1.12em; font-size: 0.74em; }
-    .strike-ultra-row { 
-      font-size: 0.75rem;
-      flex-wrap: wrap;
-      gap: 0.4rem 1rem;
-      padding: 0.7em 0.6em;
-    }
-    .strike-event,
-    .strike-date,
-    .strike-amount {
-      min-width: auto;
-      flex-basis: 100%;
-      color: var(--strike-green);
-    }
-    .strike-reason {
-      flex-basis: 100%;
-      margin-top: 0.2rem;
-      font-weight: 600;
-      color: #24282b;
-    }
-    .strike-event { min-width: 30px; }
-    .strike-date { min-width: 48px; }
-    .strike-amount { min-width: 55px; }
-    .usercard-content { font-size: 0.85rem; }
+    .strike-ultra-list { padding: 0.4rem 0.45rem; gap: 0.45rem; }
+    .strike-card { padding: 0.65rem 0.75rem 0.55rem 0.75rem; }
+    .strike-card-reason { font-size: 0.91rem; }
+    .strike-card-amount { font-size: 0.95rem; }
+    .strike-card-meta { font-size: 0.72rem; gap: 0.3rem 0.6rem; }
+    .strike-card-actions { gap: 0.4rem; }
+    .strike-card-btn { font-size: 0.73rem; padding: 0.28em 0.7em; }
   }
 </style>
 
 <script>
+  const IS_ADMIN = <%= user.is_admin ? 'true' : 'false' %>;
+
   document.addEventListener('DOMContentLoaded', () => {
     const toggles = document.querySelectorAll('.usercard-head');
+
+    // Für Admins: alle Karten direkt aufgeklappt
+    if (IS_ADMIN) {
+      document.querySelectorAll('.strikeboard-user-card').forEach(card => {
+        card.classList.add('open');
+        card.querySelector('.usercard-content').hidden = false;
+        card.querySelector('.usercard-head').setAttribute('aria-expanded', 'true');
+      });
+    }
+
     toggles.forEach(toggle => {
       toggle.addEventListener('click', () => {
         const card = toggle.closest('.strikeboard-user-card');
         const content = card.querySelector('.usercard-content');
         const isOpen = card.classList.contains('open');
 
-        // Alle Karten schließen
-        document.querySelectorAll('.strikeboard-user-card.open').forEach(openCard => {
-          openCard.classList.remove('open');
-          openCard.querySelector('.usercard-content').hidden = true;
-          openCard.querySelector('.usercard-head').setAttribute('aria-expanded', 'false');
-        });
+        if (!IS_ADMIN) {
+          // Normaler Modus: nur eine Karte auf einmal
+          document.querySelectorAll('.strikeboard-user-card.open').forEach(openCard => {
+            openCard.classList.remove('open');
+            openCard.querySelector('.usercard-content').hidden = true;
+            openCard.querySelector('.usercard-head').setAttribute('aria-expanded', 'false');
+          });
+        }
 
-        // Aktuelle Karte öffnen/schließen
+        // Aktuelle Karte toggeln
         if (!isOpen) {
           card.classList.add('open');
           content.hidden = false;
           toggle.setAttribute('aria-expanded', 'true');
+        } else if (IS_ADMIN) {
+          card.classList.remove('open');
+          content.hidden = true;
+          toggle.setAttribute('aria-expanded', 'false');
         }
       });
     });

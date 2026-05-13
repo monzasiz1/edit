@@ -3,7 +3,18 @@ const router = express.Router();
 const db = require('../db'); // Deine DB-Verbindung
 
 router.get('/', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
   try {
+    const isAdmin = req.session.user && req.session.user.is_admin;
+    const userId = req.session.user ? req.session.user.id : null;
+
+    const settingResult = await db.query(
+      `SELECT value FROM app_settings WHERE key = 'ranking_blur_enabled' LIMIT 1`
+    );
+    const rankingBlurEnabled = settingResult.rowCount === 0
+      ? true
+      : [true, 1, '1', 'true', 'on'].includes(settingResult.rows[0].value);
+
     const users = await db.query(`
       SELECT u.id, u.username, COALESCE(SUM(p.amount), 0) AS total_penalty_amount
       FROM users u
@@ -26,12 +37,16 @@ router.get('/', async (req, res) => {
     console.log(users.rows); // Ausgabe der Benutzerdaten zur Kontrolle
     console.log('Gesamtsumme aller Strafen:', totalSum);
 
-    // Überprüfen, ob der Benutzer Admin ist
-    const isAdmin = req.session.user && req.session.user.is_admin;
-    const userId = req.session.user ? req.session.user.id : null;
-
     // Alle Benutzer an die View übergeben, einschließlich der `isAdmin`-Variable und der Gesamtsumme
-    res.render('ranking', { users: users.rows, userId, isAdmin, totalSum });
+    res.render('ranking', {
+      users: users.rows,
+      userId,
+      isAdmin,
+      totalSum,
+      rankingBlurEnabled,
+      title: 'Ranking',
+      path: '/ranking'
+    });
   } catch (err) {
     console.error('Fehler beim Abrufen der Benutzerdaten:', err);
     res.status(500).send('Server Error');

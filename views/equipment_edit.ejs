@@ -1,0 +1,108 @@
+<%- include('partials/zeugwart_page_styles') %>
+
+<main class="apple-dashboard">
+  <header class="page-hero">
+    <div class="page-hero-clip">
+      <div class="page-hero-orb page-hero-orb-1"></div>
+      <div class="page-hero-orb page-hero-orb-2"></div>
+    </div>
+    <div class="page-hero-content">
+      <div class="page-hero-title-wrap">
+        <span class="page-hero-kicker">Zeugwart</span>
+        <h1 class="page-hero-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+          Equipment bearbeiten
+        </h1>
+      </div>
+      <div class="page-hero-actions">
+        <a href="/equipment" class="page-hero-btn ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Zurück
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="dev-card" style="max-width: 700px;">
+    <form method="POST" action="/equipment/<%= equipment.id %>/edit">
+      <div class="apple-form-group">
+        <label>Name *</label>
+        <input type="text" name="name" class="apple-input" value="<%= equipment.name %>" required>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Kategorie</label>
+        <% const selectedCat = categories.find(c => String(c.id) === String(equipment.category_id)); %>
+        <div class="cat-select" data-cat-select>
+          <input type="hidden" name="category_id" value="<%= equipment.category_id || '' %>" data-cat-input>
+          <button type="button" class="cat-select-btn apple-input" data-cat-toggle aria-haspopup="listbox" aria-expanded="false">
+            <span class="cat-select-label" data-cat-label>
+              <% if (selectedCat) { %>
+                <span class="cat-select-icon"><%- selectedCat.icon_svg %></span>
+                <span><%= selectedCat.name %></span>
+              <% } else { %>
+                <span class="cat-select-icon cat-select-icon--empty"></span>
+                <span>-- Keine Kategorie --</span>
+              <% } %>
+            </span>
+            <svg class="cat-select-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="cat-select-list" role="listbox" data-cat-list hidden>
+            <li class="cat-select-opt" role="option" data-value="" data-label="-- Keine Kategorie --">
+              <span class="cat-select-icon cat-select-icon--empty"></span>
+              <span>-- Keine Kategorie --</span>
+            </li>
+            <% categories.forEach(cat => { %>
+              <li class="cat-select-opt" role="option" data-value="<%= cat.id %>" data-label="<%= cat.name %>" data-icon='<%- cat.icon_svg %>'>
+                <span class="cat-select-icon"><%- cat.icon_svg %></span>
+                <span><%= cat.name %></span>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Beschreibung</label>
+        <textarea name="description" class="apple-input" rows="3"><%= equipment.description || '' %></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="apple-form-group">
+          <label>Seriennummer</label>
+          <input type="text" name="serial_number" class="apple-input" value="<%= equipment.serial_number || '' %>">
+        </div>
+
+        <div class="apple-form-group">
+          <label>Zustand</label>
+          <select name="condition" class="apple-input">
+            <option value="gut" <%= equipment.condition === 'gut' ? 'selected' : '' %>>Gut</option>
+            <option value="gebraucht" <%= equipment.condition === 'gebraucht' ? 'selected' : '' %>>Gebraucht</option>
+            <option value="reparaturbedürftig" <%= equipment.condition === 'reparaturbedürftig' ? 'selected' : '' %>>Reparaturbedürftig</option>
+            <option value="defekt" <%= equipment.condition === 'defekt' ? 'selected' : '' %>>Defekt</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="apple-form-group">
+        <label>Menge</label>
+        <input type="number" name="quantity" class="apple-input" value="<%= equipment.quantity %>" min="1">
+      </div>
+
+      <div class="apple-form-group">
+        <label>Notizen</label>
+        <textarea name="notes" class="apple-input" rows="2"><%= equipment.notes || '' %></textarea>
+      </div>
+
+      <button type="submit" class="dev-btn-primary" style="margin-top: 1rem;">Änderungen speichern</button>
+    </form>
+
+    <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e5e7eb;">
+
+    <h3 style="color: #b91c1c;">Gefahrenzone</h3>
+    <form method="POST" action="/equipment/<%= equipment.id %>/delete" onsubmit="return confirm('Equipment <%= equipment.name %> wirklich löschen?');">
+      <button type="submit" class="dev-btn-danger">Equipment löschen</button>
+    </form>
+  </div>
+<%- include('partials/cat_select_styles') %>
+</main>
