@@ -1382,15 +1382,32 @@
   }
 
   function loadZXing() {
-    if (window.ZXingBrowser || window.ZXing) return Promise.resolve(window.ZXingBrowser || window.ZXing);
+    if (window.ZXing) return Promise.resolve(window.ZXing);
     if (zxingLoading) return zxingLoading;
-    zxingLoading = new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js';
-      s.onload  = () => resolve(window.ZXingBrowser || window.ZXing);
-      s.onerror = () => reject(new Error('Scanner-Bibliothek konnte nicht geladen werden'));
-      document.head.appendChild(s);
-    });
+    // 1. lokale Kopie (immer offline verfuegbar)  2. jsdelivr  3. unpkg
+    const sources = [
+      '/vendor/zxing.min.js',
+      'https://cdn.jsdelivr.net/npm/@zxing/library@latest/umd/index.min.js',
+      'https://unpkg.com/@zxing/library@latest/umd/index.min.js'
+    ];
+    zxingLoading = (async () => {
+      for (const src of sources) {
+        try {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.async = true;
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error('load failed: ' + src));
+            document.head.appendChild(s);
+          });
+          if (window.ZXing && window.ZXing.BrowserMultiFormatReader) return window.ZXing;
+        } catch (e) {
+          console.warn('[QR] ZXing-Quelle fehlgeschlagen:', src, e);
+        }
+      }
+      throw new Error('Scanner-Bibliothek konnte aus keiner Quelle geladen werden');
+    })();
     return zxingLoading;
   }
 
