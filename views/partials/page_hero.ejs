@@ -1,18 +1,11 @@
 <%
-/*
- * Globaler Page-Hero Header (Equipment-/Rollen-/Benutzer-Look).
- * Usage:
- *   <%- include('partials/page_hero', {
- *         kicker: 'Verwaltung',
- *         title:  'Benutzer',
- *         icon:   '<svg ...></svg>',   // optional, HTML-String
- *         subtitle: 'optionaler Untertitel', // optional
- *         actions: [
- *           { href: '/users/add', label: 'Neu',    variant: 'primary', icon: '<svg .../>' },
- *           { href: '/dashboard', label: 'Zurück', variant: 'ghost',   icon: '<svg .../>' }
- *         ]
- *       }) %>
- */
+// Globaler Page-Hero Header (Equipment-/Rollen-/Benutzer-Look).
+// Erwartet (alle optional):
+//   kicker   : String  - kleine Eyebrow-Zeile ueber dem Titel
+//   title    : String  - Hauptueberschrift (HTML erlaubt, z.B. &shy;)
+//   icon     : String  - HTML/SVG, das vor dem Titel im H1 gerendert wird
+//   subtitle : String  - kurzer Untertitel unter dem Titel
+//   actions  : Array von { href, label, variant: primary|ghost|danger, icon, tag, id, onclick, type }
 const _kicker   = typeof kicker   !== 'undefined' ? kicker   : '';
 const _title    = typeof title    !== 'undefined' ? title    : '';
 const _icon     = typeof icon     !== 'undefined' ? icon     : '';
