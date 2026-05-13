@@ -50,48 +50,114 @@
     .main-nav {
       position: sticky;
       top: 0;
-      z-index: 99;
+      z-index: 120;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.7rem 2.4rem 0.7rem 0;
-      background: var(--nav-bg);
+      padding: 0.6rem 2.4rem 0.6rem 0;
+      background:
+        radial-gradient(120% 200% at 50% -40%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 30%, rgba(232,241,229,0.0) 60%),
+        linear-gradient(180deg, #e6ede0 0%, #dde6d6 55%, #d2dccb 100%);
       border-radius: 0 0 var(--radius) var(--radius);
-      min-height: 64px;
+      min-height: 130px;
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       user-select: none;
-      border: 1.4px solid #d4dfcfcc;
+      border: 1.4px solid #c8d4be;
       border-top: none;
-      box-shadow: 0 4px 18px rgba(122,142,111,0.10), 0 1.5px 6px rgba(181,198,164,0.08);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.85),
+        inset 0 -2px 6px rgba(85,110,75,0.18),
+        0 6px 22px rgba(85,110,75,0.14),
+        0 1.5px 6px rgba(181,198,164,0.10);
     }
     .main-nav .logo {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 14px;
-      font-size: 42px;
-      font-weight: 900;
-      color: var(--green-dark);
-      letter-spacing: -0.025em;
+      justify-content: flex-start;
+      gap: 22px;
       text-decoration: none;
-      text-align: center;
+      text-align: left;
       user-select: text;
       line-height: 1;
-      padding-left: 1rem;
+      padding-left: 1.4rem;
       white-space: nowrap;
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+    .main-nav .logo:hover { transform: none; }
+    .main-nav .logo:focus-visible { outline: 2px solid #2d8f55; outline-offset: 4px; border-radius: 14px; }
+    .main-nav.has-user .logo { cursor: default; }
+    .main-nav.has-user .logo:hover { transform: none; filter: none; }
+    .main-nav.has-user .logo:hover img { transform: none; }
+
+    /* Logo-Bild „eingefräst" — nahtlos im Header, ohne Kreis */
+    .main-nav .logo-img-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 138px;
+      height: 138px;
+      flex-shrink: 0;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
     }
     .main-nav .logo img {
-      height: 56px;
-      width: 56px;
+      position: relative;
+      z-index: 1;
+      height: 128px;
+      width: 128px;
       object-fit: contain;
       border-radius: 0;
       box-shadow: none;
       background: none;
-      filter: none;
+      filter:
+        drop-shadow(0 -1px 0 rgba(40,60,40,0.55))
+        drop-shadow(-1px -1px 1px rgba(40,60,40,0.35))
+        drop-shadow(0 1px 0 rgba(255,255,255,0.7))
+        drop-shadow(1px 2px 1px rgba(255,255,255,0.4));
       user-select: none;
       pointer-events: none;
-      transition: none;
+      mix-blend-mode: multiply;
+      opacity: 0.95;
+    }
+    .main-nav .logo:hover img { transform: none; filter:
+        drop-shadow(0 -1px 0 rgba(40,60,40,0.55))
+        drop-shadow(-1px -1px 1px rgba(40,60,40,0.35))
+        drop-shadow(0 1px 0 rgba(255,255,255,0.7))
+        drop-shadow(1px 2px 1px rgba(255,255,255,0.4)); }
+
+    /* Wordmark — als wäre der Name in das Material des Headers eingestanzt */
+    .main-nav .logo-wordmark {
+      position: relative;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: clamp(26px, 5.6vw, 52px);
+      font-weight: 900;
+      letter-spacing: -1.8px;
+      line-height: 0.95;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
+      color: #b6c3ab;
+      text-shadow:
+        0 -1px 0 rgba(40,60,40,0.55),
+        0 -2px 1px rgba(40,60,40,0.18),
+        0 1px 0 rgba(255,255,255,0.85),
+        0 2px 1px rgba(255,255,255,0.45);
+      padding-bottom: 4px;
+    }
+    .main-nav .logo-wordmark::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      right: 8px;
+      bottom: -2px;
+      height: 2px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, rgba(40,60,40,0.25) 0%, rgba(40,60,40,0.05) 60%, transparent 100%);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.7);
     }
     .nav-menu {
       display: flex;
@@ -277,6 +343,9 @@
         justify-self: end;
       }
       .main-nav .logo img { height: 40px; width: 40px; }
+      .main-nav .logo-img-wrap { width: 48px; height: 48px; }
+      .main-nav .logo-wordmark { font-size: 28px; letter-spacing: -0.8px; }
+      .main-nav { min-height: 64px; padding: 0.56rem 0.75rem; }
 
       /* Bottom Sheet – transition-basiert, kein keyframe */
       .nav-menu {
@@ -563,15 +632,304 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
+
+    /* ============================================================
+       Desktop-Navigation: kategorisierte Dropdowns (aus Kopie)
+       ============================================================ */
+    .nav-desktop { display: none; }
+
+    @media (min-width: 1024px) {
+      .main-nav .nav-menu,
+      body > .nav-menu { display: none !important; }
+      .main-nav .hamburger-btn,
+      .hamburger-btn { display: none !important; }
+
+      .nav-desktop {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin-left: auto;
+        padding-right: 0.8rem;
+      }
+
+      .nav-d-link,
+      .nav-d-btn,
+      .nav-d-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42em;
+        font-family: inherit;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #1f4a30;
+        background: transparent;
+        border: 1.2px solid transparent;
+        padding: 0.5em 0.85em;
+        border-radius: 0.85em;
+        cursor: pointer;
+        text-decoration: none;
+        line-height: 1;
+        transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.12s ease;
+      }
+      .nav-d-link svg,
+      .nav-d-btn svg,
+      .nav-d-icon-link svg { color: #2d8f55; }
+
+      .nav-d-link:hover,
+      .nav-d-btn:hover,
+      .nav-d-icon-link:hover {
+        background: rgba(255,255,255,0.7);
+        border-color: rgba(45,143,85,0.22);
+        color: #154e2c;
+      }
+      .nav-d-link.active,
+      .nav-d-icon-link.active {
+        background: rgba(61,169,115,0.18);
+        border-color: rgba(45,143,85,0.35);
+        color: #15532e;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      }
+      .nav-d-link:focus-visible,
+      .nav-d-btn:focus-visible,
+      .nav-d-icon-link:focus-visible {
+        outline: 2px solid #2d8f55;
+        outline-offset: 2px;
+      }
+
+      .nav-d-icon-link { padding: 0.55em; gap: 0; }
+
+      .nav-d-logout-form { margin: 0; display: inline-flex; }
+      .nav-d-logout { background: transparent; border: 1.2px solid transparent; }
+      .nav-d-logout svg { color: #c0282a; }
+      .nav-d-logout:hover { background: #fdecec; border-color: rgba(192,40,42,0.3); }
+
+      .nav-d-group { position: relative; }
+      .nav-d-group::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 12px;
+        background: transparent;
+      }
+      .nav-d-btn .nav-d-caret { transition: transform 0.2s ease; opacity: 0.7; }
+      .nav-d-group:hover .nav-d-btn,
+      .nav-d-group:focus-within .nav-d-btn {
+        background: rgba(255,255,255,0.85);
+        border-color: rgba(45,143,85,0.28);
+      }
+      .nav-d-group:hover .nav-d-caret,
+      .nav-d-group:focus-within .nav-d-caret { transform: rotate(180deg); }
+
+      .nav-d-pop {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 280px;
+        background: #ffffff;
+        border: 1px solid rgba(45,143,85,0.18);
+        border-radius: 1em;
+        box-shadow:
+          0 18px 40px rgba(20,60,40,0.18),
+          0 4px 14px rgba(20,60,40,0.10);
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+        transform-origin: top right;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 200;
+      }
+      .nav-d-pop::after {
+        content: '';
+        position: absolute;
+        top: -14px;
+        left: 0;
+        right: 0;
+        height: 14px;
+        background: transparent;
+      }
+      .nav-d-pop::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: 1.6em;
+        width: 14px;
+        height: 14px;
+        background: #ffffff;
+        border-left: 1px solid rgba(45,143,85,0.18);
+        border-top: 1px solid rgba(45,143,85,0.18);
+        transform: rotate(45deg);
+      }
+      .nav-d-group:hover .nav-d-pop,
+      .nav-d-group:focus-within .nav-d-pop {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+      }
+
+      .nav-d-item {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.55rem 0.7rem;
+        border-radius: 0.7em;
+        text-decoration: none;
+        color: #1c3a25;
+        transition: background 0.14s ease;
+      }
+      .nav-d-item:hover { background: #f1f7f2; }
+      .nav-d-item span:not(.nav-d-ic) {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        line-height: 1.15;
+      }
+      .nav-d-item strong { font-size: 0.93rem; font-weight: 700; color: #154e2c; }
+      .nav-d-item small  { font-size: 0.76rem; font-weight: 500; color: #6f8678; }
+      .nav-d-ic {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 0.6em;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .nav-d-link,
+      .nav-d-btn { font-size: 0.97rem; padding: 0.55em 0.95em; }
+    }
   </style>
 </head>
 <body>
   <nav class="main-nav<% if (user) { %> has-user<% } %>" role="navigation" aria-label="Hauptnavigation">
-    <a href="/" class="logo" tabindex="0" aria-label="Spießbuch Startseite">
-      <img src="/logo.png" alt="Logo Spießbuch" />
-      Spießbuch
-    </a>
     <% if (user) { %>
+      <div class="logo" aria-label="Spießbuch">
+        <span class="logo-img-wrap">
+          <img src="/logo.png" alt="Logo Spießbuch" />
+        </span>
+        <span class="logo-wordmark">Spießbuch</span>
+      </div>
+    <% } else { %>
+      <a href="/" class="logo" tabindex="0" aria-label="Spießbuch Startseite">
+        <span class="logo-img-wrap">
+          <img src="/logo.png" alt="Logo Spießbuch" />
+        </span>
+        <span class="logo-wordmark">Spießbuch</span>
+      </a>
+    <% } %>
+    <% if (user) { %>
+      <!-- Desktop-Navigation mit kategorisierten Dropdowns -->
+      <nav class="nav-desktop" aria-label="Hauptnavigation Desktop">
+        <a class="nav-d-link <% if (typeof path !== 'undefined' && path === '/dashboard') { %>active<% } %>" href="/dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Start
+        </a>
+
+        <% if (user.is_admin) { %>
+        <div class="nav-d-group">
+          <button type="button" class="nav-d-btn" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Aktionen
+            <svg class="nav-d-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-d-pop">
+            <a href="/penalties" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#f2eafa;color:#8b4cc8;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+              <span><strong>Strafen-Übersicht</strong><small>Alle Strafen einsehen</small></span>
+            </a>
+            <a href="/penalties/add" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#e6f4ec;color:#2d8f55;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+              <span><strong>Neue Strafe</strong><small>Strafe verteilen</small></span>
+            </a>
+            <a href="/spiess-board" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#fdeaea;color:#c84c4c;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+              <span><strong>Spießboard</strong><small>Übersicht für den Spieß</small></span>
+            </a>
+            <a href="/strafenkatalog.pdf" target="_blank" rel="noopener" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#f0f0f0;color:#5a6a5a;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+              <span><strong>Strafenkatalog</strong><small>PDF herunterladen</small></span>
+            </a>
+            <% if (user.is_board) { %>
+            <a href="/suggestions/admin" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#fff0e8;color:#d97b2a;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></span>
+              <span><strong>Vorschläge Admin</strong><small>Ideen prüfen &amp; freigeben</small></span>
+            </a>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+
+        <% if (user.is_admin || user.is_board || (typeof canManageEquipment !== 'undefined' && canManageEquipment) || (typeof canAssignEquipment !== 'undefined' && canAssignEquipment) || (typeof canManageRoles !== 'undefined' && canManageRoles)) { %>
+        <div class="nav-d-group">
+          <button type="button" class="nav-d-btn" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Verwaltung
+            <svg class="nav-d-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-d-pop">
+            <% if (user.is_admin || user.is_board) { %>
+            <a href="/users" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#eaeffa;color:#3b5bbf;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+              <span><strong>Nutzer</strong><small>Mitglieder verwalten</small></span>
+            </a>
+            <% } %>
+            <% if (user.is_admin || (typeof canManageRoles !== 'undefined' && canManageRoles)) { %>
+            <a href="/roles" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#fce7f3;color:#be185d;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+              <span><strong>Rollen</strong><small>Berechtigungen</small></span>
+            </a>
+            <% } %>
+            <% if (user.is_admin || (typeof canManageEquipment !== 'undefined' && canManageEquipment) || (typeof canAssignEquipment !== 'undefined' && canAssignEquipment)) { %>
+            <a href="/equipment" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#eae8ff;color:#667eea;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+              <span><strong>Zeugwart</strong><small>Ausrüstung &amp; Zuweisung</small></span>
+            </a>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+
+        <div class="nav-d-group">
+          <button type="button" class="nav-d-btn" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Verein
+            <svg class="nav-d-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-d-pop">
+            <a href="/ranking" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#fef4e2;color:#c9920a;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+              <span><strong>Ranking</strong><small>Top-Platzierungen</small></span>
+            </a>
+            <a href="/suggestions" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#fef4e2;color:#d97b0a;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><path d="M12 6a6 6 0 0 1 6 6c0 3-1.5 5-3 6H9c-1.5-1-3-3-3-6a6 6 0 0 1 6-6z"/></svg></span>
+              <span><strong>Ideen</strong><small>Vorschläge einreichen</small></span>
+            </a>
+            <a href="/export" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#eaeffd;color:#3b6bbf;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span><strong>Export</strong><small>Daten exportieren</small></span>
+            </a>
+          </div>
+        </div>
+
+        <a class="nav-d-icon-link <% if (typeof path !== 'undefined' && path === '/profil') { %>active<% } %>" href="/profil" aria-label="Profil" title="Profil">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+
+        <form action="/logout" method="POST" class="nav-d-logout-form">
+          <button type="submit" class="nav-d-icon-link nav-d-logout" aria-label="Abmelden" title="Abmelden">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </form>
+      </nav>
+
       <button class="hamburger-btn" id="hamburger-btn" aria-label="Menü öffnen" aria-expanded="false" aria-controls="main-menu" tabindex="0">
         <span></span><span></span><span></span>
       </button>
