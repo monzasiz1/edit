@@ -212,12 +212,26 @@
   letter-spacing: 0;
 }
 .apple-welcome-head strong {
-  display: block;
-  color: #3da973;
+  display: inline-block;
   font-weight: 900;
   letter-spacing: -1.5px;
-  font-size: 1em;
+  font-size: 1.15em;
   line-height: 1.1;
+  background: linear-gradient(135deg, #3da973 0%, #1a7a45 45%, #0e5a32 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55), 0 8px 22px rgba(26, 122, 69, 0.22);
+  filter: drop-shadow(0 2px 1px rgba(15, 50, 30, 0.18));
+  padding: 0.05em 0.1em;
+}
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .apple-welcome-head strong {
+    color: #1a7a45;
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
 }
 .apple-welcome-emoji {
   font-size: 1.25em;
