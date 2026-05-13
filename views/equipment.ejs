@@ -1459,7 +1459,10 @@
   }
 
   async function handleCode(value) {
-    const code = (value || '').trim();
+    // Steuerzeichen, FNC1, Whitespace abschneiden
+    let code = (value || '')
+      .replace(/[\x00-\x1F\x7F\u200B-\u200F\uFEFF]/g, '')
+      .trim();
     if (!code) return;
     const now = Date.now();
     if (code === lastSubmitted && now - lastSubmittedAt < 3000) {
@@ -1471,6 +1474,7 @@
     scanning = false;
     hint.textContent = 'Code erkannt – wird gesucht…';
     setStatus('Suche „' + code + '“…', 'info');
+    try { console.log('[QR] Scan-Ergebnis:', JSON.stringify(value), '→ normalisiert:', JSON.stringify(code)); } catch (e) {}
 
     try {
       const res = await fetch('/equipment/lookup?code=' + encodeURIComponent(code), {

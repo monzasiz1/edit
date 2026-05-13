@@ -236,6 +236,14 @@ router.get('/lookup', requireEquipmentAccess, async (req, res) => {
       const r = await db.query('SELECT id FROM equipment WHERE id = $1', [urlMatch[1]]);
       if (r.rows[0]) foundId = r.rows[0].id;
     }
+    // Reine Zahl: zuerst als Seriennummer exakt suchen, dann als interne ID (höchst unüblich, dass die ID zur Seriennummer passt)
+    if (!foundId && /^\d+$/.test(raw)) {
+      const r = await db.query(
+        'SELECT id FROM equipment WHERE LOWER(serial_number) = LOWER($1) LIMIT 1',
+        [raw]
+      );
+      if (r.rows[0]) foundId = r.rows[0].id;
+    }
     if (!foundId && /^\d+$/.test(raw)) {
       const r = await db.query('SELECT id FROM equipment WHERE id = $1', [raw]);
       if (r.rows[0]) foundId = r.rows[0].id;
@@ -246,6 +254,20 @@ router.get('/lookup', requireEquipmentAccess, async (req, res) => {
         [raw]
       );
       if (r.rows[0]) foundId = r.rows[0].id;
+    }
+    // Nur-Ziffern-Variante (z.B. EAN-Check-Digit strippen / Code-128 mit Trennzeichen)
+    if (!foundId) {
+      const digits = raw.replace(/\D+/g, '');
+      if (digits && digits !== raw && digits.length >= 4) {
+        const r = await db.query(
+          `SELECT id FROM equipment
+           WHERE regexp_replace(COALESCE(serial_number, ''), '\\D', '', 'g') = $1
+              OR LOWER(serial_number) = LOWER($2)
+           LIMIT 2`,
+          [digits, digits]
+        );
+        if (r.rows.length === 1) foundId = r.rows[0].id;
+      }
     }
     if (!foundId) {
       const r = await db.query(
