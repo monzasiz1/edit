@@ -1229,9 +1229,9 @@
         <div class="qr-hint" id="qrHint">Kamera wird gestartet…</div>
       </div>
       <form id="qrManualForm" class="qr-manual">
-        <label for="qrManualInput">Seriennummer manuell eingeben</label>
+        <label for="qrManualInput">Seriennummer / Code manuell eingeben</label>
         <div class="qr-manual-row">
-          <input type="text" id="qrManualInput" placeholder="z. B. SN-12345" autocomplete="off" />
+          <input type="text" id="qrManualInput" placeholder="z. B. SN-12345 oder ABC-987" autocomplete="off" />
           <button type="submit" class="qr-submit">Suchen</button>
         </div>
       </form>
@@ -1369,9 +1369,17 @@
   let stream = null;
   let scanning = false;
   let detector = null;
-  let jsqrLoading = null;
+  let zxingLoading = null;
+  let zxingReader = null;
   let lastSubmitted = '';
   let lastSubmittedAt = 0;
+
+  // Alle Formate, die Zahlen UND/ODER Buchstaben tragen koennen
+  const WANTED_FORMATS = [
+    'qr_code', 'data_matrix', 'aztec', 'pdf417',
+    'code_128', 'code_39', 'code_93', 'codabar', 'itf',
+    'ean_13', 'ean_8', 'upc_a', 'upc_e'
+  ];
 
   function setStatus(msg, kind) {
     if (!msg) { status.hidden = true; status.textContent = ''; return; }
@@ -1380,17 +1388,18 @@
     status.className = 'qr-status ' + (kind || 'info');
   }
 
-  function loadJsQR() {
-    if (window.jsQR) return Promise.resolve(window.jsQR);
-    if (jsqrLoading) return jsqrLoading;
-    jsqrLoading = new Promise((resolve, reject) => {
+  function loadZXing() {
+    if (window.ZXingBrowser) return Promise.resolve(window.ZXingBrowser);
+    if (zxingLoading) return zxingLoading;
+    zxingLoading = new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
-      s.onload  = () => resolve(window.jsQR);
-      s.onerror = () => reject(new Error('jsQR konnte nicht geladen werden'));
+      // ZXing-js Browser bundle (UMD)
+      s.src = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js';
+      s.onload  = () => resolve(window.ZXingBrowser || window.ZXing);
+      s.onerror = () => reject(new Error('ZXing konnte nicht geladen werden'));
       document.head.appendChild(s);
     });
-    return jsqrLoading;
+    return zxingLoading;
   }
 
   async function startCamera() {
@@ -1401,8 +1410,25 @@
       });
       video.srcObject = stream;
       await video.play();
-      hint.textContent = 'Code in den Rahmen halten';
+      hint.textContent = 'QR / Barcode in den Rahmen halten';
       scanning = true;
+
+      // ZXing direkt benutzen wenn BarcodeDetector fehlt (Firefox/Safari)
+      if (!('BarcodeDetector' in window)) {
+        try {
+          const ZX = await loadZXing();
+          if (ZX) {
+            zxingReader = new ZX.BrowserMultiFormatReader();
+            zxingReader.decodeFromVideoElement(video, (result, err) => {
+              if (!scanning) return;
+              if (result && result.getText) {
+                handleCode(result.getText());
+              }
+            });
+            return;
+          }
+        } catch (e) { /* fall through to scanLoop */ }
+      }
       scanLoop();
     } catch (err) {
       hint.textContent = 'Kein Kamerazugriff';
@@ -1415,28 +1441,15 @@
     try {
       if ('BarcodeDetector' in window) {
         if (!detector) {
-          const formats = await window.BarcodeDetector.getSupportedFormats();
+          const supported = await window.BarcodeDetector.getSupportedFormats();
+          const formats = WANTED_FORMATS.filter(f => supported.includes(f));
           detector = new window.BarcodeDetector({
-            formats: formats.includes('qr_code')
-              ? ['qr_code']
-              : formats.slice(0, 6),
+            formats: formats.length ? formats : supported,
           });
         }
         const codes = await detector.detect(video);
         if (codes && codes.length > 0 && codes[0].rawValue) {
           return handleCode(codes[0].rawValue);
-        }
-      } else {
-        const jsQR = await loadJsQR();
-        const c = document.createElement('canvas');
-        c.width  = video.videoWidth;
-        c.height = video.videoHeight;
-        if (c.width && c.height) {
-          const ctx = c.getContext('2d', { willReadFrequently: true });
-          ctx.drawImage(video, 0, 0, c.width, c.height);
-          const img = ctx.getImageData(0, 0, c.width, c.height);
-          const r = jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
-          if (r && r.data) return handleCode(r.data);
         }
       }
     } catch (e) {
@@ -1491,6 +1504,10 @@
 
   function stopCamera() {
     scanning = false;
+    if (zxingReader) {
+      try { zxingReader.reset(); } catch (e) {}
+      zxingReader = null;
+    }
     if (stream) {
       stream.getTracks().forEach(t => t.stop());
       stream = null;
