@@ -5,8 +5,10 @@
       <img src="/logo.png" alt="Spießbuch" class="apple-logo-img" />
     </div>
     <h1 class="apple-welcome-head">
-      <span class="apple-welcome-emoji"><svg width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span>
-      Willkommen zurück,<br>
+      <span class="apple-welcome-line">
+        <span class="apple-welcome-emoji"><svg width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span>
+        Willkommen zurück,
+      </span>
       <strong><%= user.username %></strong>
     </h1>
     <div class="apple-hero-badge">Dein <span>Spießbuch</span> – immer dabei</div>
@@ -187,19 +189,35 @@
 }
 
 .apple-welcome-head {
-  font-size: 2.3rem;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15em;
+  font-size: 2.1rem;
   font-weight: 800;
   text-align: center;
   color: #273e2b;
-  line-height: 1.13;
+  line-height: 1.15;
   margin: 0 0 0.32em 0;
   letter-spacing: -1.5px;
 }
+.apple-welcome-head > .apple-welcome-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: #5b7a60;
+  letter-spacing: 0;
+}
 .apple-welcome-head strong {
+  display: block;
   color: #3da973;
   font-weight: 900;
   letter-spacing: -1.5px;
-  font-size: 1.05em;
+  font-size: 1em;
+  line-height: 1.1;
 }
 .apple-welcome-emoji {
   font-size: 1.25em;
@@ -217,15 +235,18 @@
   40% { transform: rotate(0);}
 }
 .apple-hero-badge {
-  margin-top: 0.48em;
+  display: inline-block;
+  margin-top: 0.65em;
   color: #5b7a60;
   background: linear-gradient(90deg, #ebf7eb 70%, #e6f2e7 100%);
-  padding: 0.32em 1.19em 0.32em 1em;
-  border-radius: 2em;
+  padding: 0.28em 0.85em;
+  border-radius: 999px;
   font-weight: 700;
-  font-size: 1.13em;
-  letter-spacing: 0.05em;
-  box-shadow: 0 2px 16px #a8ebc911;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 6px rgba(168, 235, 201, 0.25);
+  border: 1px solid #d6ecd9;
 }
 
 .dash-purpose-note {
@@ -505,8 +526,9 @@
   .apple-dashboard-hero { padding-top: 1.4rem; padding-bottom: 1.5rem; }
   .apple-logo-wrap { width: 64px; height: 64px; }
   .apple-logo-img { width: 60px; height: 60px; }
-  .apple-welcome-head { font-size: 1.13rem; }
-  .apple-hero-badge { font-size: 0.98em;}
+  .apple-welcome-head { font-size: 1.55rem; }
+  .apple-welcome-head > .apple-welcome-line { font-size: 0.7em; }
+  .apple-hero-badge { font-size: 0.62rem; padding: 0.25em 0.75em; }
   .apple-cards-list { max-width: 99vw; padding: 0 0.75rem;}
   .apple-card { font-size: 0.97em; min-height: 60px; padding: 1em 0.6em 0.55em 1.1em;}
   .apple-status-dot { width: 0.84em; height: 0.84em; left: -0.61em; top: 0.71em;}
