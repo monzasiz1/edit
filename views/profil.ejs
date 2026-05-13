@@ -890,11 +890,9 @@
     <% } %>
 
     <style>
+      /* Container = stacked Hero-Layout, KEIN Side-by-Side mehr */
       .equip-figure-wrap {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-        align-items: start;
+        display: block;
         padding: 0.85rem 1rem 1rem;
       }
       .equip-figure {
@@ -905,6 +903,8 @@
         border: 1px solid #d5e8dd;
         padding: 1rem 0.5rem 0.6rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        margin: 0 auto 1.1rem;
+        max-width: 460px;
       }
 
       /* Puppe + Overlay-Dots */
@@ -1047,12 +1047,8 @@
       }
       .puppet-tooltip-close:hover { background: #f3f4f6; color: #374151; }
 
-      /* Desktop: 2-Spalten erst ab 960px wenn genug Platz */
+      /* Desktop: Puppe etwas größer, Dots größer */
       @media (min-width: 960px) {
-        .equip-figure-wrap {
-          grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
-          gap: 1.75rem;
-        }
         .equip-puppet-wrap {
           max-width: 360px;
         }
@@ -1126,13 +1122,8 @@
         margin: 0;
         padding: 0;
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-      }
-      @media (min-width: 560px) and (max-width: 959.98px) {
-        .equip-slot-list {
-          grid-template-columns: 1fr 1fr;
-        }
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 0.6rem;
       }
       .equip-slot {
         background: #fff;
@@ -1285,20 +1276,26 @@
         line-height: 1.35;
       }
 
-      /* Mobile: gestapelt */
+      /* Mobile: kompaktere Polsterung */
       @media (max-width: 640px) {
         .equip-figure-wrap {
-          grid-template-columns: 1fr;
-          gap: 1rem;
-          padding: 0.6rem 0.85rem 0.85rem;
+          padding: 0.6rem 0.7rem 0.85rem;
         }
         .equip-figure {
-          padding: 0.5rem;
+          padding: 0.6rem 0.4rem 0.4rem;
+          margin-bottom: 0.85rem;
         }
         .equip-puppet-wrap {
-          max-width: 280px;
+          max-width: 260px;
           margin: 0 auto;
         }
+        .equip-slot-list {
+          grid-template-columns: 1fr;
+        }
+        .equip-summary {
+          padding: 0.55rem 0.6rem;
+        }
+        .equip-summary-stat { padding: 0 0.3rem; }
       }
     </style>
 
