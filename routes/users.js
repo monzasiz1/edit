@@ -66,6 +66,43 @@ router.post('/edit/:id', requireAdminOrBoard, async (req, res) => {
                    [username, isAdminChecked, isBoardChecked, req.params.id]);
   }
 
+  // Legacy-Flags <-> Rollenzuweisungen synchronisieren, damit das neue
+  // Rollensystem die "Admin"-/"Vorstand"-Checkboxen direkt wiederspiegelt.
+  try {
+    if (isAdminChecked) {
+      await db.query(
+        `INSERT INTO user_roles (user_id, role_id)
+         SELECT $1, r.id FROM roles r WHERE r.is_admin = TRUE
+         ON CONFLICT (user_id, role_id) DO NOTHING`,
+        [req.params.id]
+      );
+    } else {
+      await db.query(
+        `DELETE FROM user_roles
+         WHERE user_id = $1
+           AND role_id IN (SELECT id FROM roles WHERE is_admin = TRUE)`,
+        [req.params.id]
+      );
+    }
+    if (isBoardChecked) {
+      await db.query(
+        `INSERT INTO user_roles (user_id, role_id)
+         SELECT $1, r.id FROM roles r WHERE r.is_board = TRUE
+         ON CONFLICT (user_id, role_id) DO NOTHING`,
+        [req.params.id]
+      );
+    } else {
+      await db.query(
+        `DELETE FROM user_roles
+         WHERE user_id = $1
+           AND role_id IN (SELECT id FROM roles WHERE is_board = TRUE)`,
+        [req.params.id]
+      );
+    }
+  } catch (err) {
+    console.error('[users] role sync failed', err);
+  }
+
   // Session updaten, falls eigener Account
   if (String(req.session.user.id) === String(req.params.id)) {
     const { rows } = await db.query('SELECT id, username, is_admin, is_board FROM users WHERE id=$1', [req.params.id]);
@@ -96,7 +133,33 @@ router.post('/add', requireAdmin, async (req, res) => {
     return res.render('users_add', { user: req.session.user, error: 'Benutzername existiert bereits!' });
   }
   const hash = await bcrypt.hash(password, 10);
-  await db.query('INSERT INTO users(username,password,is_admin,is_board) VALUES($1,$2,$3,$4)', [username, hash, is_admin === 'on', is_board === 'on']);
+  const isAdminChecked = is_admin === 'on';
+  const isBoardChecked = is_board === 'on';
+  const insertRes = await db.query(
+    'INSERT INTO users(username,password,is_admin,is_board) VALUES($1,$2,$3,$4) RETURNING id',
+    [username, hash, isAdminChecked, isBoardChecked]
+  );
+  const newUserId = insertRes.rows[0].id;
+  try {
+    if (isAdminChecked) {
+      await db.query(
+        `INSERT INTO user_roles (user_id, role_id)
+         SELECT $1, r.id FROM roles r WHERE r.is_admin = TRUE
+         ON CONFLICT (user_id, role_id) DO NOTHING`,
+        [newUserId]
+      );
+    }
+    if (isBoardChecked) {
+      await db.query(
+        `INSERT INTO user_roles (user_id, role_id)
+         SELECT $1, r.id FROM roles r WHERE r.is_board = TRUE
+         ON CONFLICT (user_id, role_id) DO NOTHING`,
+        [newUserId]
+      );
+    }
+  } catch (err) {
+    console.error('[users] role sync on add failed', err);
+  }
   res.redirect('/users');
 });
 

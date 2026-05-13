@@ -346,6 +346,26 @@ async function ensureDatabaseSchema() {
       ('Zeugwart',      FALSE, FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE, FALSE)
     ON CONFLICT (name) DO NOTHING
   `);
+
+  // Legacy-Flags (users.is_admin / users.is_board) als Rollen-Zuweisungen
+  // ueberfuehren, damit bestehende Spiess-/Vorstand-Konten direkt im neuen
+  // Rollensystem erscheinen. Idempotent dank UNIQUE(user_id, role_id).
+  await db.query(`
+    INSERT INTO user_roles (user_id, role_id)
+    SELECT u.id, r.id
+    FROM users u
+    JOIN roles r ON r.is_admin = TRUE
+    WHERE u.is_admin = TRUE
+    ON CONFLICT (user_id, role_id) DO NOTHING
+  `);
+  await db.query(`
+    INSERT INTO user_roles (user_id, role_id)
+    SELECT u.id, r.id
+    FROM users u
+    JOIN roles r ON r.is_board = TRUE
+    WHERE u.is_board = TRUE
+    ON CONFLICT (user_id, role_id) DO NOTHING
+  `);
 }
 
 const vapidKeys = {
