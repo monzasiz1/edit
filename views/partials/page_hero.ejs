@@ -1,0 +1,55 @@
+<%
+/*
+ * Globaler Page-Hero Header (Equipment-/Rollen-/Benutzer-Look).
+ * Usage:
+ *   <%- include('partials/page_hero', {
+ *         kicker: 'Verwaltung',
+ *         title:  'Benutzer',
+ *         icon:   '<svg ...></svg>',   // optional, HTML-String
+ *         subtitle: 'optionaler Untertitel', // optional
+ *         actions: [
+ *           { href: '/users/add', label: 'Neu',    variant: 'primary', icon: '<svg .../>' },
+ *           { href: '/dashboard', label: 'Zurück', variant: 'ghost',   icon: '<svg .../>' }
+ *         ]
+ *       }) %>
+ */
+const _kicker   = typeof kicker   !== 'undefined' ? kicker   : '';
+const _title    = typeof title    !== 'undefined' ? title    : '';
+const _icon     = typeof icon     !== 'undefined' ? icon     : '';
+const _subtitle = typeof subtitle !== 'undefined' ? subtitle : '';
+const _actions  = (typeof actions !== 'undefined' && Array.isArray(actions)) ? actions : [];
+%>
+<header class="page-hero">
+  <div class="page-hero-clip">
+    <div class="page-hero-orb page-hero-orb-1"></div>
+    <div class="page-hero-orb page-hero-orb-2"></div>
+  </div>
+  <div class="page-hero-content">
+    <div class="page-hero-title-wrap">
+      <% if (_kicker) { %><span class="page-hero-kicker"><%= _kicker %></span><% } %>
+      <h1 class="page-hero-title">
+        <% if (_icon) { %><%- _icon %><% } %>
+        <%- _title %>
+      </h1>
+      <% if (_subtitle) { %><p class="page-hero-subtitle"><%= _subtitle %></p><% } %>
+    </div>
+    <% if (_actions.length) { %>
+      <div class="page-hero-actions">
+        <% _actions.forEach(function(a) {
+             const variant = a.variant ? (' ' + a.variant) : '';
+             const tag = a.tag || (a.href ? 'a' : 'button');
+             const attrs = [];
+             if (tag === 'a' && a.href) attrs.push('href="' + a.href + '"');
+             if (tag === 'button') attrs.push('type="' + (a.type || 'button') + '"');
+             if (a.id) attrs.push('id="' + a.id + '"');
+             if (a.onclick) attrs.push('onclick="' + a.onclick + '"');
+        %>
+          <<%= tag %> class="page-hero-btn<%= variant %>" <%- attrs.join(' ') %>>
+            <% if (a.icon) { %><%- a.icon %><% } %>
+            <%= a.label %>
+          </<%= tag %>>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</header>

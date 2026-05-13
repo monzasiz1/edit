@@ -1,0 +1,165 @@
+/* ──────────────────────────────────────────────────────────────
+   Globaler Page-Hero Header
+   Wird auf ALLEN Seiten (außer Dashboard) verwendet,
+   damit der Look konsistent ist (Equipment / Rollen / Benutzer).
+   ────────────────────────────────────────────────────────────── */
+
+.page-hero {
+  position: relative;
+  padding: 1.4rem 1.5rem 1.4rem 1.5rem;
+  background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+  border-radius: 1.35rem 1.35rem 2rem 2rem;
+  margin: -0.55rem -0.25rem 1.6rem;
+  overflow: visible;
+  border: 1px solid rgba(160, 212, 183, 0.42);
+  box-shadow: 0 15px 34px rgba(18, 66, 43, 0.34), 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: pageHeroFade 0.7s cubic-bezier(.4,0,0,1.12);
+}
+@keyframes pageHeroFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-hero-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.page-hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.36;
+  filter: blur(36px);
+}
+.page-hero-orb-1 {
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, #a8f4d2 0%, transparent 70%);
+  top: -50px; right: -30px;
+}
+.page-hero-orb-2 {
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, #b8e8ff 0%, transparent 70%);
+  bottom: -30px; left: 8%;
+}
+.page-hero::after {
+  content: '';
+  position: absolute;
+  left: 1.2rem; right: 1.2rem; top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.55), rgba(255,255,255,0.02));
+  pointer-events: none;
+  z-index: 2;
+}
+.page-hero-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.page-hero-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.page-hero-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+}
+.page-hero-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.page-hero-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.35;
+  max-width: 56ch;
+}
+.page-hero-title svg {
+  width: 26px; height: 26px;
+  flex-shrink: 0;
+  opacity: 0.92;
+}
+.page-hero-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.page-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 2em;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.page-hero-btn:hover {
+  background: rgba(255,255,255,0.28);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+  transform: translateY(-1px);
+  color: #fff;
+}
+.page-hero-btn:active { transform: scale(0.96); }
+.page-hero-btn.primary {
+  background: #fff;
+  color: #1a7a45;
+  border-color: rgba(255,255,255,0.6);
+}
+.page-hero-btn.primary:hover { background: #f0fff7; color: #145d34; }
+.page-hero-btn.ghost {
+  background: transparent;
+  border-color: rgba(255,255,255,0.4);
+}
+.page-hero-btn.danger {
+  background: rgba(220, 70, 70, 0.85);
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+}
+.page-hero-btn.danger:hover { background: #c0392b; color: #fff; }
+.page-hero-btn svg { width: 14px; height: 14px; }
+
+@media (max-width: 640px) {
+  .page-hero { padding: 1.1rem 1.1rem; border-radius: 1.1rem 1.1rem 1.6rem 1.6rem; margin-bottom: 1.2rem; }
+  .page-hero-content { flex-direction: column; align-items: stretch; gap: 0.85rem; }
+  .page-hero-title { font-size: 1.45rem; }
+  .page-hero-title svg { width: 22px; height: 22px; }
+  .page-hero-subtitle { font-size: 0.82rem; }
+  .page-hero-actions { width: 100%; }
+  .page-hero-btn { flex: 1 1 auto; justify-content: center; padding: 0.55rem 0.7rem; font-size: 0.82rem; }
+}
+@media (max-width: 380px) {
+  .page-hero-actions { flex-direction: column; }
+  .page-hero-btn { width: 100%; }
+}

@@ -341,14 +341,14 @@
 </style>
 
 <div class="pform-page">
-  <div class="pform-header">
-    <div class="pform-header-glass"></div>
-    <div class="pform-header-orb"></div>
-    <div class="pform-header-inner">
-      <div class="pform-kicker">Strafen</div>
-      <h2 class="pform-title">Neue Strafe vergeben</h2>
-    </div>
-  </div>
+  <%- include('partials/page_hero', {
+        kicker: 'Strafen',
+        title: 'Neue Strafe vergeben',
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+        actions: [
+          { href: '/penalties', label: 'Zur\u00fcck', variant: 'ghost', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' }
+        ]
+      }) %>
 
   <% if (error) { %>
     <div class="pform-error"><%= error %></div>

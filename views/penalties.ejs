@@ -1,36 +1,31 @@
 <main class="strikeboard-app">
-  <header class="strikeboard-hero">
-    <div class="strikeboard-glass-bg"></div>
-    <div class="strikeboard-orb strikeboard-orb-1"></div>
-    <div class="strikeboard-orb strikeboard-orb-2"></div>
-    <div class="strikeboard-header-content">
-      <div class="strikeboard-top-row">
-        <span class="strikeboard-kicker">Strafenverwaltung</span>
-        <% if (user.is_admin) { %>
-        <a href="/penalties/add" class="strikeboard-add-btn" title="Strafe hinzuf&uuml;gen">
-          <span class="strikeboard-fab-icon">+</span>
-          <span class="strikeboard-fab-label">Neu</span>
-        </a>
-        <% } %>
-      </div>
-      <h1 class="strikeboard-title">Strafen&shy;&uuml;bersicht</h1>
-      <div class="strikeboard-subline">Alle Mitglieder · Stand <span><%= new Date().toLocaleDateString('de-DE') %></span></div>
-      <div class="strikeboard-stats-row">
-        <div class="strikeboard-stat-chip">
-          <span class="stat-chip-value"><%= strafen.length %></span>
-          <span class="stat-chip-label">Eintr&auml;ge</span>
-        </div>
-        <div class="strikeboard-stat-chip highlight-chip">
-          <span class="stat-chip-value"><%= strafen.reduce((s, p) => s + Number(p.amount), 0).toFixed(2) %> &euro;</span>
-          <span class="stat-chip-label">Gesamt</span>
-        </div>
-        <div class="strikeboard-stat-chip danger-chip">
-          <span class="stat-chip-value"><%= strafen.filter(s => s.status === 'offen').length %></span>
-          <span class="stat-chip-label">Offen</span>
-        </div>
-      </div>
+  <%- include('partials/page_hero', {
+        kicker: 'Strafenverwaltung',
+        title: 'Strafen\u00fcbersicht',
+        subtitle: 'Alle Mitglieder \u00b7 Stand ' + new Date().toLocaleDateString('de-DE'),
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        actions: (user.is_admin ? [
+          { href: '/penalties/add', label: 'Neu', variant: 'primary', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' },
+          { href: '/dashboard', label: 'Zur\u00fcck', variant: 'ghost', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' }
+        ] : [
+          { href: '/dashboard', label: 'Zur\u00fcck', variant: 'ghost', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' }
+        ])
+      }) %>
+
+  <div class="strikeboard-stats-row" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin:-0.8rem 0 1.3rem;">
+    <div class="strikeboard-stat-chip">
+      <span class="stat-chip-value"><%= strafen.length %></span>
+      <span class="stat-chip-label">Eintr&auml;ge</span>
     </div>
-  </header>
+    <div class="strikeboard-stat-chip highlight-chip">
+      <span class="stat-chip-value"><%= strafen.reduce((s, p) => s + Number(p.amount), 0).toFixed(2) %> &euro;</span>
+      <span class="stat-chip-label">Gesamt</span>
+    </div>
+    <div class="strikeboard-stat-chip danger-chip">
+      <span class="stat-chip-value"><%= strafen.filter(s => s.status === 'offen').length %></span>
+      <span class="stat-chip-label">Offen</span>
+    </div>
+  </div>
 
   <section class="strikeboard-list">
     <% 

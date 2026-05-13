@@ -272,29 +272,29 @@
 
 <div class="ub-page">
 
-  <!-- Hero -->
-  <div class="ub-hero">
-    <div class="ub-hero-top">
-      <span class="ub-kicker">Verwaltung</span>
-      <a href="/users/add" class="ub-add-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Neu
-      </a>
+  <%- include('partials/page_hero', {
+        kicker: 'Verwaltung',
+        title: 'Benutzer\u00ad\u00fcbersicht',
+        subtitle: 'Mitglieder verwalten, anlegen und Rollen pflegen.',
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        actions: [
+          { href: '/users/add', label: 'Neu', variant: 'primary', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' },
+          { href: '/dashboard', label: 'Zur\u00fcck', variant: 'ghost', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' }
+        ]
+      }) %>
+
+  <div class="ub-stats" style="margin:-0.8rem 0 1.3rem;">
+    <div class="ub-stat">
+      <span class="ub-stat-val"><%= users.length %></span>
+      <span class="ub-stat-label">Mitglieder</span>
     </div>
-    <h1 class="ub-hero-title">Benutzer&shy;übersicht</h1>
-    <div class="ub-stats">
-      <div class="ub-stat">
-        <span class="ub-stat-val"><%= users.length %></span>
-        <span class="ub-stat-label">Mitglieder</span>
-      </div>
-      <div class="ub-stat">
-        <span class="ub-stat-val"><%= users.filter(u => u.is_admin).length %></span>
-        <span class="ub-stat-label">Spieße</span>
-      </div>
-      <div class="ub-stat">
-        <span class="ub-stat-val"><%= users.filter(u => u.is_board).length %></span>
-        <span class="ub-stat-label">Vorstand</span>
-      </div>
+    <div class="ub-stat">
+      <span class="ub-stat-val"><%= users.filter(u => u.is_admin).length %></span>
+      <span class="ub-stat-label">Spieße</span>
+    </div>
+    <div class="ub-stat">
+      <span class="ub-stat-val"><%= users.filter(u => u.is_board).length %></span>
+      <span class="ub-stat-label">Vorstand</span>
     </div>
   </div>
 
