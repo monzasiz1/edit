@@ -288,39 +288,66 @@
   }
   .usercard-head {
     display: flex; align-items: center; width: 100%;
-    gap: 0.85rem; padding: 0.95rem 1.1rem;
-    background: none; border: none; outline: none;
+    gap: 0.9rem; padding: 0.85rem 1rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 100%);
+    border: none; outline: none;
     box-sizing: border-box;
     text-align: left;
-    cursor: pointer; font-size: 1rem; font-weight: 700; color: #193b27; transition: background 0.18s; position: relative;
+    cursor: pointer; color: #193b27;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    letter-spacing: 0.01em;
   }
-  .usercard-head .user-avatar-lg { flex: 0 0 auto; }
-  .usercard-head .user-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .usercard-head .user-strike-count { flex: 0 0 auto; }
-  .usercard-head .chevron { flex: 0 0 auto; margin-left: auto; }
-  .usercard-head:hover, .strikeboard-user-card.open .usercard-head {
-    background: linear-gradient(91deg,#f7fff9 60%,#eaf6ff 100%);
+  .usercard-head:hover {
+    background: linear-gradient(180deg, #f5fbf7 0%, #ecf6f0 100%);
   }
-  .user-avatar-lg {
+  .usercard-head:active { transform: scale(0.995); }
+  .strikeboard-user-card.open .usercard-head {
+    background: linear-gradient(180deg, #eef9f2 0%, #e2f3e7 100%);
+  }
+  .usercard-head .user-avatar-lg {
+    flex: 0 0 auto;
+    width: 2.6em; height: 2.6em;
     background: var(--avatar-grad);
     color: #fff;
-    width: 2.1em; height: 2.1em; /* kleiner */
     display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; font-weight: 900; font-size: 1.05em; letter-spacing: 0.4px; box-shadow: 0 4px 12px #6bffec17;
+    border-radius: 50%;
+    font-weight: 900; font-size: 1em;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(26,230,141,0.25), inset 0 1px 0 rgba(255,255,255,0.35);
+    border: 2px solid #fff;
   }
-  .user-name {
-    flex: 1; font-size: 1.07em; font-weight: 700; color: #1d2727; letter-spacing: -0.59px;
+  .usercard-head .user-name {
+    flex: 1 1 auto; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: 1.05rem; font-weight: 700; color: #1a2e25;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
   }
-  .user-strike-count {
-    background: #fff; color: #1ae68d; font-size: 1.05em; padding: 0.11em 0.5em; border-radius: 1.2em; margin-right: 0.6em; font-weight: 800; border: 1.5px solid #d8f6ef; box-shadow: 0 1px 8px #13c07418;
+  .usercard-head .user-strike-count {
+    flex: 0 0 auto;
+    background: linear-gradient(135deg, #1ae68d 0%, #0d8a55 100%);
+    color: #fff;
+    font-size: 0.85rem; font-weight: 800;
+    padding: 0.25em 0.75em;
+    border-radius: 999px;
+    border: none;
+    box-shadow: 0 3px 10px rgba(13,138,85,0.28);
+    margin: 0;
+    letter-spacing: 0.02em;
+    min-width: 1.8em; text-align: center;
   }
-  .chevron {
-    font-size: 1.5em; color: #b0bac8; margin-right: 0.3em; transition: transform 0.34s cubic-bezier(.7,.3,0,1.4);
+  .usercard-head .chevron {
+    flex: 0 0 auto;
+    width: 1.4em; height: 1.4em;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2em; color: #8aa094;
+    margin: 0;
+    transition: transform 0.3s cubic-bezier(.7,.3,0,1.4);
   }
-  .strikeboard-user-card.open .chevron {
+  .strikeboard-user-card.open .usercard-head .chevron {
     transform: rotate(90deg);
+    color: #1ae68d;
   }
   .usercard-content {
     max-height: 0;
