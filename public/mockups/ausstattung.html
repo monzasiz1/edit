@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vereinsausstattung – Design-Vergleich</title>
+<style>
+  :root {
+    --green:#1a7a45;
+    --green-2:#3da973;
+    --green-soft:#e6f4ec;
+    --green-line:#c5e8d2;
+    --bg:#f5f7f6;
+    --ink:#0f1f1a;
+    --ink-2:#1b2e2b;
+    --muted:#6b7c70;
+    --line:#e2efe6;
+    --card:#ffffff;
+    --warn:#b45309;
+    --warn-bg:#fff4e6;
+    --warn-line:#fde2a8;
+    --stage:#0f1d18;
+    --stage-2:#162a23;
+    --accent:#34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:2rem 1rem 6rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header {
+    text-align: center; margin-bottom: 2.5rem;
+  }
+  .header h1 { margin: 0 0 0.4rem; font-size: 1.75rem; letter-spacing: -0.02em; }
+  .header p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .toggle {
+    display: inline-flex; gap: 0; margin-top: 1rem;
+    background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .toggle button {
+    border: 0; background: transparent; padding: 0.55rem 1.1rem; border-radius: 9px;
+    font-weight: 600; font-size: 0.88rem; cursor: pointer; color: var(--muted);
+    transition: background 0.15s, color 0.15s;
+  }
+  .toggle button.active { background: var(--green); color: #fff; }
+  .variant-label {
+    display: inline-block; padding: 0.25rem 0.7rem; border-radius: 999px;
+    background: var(--green-soft); color: var(--green); font-size: 0.72rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem;
+  }
+  .variant-title { margin: 0 0 0.2rem; font-size: 1.4rem; letter-spacing: -0.015em; }
+  .variant-sub { margin: 0 0 1.25rem; color: var(--muted); font-size: 0.9rem; }
+  .device-grid {
+    display: grid; gap: 2rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 1000px) {
+    .device-grid { grid-template-columns: 1fr 380px; align-items: start; }
+  }
+  .device-label {
+    text-align: center; font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .phone-frame {
+    max-width: 380px; margin: 0 auto;
+    background: #0f1d18; padding: 12px; border-radius: 34px;
+    box-shadow: 0 12px 40px rgba(15,29,24,0.25);
+  }
+  .phone-inner {
+    background: var(--bg); border-radius: 24px; overflow: hidden; padding: 1rem 0.85rem;
+  }
+  .desktop-frame {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 18px;
+    padding: 1.5rem; box-shadow: 0 8px 28px rgba(15,29,24,0.06);
+  }
+  .section-block { display: none; }
+  .section-block.active { display: block; }
+
+  /* ─────────────────────────  VARIANT A : STACKED HERO  ───────────────────────── */
+  .vA .equip-card {
+    background: linear-gradient(180deg, #fff 0%, #fbfdfc 100%);
+    border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+  .vA .equip-head {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.85rem 1rem; border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #f7fbf8, #fff);
+  }
+  .vA .equip-head svg { width: 20px; height: 20px; color: var(--green); flex-shrink: 0; }
+  .vA .equip-head h3 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; flex: 1; }
+  .vA .equip-head-chev { color: var(--muted); }
+
+  .vA .equip-hero {
+    position: relative;
+    padding: 1.2rem 1rem 1rem;
+    background:
+      radial-gradient(80% 60% at 50% 0%, #eaf5ee 0%, transparent 70%),
+      linear-gradient(180deg, #fdfffe 0%, #fff 100%);
+    text-align: center;
+  }
+  .vA .equip-hero-puppet {
+    position: relative; display: inline-block;
+    width: 100%; max-width: 280px;
+    filter: drop-shadow(0 18px 28px rgba(15,29,24,0.12));
+  }
+  .vA .equip-hero-puppet img {
+    display: block; width: 100%; height: auto; user-select: none; pointer-events: none;
+  }
+  .vA .equip-hero-stats {
+    margin-top: 1rem; display: inline-flex; gap: 0;
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 0.55rem 0.9rem; box-shadow: 0 2px 8px rgba(15,29,24,0.06);
+  }
+  .vA .stat { display: flex; flex-direction: column; align-items: center; padding: 0 0.85rem; }
+  .vA .stat-v { font-size: 1.35rem; font-weight: 800; color: var(--green); letter-spacing: -0.02em; line-height: 1; }
+  .vA .stat-k { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 0.25rem; }
+  .vA .stat-sep { width: 1px; background: linear-gradient(to bottom, transparent, var(--green-line), transparent); }
+
+  .vA .equip-body { padding: 1rem; }
+  .vA .equip-slots {
+    list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) {
+    .vA .equip-slots { grid-template-columns: 1fr 1fr; }
+  }
+  .vA .slot {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 0.7rem 0.9rem 0.8rem; min-width: 0;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  }
+  .vA .slot:hover { border-color: #b8d8c0; box-shadow: 0 8px 22px rgba(15,29,24,0.07); transform: translateY(-1px); }
+  .vA .slot-head { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
+  .vA .slot-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green-2);
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.18); flex-shrink: 0; }
+  .vA .slot-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--ink-2); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vA .slot-count { font-size: 0.7rem; font-weight: 700; color: var(--green);
+    background: var(--green-soft); border: 1px solid var(--green-line);
+    border-radius: 999px; padding: 0.08rem 0.5rem; flex-shrink: 0; }
+  .vA .slot-items { list-style: none; margin: 0.55rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+  .vA .item {
+    padding: 0.5rem 0.65rem 0.55rem 0.85rem; background: #fafdfb;
+    border-radius: 10px; border-left: 3px solid var(--green-line); min-width: 0;
+  }
+  .vA .item-name { display: flex; align-items: baseline; gap: 0.4rem; font-size: 0.92rem;
+    font-weight: 600; color: var(--ink-2); line-height: 1.3; word-break: break-word; }
+  .vA .qty { font-size: 0.74rem; font-weight: 700; color: #fff; background: var(--green);
+    padding: 0.05rem 0.4rem; border-radius: 999px; flex-shrink: 0; }
+  .vA .item-desc { margin-top: 0.18rem; font-size: 0.8rem; color: #4b5563; }
+  .vA .item-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+  .vA .tag { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.7rem;
+    font-weight: 600; line-height: 1; padding: 0.22rem 0.45rem; border-radius: 6px;
+    background: #f1f5f4; color: var(--ink-2); border: 1px solid #e1eae3; }
+  .vA .tag-k { font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #94a3b8; }
+
+  /* ─────────────────────────  VARIANT B : STUDIO SPLIT  ───────────────────────── */
+  .vB .equip-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 20px;
+    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+  .vB .equip-head {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--line);
+  }
+  .vB .equip-head svg { width: 20px; height: 20px; color: var(--green); }
+  .vB .equip-head h3 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; flex: 1; }
+
+  .vB .equip-split {
+    display: grid; grid-template-columns: 1fr; gap: 0;
+  }
+  @media (min-width: 760px) {
+    .vB .equip-split { grid-template-columns: minmax(280px, 360px) 1fr; }
+  }
+
+  /* Stage (Puppe in dunklem Studio-Look) */
+  .vB .stage {
+    position: relative;
+    background:
+      radial-gradient(60% 50% at 50% 25%, rgba(52,211,153,0.18) 0%, transparent 70%),
+      linear-gradient(180deg, var(--stage) 0%, var(--stage-2) 100%);
+    padding: 1.5rem 1rem 1.2rem;
+    overflow: hidden;
+  }
+  .vB .stage::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+  .vB .stage-puppet {
+    position: relative; z-index: 1; max-width: 280px; margin: 0 auto;
+    filter: drop-shadow(0 24px 30px rgba(0,0,0,0.5));
+  }
+  .vB .stage-puppet img { display: block; width: 100%; height: auto; }
+  .vB .stage-stats {
+    position: relative; z-index: 1; margin-top: 1.2rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+  }
+  .vB .stage-stat {
+    background: rgba(255,255,255,0.06); backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    padding: 0.55rem 0.7rem; text-align: center;
+  }
+  .vB .stage-stat-v { font-size: 1.45rem; font-weight: 800; color: var(--accent);
+    letter-spacing: -0.02em; line-height: 1; }
+  .vB .stage-stat-k { font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: rgba(255,255,255,0.6); margin-top: 0.25rem; display: block; }
+
+  /* Inventory column */
+  .vB .inventory { padding: 1rem; background: #fafdfb; }
+  .vB .inv-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted); margin: 0 0 0.7rem; }
+  .vB .inv-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+  .vB .inv-slot {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; min-width: 0;
+  }
+  .vB .inv-slot-head {
+    display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.85rem;
+    background: linear-gradient(90deg, #f7fbf8 0%, transparent 100%);
+    border-bottom: 1px solid var(--line);
+  }
+  .vB .inv-slot-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-2);
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.18); flex-shrink: 0; }
+  .vB .inv-slot-label { font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--ink-2); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vB .inv-slot-count { font-size: 0.68rem; font-weight: 700; color: var(--green);
+    background: var(--green-soft); border-radius: 999px; padding: 0.05rem 0.45rem; }
+  .vB .inv-items { list-style: none; margin: 0; padding: 0.5rem 0.85rem 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .vB .inv-item { display: flex; gap: 0.7rem; align-items: flex-start; min-width: 0; }
+  .vB .inv-thumb {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--green-soft), #d4eadc);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green); font-size: 1.05rem; font-weight: 800;
+  }
+  .vB .inv-item-main { flex: 1; min-width: 0; }
+  .vB .inv-item-name { display: flex; align-items: baseline; gap: 0.4rem;
+    font-size: 0.92rem; font-weight: 600; color: var(--ink-2); line-height: 1.25;
+    word-break: break-word; }
+  .vB .inv-qty { font-size: 0.72rem; font-weight: 700; color: var(--green);
+    background: var(--green-soft); padding: 0.05rem 0.4rem; border-radius: 999px; }
+  .vB .inv-desc { margin-top: 0.15rem; font-size: 0.78rem; color: #4b5563; line-height: 1.35; }
+  .vB .inv-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.3rem;
+    font-size: 0.7rem; color: var(--muted); }
+  .vB .inv-meta span { display: inline-flex; align-items: center; gap: 0.2rem; }
+  .vB .inv-meta b { color: var(--ink-2); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Meine Vereinsausstattung – Design-Vergleich</h1>
+    <p>Zwei Ansätze für mobile + desktop. Klicke zum Umschalten.</p>
+    <div class="toggle" role="tablist">
+      <button class="active" data-variant="A">Ansatz A – Stacked Hero</button>
+      <button data-variant="B">Ansatz B – Studio Split</button>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════  VARIANT A  ═════════════════════════ -->
+  <div class="section-block active" data-variant="A">
+    <span class="variant-label">Ansatz A</span>
+    <h2 class="variant-title">Stacked Hero</h2>
+    <p class="variant-sub">Puppe als Hero zentriert, Stats darunter als schwebende Pill-Bar, Slot-Karten als 2-Spalten-Grid. Leicht, hell, übersichtlich. Mobile = Desktop, nur Spalten reduzieren sich.</p>
+
+    <div class="device-grid">
+      <!-- Desktop -->
+      <div>
+        <div class="device-label">Desktop</div>
+        <div class="desktop-frame vA">
+          <div class="equip-card">
+            <div class="equip-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M12 8v6"/><path d="M9 11l-3 3"/><path d="M15 11l3 3"/><path d="M12 14l-3 7"/><path d="M12 14l3 7"/></svg>
+              <h3>Meine Vereinsausstattung</h3>
+              <span class="equip-head-chev">▾</span>
+            </div>
+            <div class="equip-hero">
+              <div class="equip-hero-puppet">
+                <img src="/puppe.png" alt="">
+              </div>
+              <div class="equip-hero-stats">
+                <div class="stat"><span class="stat-v">4</span><span class="stat-k">Gegenstände</span></div>
+                <div class="stat-sep"></div>
+                <div class="stat"><span class="stat-v">3</span><span class="stat-k">Positionen</span></div>
+                <div class="stat-sep"></div>
+                <div class="stat"><span class="stat-v">2</span><span class="stat-k">Kategorien</span></div>
+              </div>
+            </div>
+            <div class="equip-body">
+              <ul class="equip-slots">
+                <li class="slot">
+                  <div class="slot-head"><span class="slot-dot"></span><span class="slot-label">Oberkörper</span><span class="slot-count">1</span></div>
+                  <ul class="slot-items">
+                    <li class="item">
+                      <div class="item-name"><span>Vereinsjacke „Edition 2025"</span></div>
+                      <div class="item-desc">Marineblau mit Stickerei</div>
+                      <div class="item-tags"><span class="tag"><span class="tag-k">Größe</span> M</span><span class="tag"><span class="tag-k">SN</span> 4421</span></div>
+                    </li>
+                  </ul>
+                </li>
+                <li class="slot">
+                  <div class="slot-head"><span class="slot-dot"></span><span class="slot-label">Rechte Hand</span><span class="slot-count">1</span></div>
+                  <ul class="slot-items">
+                    <li class="item">
+                      <div class="item-name"><span>Lyra</span></div>
+                      <div class="item-desc">Vereinsinstrument, Messing poliert</div>
+                      <div class="item-tags"><span class="tag"><span class="tag-k">SN</span> 65776</span></div>
+                    </li>
+                  </ul>
+                </li>
+                <li class="slot">
+                  <div class="slot-head"><span class="slot-dot"></span><span class="slot-label">Beine</span><span class="slot-count">1</span></div>
+                  <ul class="slot-items">
+                    <li class="item">
+                      <div class="item-name"><span>Uniformhose</span></div>
+                      <div class="item-tags"><span class="tag"><span class="tag-k">Größe</span> 50</span></div>
+                    </li>
+                  </ul>
+                </li>
+                <li class="slot">
+                  <div class="slot-head"><span class="slot-dot"></span><span class="slot-label">Füße</span><span class="slot-count">1</span></div>
+                  <ul class="slot-items">
+                    <li class="item">
+                      <div class="item-name"><span>Schwarze Lederschuhe</span><span class="qty">×1</span></div>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div>
+        <div class="device-label">Mobile</div>
+        <div class="phone-frame">
+          <div class="phone-inner vA">
+            <div class="equip-card">
+              <div class="equip-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M12 8v6"/><path d="M9 11l-3 3"/><path d="M15 11l3 3"/></svg>
+                <h3>Vereinsausstattung</h3>
+              </div>
+              <div class="equip-hero">
+                <div class="equip-hero-puppet" style="max-width:200px"><img src="/puppe.png" alt=""></div>
+                <div class="equip-hero-stats">
+                  <div class="stat"><span class="stat-v">4</span><span class="stat-k">Items</span></div>
+                  <div class="stat-sep"></div>
+                  <div class="stat"><span class="stat-v">3</span><span class="stat-k">Pos.</span></div>
+                </div>
+              </div>
+              <div class="equip-body">
+                <ul class="equip-slots">
+                  <li class="slot">
+                    <div class="slot-head"><span class="slot-dot"></span><span class="slot-label">Oberkörper</span><span class="slot-count">1</span></div>
+                    <ul class="slot-items">
+                      <li class="item">
+                        <div class="item-name"><span>Vereinsjacke</span></div>
+                        <div class="item-tags"><span class="tag"><span class="tag-k">SN</span> 4421</span></div>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="slot">
+                    <div class="slot-head"><span class="slot-dot"></span><span class="slot-label">Rechte Hand</span><span class="slot-count">1</span></div>
+                    <ul class="slot-items">
+                      <li class="item">
+                        <div class="item-name"><span>Lyra</span></div>
+                        <div class="item-tags"><span class="tag"><span class="tag-k">SN</span> 65776</span></div>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════  VARIANT B  ═════════════════════════ -->
+  <div class="section-block" data-variant="B">
+    <span class="variant-label">Ansatz B</span>
+    <h2 class="variant-title">Studio Split</h2>
+    <p class="variant-sub">Premium-Look: Puppe steht in eigenem dunklen „Studio"-Panel mit Grid-Hintergrund (wie ein Game-Inventory-Screen). Items rechts in heller Spalte mit Thumbnails. Auf Mobile gestapelt mit kompakter Studio-Höhe.</p>
+
+    <div class="device-grid">
+      <div>
+        <div class="device-label">Desktop</div>
+        <div class="desktop-frame vB">
+          <div class="equip-card">
+            <div class="equip-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M12 8v6"/><path d="M9 11l-3 3"/><path d="M15 11l3 3"/></svg>
+              <h3>Meine Vereinsausstattung</h3>
+            </div>
+            <div class="equip-split">
+              <div class="stage">
+                <div class="stage-puppet"><img src="/puppe.png" alt=""></div>
+                <div class="stage-stats">
+                  <div class="stage-stat"><div class="stage-stat-v">4</div><span class="stage-stat-k">Items</span></div>
+                  <div class="stage-stat"><div class="stage-stat-v">3</div><span class="stage-stat-k">Positionen</span></div>
+                </div>
+              </div>
+              <div class="inventory">
+                <h4 class="inv-title">Inventar</h4>
+                <ul class="inv-list">
+                  <li class="inv-slot">
+                    <div class="inv-slot-head"><span class="inv-slot-dot"></span><span class="inv-slot-label">Oberkörper</span><span class="inv-slot-count">1</span></div>
+                    <ul class="inv-items">
+                      <li class="inv-item">
+                        <div class="inv-thumb">J</div>
+                        <div class="inv-item-main">
+                          <div class="inv-item-name">Vereinsjacke „Edition 2025"</div>
+                          <div class="inv-desc">Marineblau mit Stickerei</div>
+                          <div class="inv-meta"><span>Größe <b>M</b></span><span>SN <b>4421</b></span></div>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="inv-slot">
+                    <div class="inv-slot-head"><span class="inv-slot-dot"></span><span class="inv-slot-label">Rechte Hand</span><span class="inv-slot-count">1</span></div>
+                    <ul class="inv-items">
+                      <li class="inv-item">
+                        <div class="inv-thumb">L</div>
+                        <div class="inv-item-main">
+                          <div class="inv-item-name">Lyra</div>
+                          <div class="inv-desc">Vereinsinstrument, Messing poliert</div>
+                          <div class="inv-meta"><span>SN <b>65776</b></span></div>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="inv-slot">
+                    <div class="inv-slot-head"><span class="inv-slot-dot"></span><span class="inv-slot-label">Beine</span><span class="inv-slot-count">1</span></div>
+                    <ul class="inv-items">
+                      <li class="inv-item">
+                        <div class="inv-thumb">H</div>
+                        <div class="inv-item-main">
+                          <div class="inv-item-name">Uniformhose</div>
+                          <div class="inv-meta"><span>Größe <b>50</b></span></div>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="inv-slot">
+                    <div class="inv-slot-head"><span class="inv-slot-dot"></span><span class="inv-slot-label">Füße</span><span class="inv-slot-count">1</span></div>
+                    <ul class="inv-items">
+                      <li class="inv-item">
+                        <div class="inv-thumb">S</div>
+                        <div class="inv-item-main">
+                          <div class="inv-item-name">Schwarze Lederschuhe</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="device-label">Mobile</div>
+        <div class="phone-frame">
+          <div class="phone-inner vB">
+            <div class="equip-card">
+              <div class="equip-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M12 8v6"/><path d="M9 11l-3 3"/><path d="M15 11l3 3"/></svg>
+                <h3>Vereinsausstattung</h3>
+              </div>
+              <div class="equip-split">
+                <div class="stage" style="padding:1rem 0.8rem 0.9rem">
+                  <div class="stage-puppet" style="max-width:200px"><img src="/puppe.png" alt=""></div>
+                  <div class="stage-stats">
+                    <div class="stage-stat"><div class="stage-stat-v">4</div><span class="stage-stat-k">Items</span></div>
+                    <div class="stage-stat"><div class="stage-stat-v">3</div><span class="stage-stat-k">Pos.</span></div>
+                  </div>
+                </div>
+                <div class="inventory">
+                  <h4 class="inv-title">Inventar</h4>
+                  <ul class="inv-list">
+                    <li class="inv-slot">
+                      <div class="inv-slot-head"><span class="inv-slot-dot"></span><span class="inv-slot-label">Oberkörper</span><span class="inv-slot-count">1</span></div>
+                      <ul class="inv-items">
+                        <li class="inv-item">
+                          <div class="inv-thumb">J</div>
+                          <div class="inv-item-main">
+                            <div class="inv-item-name">Vereinsjacke</div>
+                            <div class="inv-meta"><span>SN <b>4421</b></span></div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="inv-slot">
+                      <div class="inv-slot-head"><span class="inv-slot-dot"></span><span class="inv-slot-label">Rechte Hand</span><span class="inv-slot-count">1</span></div>
+                      <ul class="inv-items">
+                        <li class="inv-item">
+                          <div class="inv-thumb">L</div>
+                          <div class="inv-item-main">
+                            <div class="inv-item-name">Lyra</div>
+                            <div class="inv-meta"><span>SN <b>65776</b></span></div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.dataset.variant;
+      document.querySelectorAll('.toggle button').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.section-block').forEach(sec => {
+        sec.classList.toggle('active', sec.dataset.variant === v);
+      });
+    });
+  });
+</script>
+</body>
+</html>
