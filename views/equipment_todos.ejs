@@ -569,7 +569,11 @@
       fetch('/equipment/todos/' + id + '/toggle', { method: 'POST', headers: { 'Accept': 'application/json' } })
         .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
         .then(function (res) {
-          if (!res.ok || !res.j || !res.j.ok) { console.warn('[todo-toggle] fehlgeschlagen', res); return; }
+          if (!res.ok || !res.j || !res.j.ok) {
+            console.warn('[todo-toggle] fehlgeschlagen', res.j || res, 'status=', res.ok);
+            if (res.j && res.j.message) alert('Toggle-Fehler: ' + res.j.message + (res.j.code ? ' (' + res.j.code + ')' : ''));
+            return;
+          }
           var card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
           if (!card) return;
           var done = !!res.j.done;
