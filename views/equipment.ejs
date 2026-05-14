@@ -912,6 +912,17 @@
     .ueq-puppet-wrap { justify-self: center; max-width: 280px; }
   }
 
+  /* Holder-Ansicht (Lager/Fahrzeug) hat keine Puppe -> volle Breite fuer Items */
+  .ueq-modal-body.is-holder-view {
+    grid-template-columns: 1fr !important;
+    justify-items: stretch;
+  }
+  .ueq-modal-body.is-holder-view > .ueq-puppet-wrap {
+    display: none !important;
+    border-right: none !important;
+    padding-right: 0 !important;
+  }
+
   .ueq-puppet-wrap {
     position: relative;
     display: inline-block;
@@ -2047,6 +2058,8 @@
     // Puppet wieder einblenden (falls von Holder-View ausgeblendet)
     const puppet = modal.querySelector('.ueq-puppet-wrap');
     if (puppet) puppet.style.display = '';
+    const body = modal.querySelector('.ueq-modal-body');
+    if (body) body.classList.remove('is-holder-view');
   }
 
   function openHolderModal(holderId) {
@@ -2061,6 +2074,8 @@
     // Puppet ausblenden — Lagerort/Fahrzeug hat keinen Körper
     const puppet = modal.querySelector('.ueq-puppet-wrap');
     if (puppet) puppet.style.display = 'none';
+    const bodyEl = modal.querySelector('.ueq-modal-body');
+    if (bodyEl) bodyEl.classList.add('is-holder-view');
     // Items rendern
     if (!h.items || !h.items.length) {
       itemsEl.innerHTML = '<div class="ueq-empty-list">Keine aktiven Zuweisungen</div>';
