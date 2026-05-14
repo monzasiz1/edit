@@ -160,6 +160,16 @@
   .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; }
   .eq-assignee-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .eq-assignee-qty { opacity: 0.7; font-weight: 500; }
+  .eq-assignee-sn {
+    font-weight: 700;
+    color: #1a7a45;
+    background: #e6f4ec;
+    border: 1px solid #c5e8d2;
+    border-radius: 999px;
+    padding: 0 0.45rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+  }
 
   .eq-card-actions {
     display: flex;
@@ -954,6 +964,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   <% } %>
                   <span class="eq-assignee-name"><%= a.name || '—' %></span>
+                  <% if (a.serial_number) { %><span class="eq-assignee-sn">#<%= a.serial_number %></span><% } %>
                   <% if (a.quantity && a.quantity > 1) { %><span class="eq-assignee-qty">×<%= a.quantity %></span><% } %>
                 </span>
               <% }) %>

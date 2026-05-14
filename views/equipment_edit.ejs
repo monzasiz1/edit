@@ -69,8 +69,9 @@
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div class="apple-form-group">
-          <label>Seriennummer</label>
+          <label>Seriennummer <span style="color:#9ca3af;font-weight:400;">(optional)</span></label>
           <input type="text" name="serial_number" class="apple-input" value="<%= equipment.serial_number || '' %>">
+          <small style="color:#6b7280;">Bei Mehrfachartikeln Seriennummer pro Zuweisung erfassen.</small>
         </div>
 
         <div class="apple-form-group">

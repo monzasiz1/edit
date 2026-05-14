@@ -80,6 +80,7 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       SELECT
         ea.equipment_id,
         ea.quantity,
+        ea.serial_number AS assignment_serial,
         ea.user_id,
         ea.holder_id,
         u.username, u.full_name,
@@ -103,6 +104,7 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
         name: isHolder ? row.holder_name : (row.full_name || row.username),
         type: isHolder ? (row.holder_type || 'other') : 'user',
         quantity: row.quantity,
+        serial_number: row.assignment_serial || null,
       });
     });
 
@@ -116,7 +118,8 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
     const userAssignmentsResult = await db.query(`
       SELECT
         u.id AS user_id, u.username, u.full_name,
-        e.id AS equipment_id, e.name, e.description, e.serial_number, e.condition,
+        e.id AS equipment_id, e.name, e.description, e.condition,
+        COALESCE(NULLIF(ea.serial_number, ''), e.serial_number) AS serial_number,
         ec.name AS category_name, ec.icon AS category_icon,
         ea.assigned_at, ea.quantity, ea.notes
       FROM equipment_assignments ea
@@ -165,7 +168,8 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
     const holderAssignmentsResult = await db.query(`
       SELECT
         h.id AS holder_id, h.name AS holder_name, h.holder_type,
-        e.id AS equipment_id, e.name, e.description, e.serial_number, e.condition,
+        e.id AS equipment_id, e.name, e.description, e.condition,
+        COALESCE(NULLIF(ea.serial_number, ''), e.serial_number) AS serial_number,
         ec.name AS category_name, ec.icon AS category_icon,
         ea.assigned_at, ea.quantity, ea.notes
       FROM equipment_assignments ea
@@ -239,7 +243,14 @@ router.get('/lookup', requireEquipmentAccess, async (req, res) => {
     // Reine Zahl: zuerst als Seriennummer exakt suchen, dann als interne ID (höchst unüblich, dass die ID zur Seriennummer passt)
     if (!foundId && /^\d+$/.test(raw)) {
       const r = await db.query(
-        'SELECT id FROM equipment WHERE LOWER(serial_number) = LOWER($1) LIMIT 1',
+        `SELECT e.id FROM equipment e
+         WHERE LOWER(e.serial_number) = LOWER($1)
+            OR EXISTS (
+              SELECT 1 FROM equipment_assignments ea
+              WHERE ea.equipment_id = e.id
+                AND LOWER(ea.serial_number) = LOWER($1)
+            )
+         LIMIT 1`,
         [raw]
       );
       if (r.rows[0]) foundId = r.rows[0].id;
@@ -250,7 +261,14 @@ router.get('/lookup', requireEquipmentAccess, async (req, res) => {
     }
     if (!foundId) {
       const r = await db.query(
-        'SELECT id FROM equipment WHERE LOWER(serial_number) = LOWER($1) LIMIT 1',
+        `SELECT e.id FROM equipment e
+         WHERE LOWER(e.serial_number) = LOWER($1)
+            OR EXISTS (
+              SELECT 1 FROM equipment_assignments ea
+              WHERE ea.equipment_id = e.id
+                AND LOWER(ea.serial_number) = LOWER($1)
+            )
+         LIMIT 1`,
         [raw]
       );
       if (r.rows[0]) foundId = r.rows[0].id;
@@ -260,9 +278,17 @@ router.get('/lookup', requireEquipmentAccess, async (req, res) => {
       const digits = raw.replace(/\D+/g, '');
       if (digits && digits !== raw && digits.length >= 4) {
         const r = await db.query(
-          `SELECT id FROM equipment
-           WHERE regexp_replace(COALESCE(serial_number, ''), '\\D', '', 'g') = $1
-              OR LOWER(serial_number) = LOWER($2)
+          `SELECT e.id FROM equipment e
+           WHERE regexp_replace(COALESCE(e.serial_number, ''), '\\D', '', 'g') = $1
+              OR LOWER(e.serial_number) = LOWER($2)
+              OR EXISTS (
+                SELECT 1 FROM equipment_assignments ea
+                WHERE ea.equipment_id = e.id
+                  AND (
+                    regexp_replace(COALESCE(ea.serial_number, ''), '\\D', '', 'g') = $1
+                    OR LOWER(ea.serial_number) = LOWER($2)
+                  )
+              )
            LIMIT 2`,
           [digits, digits]
         );
@@ -271,8 +297,13 @@ router.get('/lookup', requireEquipmentAccess, async (req, res) => {
     }
     if (!foundId) {
       const r = await db.query(
-        `SELECT id FROM equipment
-         WHERE serial_number ILIKE $1 OR name ILIKE $1
+        `SELECT e.id FROM equipment e
+         WHERE e.serial_number ILIKE $1 OR e.name ILIKE $1
+            OR EXISTS (
+              SELECT 1 FROM equipment_assignments ea
+              WHERE ea.equipment_id = e.id
+                AND ea.serial_number ILIKE $1
+            )
          LIMIT 2`,
         [`%${raw}%`]
       );
@@ -468,8 +499,9 @@ router.get('/:id/assign', requireEquipmentAccess, async (req, res) => {
 
 router.post('/:id/assign', requireEquipmentAccess, async (req, res) => {
   try {
-    const { target, quantity, notes } = req.body;
+    const { target, quantity, notes, serial_number } = req.body;
     const assignedBy = req.session.user.id;
+    const serialClean = (serial_number || '').toString().trim().slice(0, 100) || null;
 
     if (!target || typeof target !== 'string' || !target.includes(':')) {
       return res.redirect(`/equipment/${req.params.id}/assign?error=Ziel%20fehlt`);
@@ -500,9 +532,9 @@ router.post('/:id/assign', requireEquipmentAccess, async (req, res) => {
     }
 
     await db.query(
-      `INSERT INTO equipment_assignments (equipment_id, user_id, holder_id, assigned_by, quantity, notes)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [req.params.id, userId, holderId, assignedBy, quantity || 1, notes]
+      `INSERT INTO equipment_assignments (equipment_id, user_id, holder_id, assigned_by, quantity, notes, serial_number)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [req.params.id, userId, holderId, assignedBy, quantity || 1, notes, serialClean]
     );
     res.redirect(`/equipment/${req.params.id}/assign?success=Zugewiesen`);
   } catch (err) {

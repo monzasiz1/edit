@@ -286,6 +286,12 @@
         </div>
 
         <div class="apple-form-group">
+          <label>Seriennummer / Stück-Nr.</label>
+          <input type="text" name="serial_number" class="apple-input" placeholder="z.B. 17 (nur bei Einzelzuweisung)" maxlength="100">
+          <small style="color: #6b7280;">Optional. Wird beim Zuweisen genau diesem Stück zugeordnet.</small>
+        </div>
+
+        <div class="apple-form-group">
           <label>Notiz</label>
           <textarea name="notes" class="apple-input" rows="2" placeholder="Optional"></textarea>
         </div>
@@ -364,6 +370,9 @@
               </div>
               <div class="assign-meta">
                 <span>Anzahl:&nbsp;<strong><%= assignment.quantity %></strong></span>
+                <% if (assignment.serial_number) { %>
+                  <span>SN:&nbsp;<strong><%= assignment.serial_number %></strong></span>
+                <% } %>
                 <span>Seit:&nbsp;<%= new Date(assignment.assigned_at).toLocaleDateString('de-DE') %></span>
               </div>
               <% if (assignment.notes) { %>

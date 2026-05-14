@@ -326,6 +326,12 @@ async function ensureDatabaseSchema() {
     )
   `);
 
+  // Migration: Seriennummer auf Zuweisungs-Ebene (pro zugewiesenem Stueck)
+  await db.query(`
+    ALTER TABLE equipment_assignments
+      ADD COLUMN IF NOT EXISTS serial_number VARCHAR(100)
+  `);
+
   await db.query(`
     INSERT INTO equipment_categories (name, icon) VALUES
       ('Instrumente', 'instrument'),
