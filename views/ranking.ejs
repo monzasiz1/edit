@@ -218,8 +218,6 @@
     <span class="rank-hero-vignette"></span>
   </div>
 
-  <div class="rank-hero-stamp" aria-hidden="true">Hall of Shame</div>
-
   <div class="rank-hero-trophy" aria-hidden="true">
     <span class="rank-hero-glow"></span>
     <span class="rank-hero-glow rank-hero-glow-red"></span>
@@ -243,11 +241,6 @@
     <span class="rank-hero-title-shadow" aria-hidden="true">Strafen-Ranking</span>
     <span class="rank-hero-title-text">Strafen-Ranking</span>
   </h1>
-
-  <p class="rank-hero-warn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <span>Letzter Platz zahlt am meisten</span>
-  </p>
 </section>
 
 <style>
@@ -345,26 +338,6 @@
   @keyframes rankOrbFloat {
     0%, 100% { transform: translate(0, 0) scale(1); }
     50%      { transform: translate(14px, -10px) scale(1.07); }
-  }
-
-  /* Stamp "Hall of Shame" diagonal hinten */
-  .rank-hero-stamp {
-    position: absolute;
-    z-index: 1;
-    top: 12px;
-    right: -18px;
-    transform: rotate(8deg);
-    font-family: 'Inter', sans-serif;
-    font-weight: 900;
-    font-size: 0.7rem;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: rgba(255,180,80,0.28);
-    border: 2px solid rgba(255,180,80,0.32);
-    padding: 0.22rem 0.55rem 0.18rem;
-    border-radius: 4px;
-    pointer-events: none;
-    text-shadow: 0 0 8px rgba(255,150,50,0.25);
   }
 
   /* Pokal */
@@ -506,34 +479,11 @@
     80%           { opacity: 1; }
   }
 
-  .rank-hero-warn {
-    position: relative;
-    z-index: 2;
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.25rem 0.7rem;
-    border: 1px solid rgba(255,180,80,0.3);
-    background: rgba(255,80,40,0.08);
-    color: #ffcc88;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    border-radius: 4px;
-    width: fit-content;
-    margin: 0 auto;
-  }
-  .rank-hero-warn svg { color: #ffaa44; }
-
   @media (max-width: 560px) {
     .rank-hero { padding: 2.1rem 1rem 1.5rem; border-radius: 20px; }
     .rank-hero-trophy { width: 78px; height: 78px; margin-bottom: 0.8rem; }
     .rank-hero-trophy-svg { width: 58px; height: 58px; }
     .rank-hero-back { top: 0.7rem; left: 0.7rem; width: 32px; height: 32px; }
-    .rank-hero-stamp { font-size: 0.6rem; right: -14px; }
-    .rank-hero-warn { font-size: 0.62rem; padding: 0.2rem 0.55rem; }
   }
 </style>
 
@@ -591,6 +541,40 @@
   </table>
 </div>
 
-<div class="back-to-dashboard">
-  <a href="/dashboard" class="btn-back" aria-label="Zurück zum Dashboard">🔙 Zurück zum Dashboard</a>
+<div class="rank-back-wrap">
+  <a href="/dashboard" class="rank-back-btn" aria-label="Zurück zum Dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    <span>Zurück zum Dashboard</span>
+  </a>
 </div>
+
+<style>
+  .rank-back-wrap {
+    max-width: 720px;
+    margin: 1.6rem auto 0;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  .rank-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    background: #fff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .rank-back-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  .rank-back-btn:active { transform: scale(0.98); }
+  .rank-back-btn svg { color: #64748b; }
+</style>
