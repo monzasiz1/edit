@@ -987,7 +987,9 @@ router.post('/todos/:id/toggle', requireEquipmentAccess, async (req, res) => {
     const cur = await db.query(`SELECT done FROM equipment_todos WHERE id = $1`, [id]);
     if (!cur.rows.length) return res.status(404).json({ error: 'not_found' });
     const newDone = !cur.rows[0].done;
-    const userId = req.session.user && req.session.user.id ? req.session.user.id : null;
+    const rawUid = req.session.user && req.session.user.id;
+    const userIdNum = parseInt(rawUid, 10);
+    const userId = Number.isInteger(userIdNum) ? userIdNum : null;
     await db.query(`
       UPDATE equipment_todos
          SET done = $1,
