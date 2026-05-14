@@ -6,6 +6,9 @@
 // Item-Name ein Sub-Wort enthält, das eigentlich einem anderen Slot zugeordnet
 // wäre (z. B. "Krawatten-NADEL" enthält "krawatte" → würde sonst zu neck).
 const BODY_PART_OVERRIDES = [
+  // Zubehör (Paradetrommel, Koppel, Schärpe etc.) → other / Zubehör
+  // (vor 'trommel' aus handRight gepruft, damit Paradetrommel nicht der rechten Hand zugeordnet wird)
+  { slot: 'other', words: ['paradetrommel', 'parade-trommel', 'koppel', 'schärpe', 'schaerpe', 'tambourstock', 'tambour-stock', 'fangschnur', 'epaulette', 'epaulett', 'ehrenband', 'wappenband'] },
   // Anstecker/Orden/Abzeichen → Oberkörper (nicht neck/legs/...)
   { slot: 'torso', words: ['nadel', 'anstecker', 'orden', 'abzeichen', 'medaille', 'plakette', 'brosche', 'wappen-pin', 'pin '] },
 ];
@@ -30,6 +33,7 @@ const BODY_PART_LABELS = {
   handRight: 'Rechte Hand',
   legs:      'Beine',
   feet:      'Füße',
+  other:     'Zubehör',
 };
 
 function mapEquipmentToBodyParts(equipment) {
