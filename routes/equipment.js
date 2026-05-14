@@ -994,7 +994,7 @@ router.post('/todos/:id/toggle', requireEquipmentAccess, async (req, res) => {
       UPDATE equipment_todos
          SET done = $1,
              done_at = CASE WHEN $1 THEN NOW() ELSE NULL END,
-             done_by = CASE WHEN $1 THEN $2 ELSE NULL END
+             done_by = CASE WHEN $1 THEN $2::int ELSE NULL END
        WHERE id = $3
     `, [newDone, userId, id]);
     res.json({ ok: true, done: newDone });
