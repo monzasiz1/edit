@@ -2,6 +2,14 @@
 // Wird sowohl von profile.js (eigenes Profil) als auch equipment.js
 // (Übersicht pro Mitglied) verwendet.
 
+// Overrides werden VOR den normalen Keywords geprüft. Sie sind nötig wenn ein
+// Item-Name ein Sub-Wort enthält, das eigentlich einem anderen Slot zugeordnet
+// wäre (z. B. "Krawatten-NADEL" enthält "krawatte" → würde sonst zu neck).
+const BODY_PART_OVERRIDES = [
+  // Anstecker/Orden/Abzeichen → Oberkörper (nicht neck/legs/...)
+  { slot: 'torso', words: ['nadel', 'anstecker', 'orden', 'abzeichen', 'medaille', 'plakette', 'brosche', 'wappen-pin', 'pin '] },
+];
+
 const BODY_PART_KEYWORDS = {
   head:      ['hut', 'mütze', 'mutze', 'kappe', 'helm', 'tschako', 'haube', 'federhut', 'baskenmütze', 'baskenmutze'],
   neck:      ['krawatte', 'binder', 'fliege', 'halstuch', 'halsband', 'schal'],
@@ -32,6 +40,18 @@ function mapEquipmentToBodyParts(equipment) {
   (equipment || []).forEach(item => {
     const haystack = (String(item.name || '') + ' ' + String(item.category_name || '')).toLowerCase();
     let placed = false;
+
+    // 1) Overrides zuerst (z. B. Krawattennadel → torso, nicht neck)
+    for (const ov of BODY_PART_OVERRIDES) {
+      if (ov.words.some(w => haystack.includes(w))) {
+        slots[ov.slot].push(item);
+        placed = true;
+        break;
+      }
+    }
+    if (placed) return;
+
+    // 2) Normale Keyword-Suche
     for (const [slot, words] of Object.entries(BODY_PART_KEYWORDS)) {
       if (words.some(w => haystack.includes(w))) {
         slots[slot].push(item);
@@ -44,4 +64,4 @@ function mapEquipmentToBodyParts(equipment) {
   return slots;
 }
 
-module.exports = { BODY_PART_KEYWORDS, BODY_PART_LABELS, mapEquipmentToBodyParts };
+module.exports = { BODY_PART_KEYWORDS, BODY_PART_OVERRIDES, BODY_PART_LABELS, mapEquipmentToBodyParts };
