@@ -57,7 +57,8 @@ router.get('/', async (req, res) => {
     // Zugewiesenes Equipment laden
     const equipmentQuery = `
       SELECT
-        e.id, e.name, e.description, e.serial_number, e.condition,
+        e.id, e.name, e.description, e.condition,
+        COALESCE(NULLIF(ea.serial_number, ''), e.serial_number) AS serial_number,
         ec.name AS category_name, ec.icon AS category_icon,
         ea.assigned_at, ea.quantity, ea.notes
       FROM equipment_assignments ea
