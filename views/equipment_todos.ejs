@@ -75,9 +75,10 @@
     display: flex; gap: 0.7rem; align-items: flex-start;
     background: #fff; border: 1px solid #d8e7de; border-left: 4px solid #6b8a76;
     border-radius: 12px; padding: 0.7rem 0.85rem;
-    transition: box-shadow 0.18s ease, transform 0.15s ease;
+    transition: box-shadow 0.18s ease, transform 0.25s ease, opacity 0.35s ease;
   }
   .eq-todo-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+  .eq-todo-card.is-leaving { opacity: 0; transform: translateX(20px) scale(0.95); pointer-events: none; }
   .eq-todo-card.is-done { opacity: 0.62; border-left-color: #a8c7b5; background: #f7fbf9; }
   .eq-todo-card.is-done .eq-todo-title { text-decoration: line-through; }
   .eq-todo-card.is-prio-high { border-left-color: #d94545; }
@@ -225,7 +226,7 @@
 
   <div class="eq-todo-toolbar">
     <span class="eq-todo-counts">
-      <%= openCount %> offen<% if (doneCount) { %> &middot; <%= doneCount %> erledigt<% } %>
+      <%= openCount %> offen<% if (doneCount) { %> &middot; <%= doneCount %> im Archiv<% } %>
     </span>
     <div class="eq-todo-filterbox">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -233,7 +234,7 @@
     </div>
     <div class="eq-todo-tabs" role="tablist">
       <button type="button" class="eq-todo-tab is-active" data-filter="open">Offen</button>
-      <button type="button" class="eq-todo-tab" data-filter="done">Erledigt</button>
+      <button type="button" class="eq-todo-tab" data-filter="done">Archiv</button>
       <button type="button" class="eq-todo-tab" data-filter="all">Alle</button>
     </div>
     <button type="button" class="eq-todo-add-btn" onclick="openTodoModal()">
@@ -549,12 +550,17 @@
     fetch('/equipment/todos/' + id + '/toggle', { method: 'POST' })
       .then(r => r.json())
       .then(j => {
-        if (j && j.ok) {
-          const card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
-          if (card) {
-            card.classList.toggle('is-done', !!j.done);
-            card.dataset.done = j.done ? '1' : '0';
-          }
+        if (!j || !j.ok) { return; }
+        const card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
+        if (!card) return;
+        card.classList.toggle('is-done', !!j.done);
+        card.dataset.done = j.done ? '1' : '0';
+        // Wenn auf einen Tab gewechselt wo das Card nicht mehr passt: animiert ausblenden
+        const willHide = (currentTab === 'open' && j.done) || (currentTab === 'done' && !j.done);
+        if (willHide) {
+          card.classList.add('is-leaving');
+          setTimeout(() => { applyListFilter(); card.classList.remove('is-leaving'); }, 320);
+        } else {
           applyListFilter();
         }
       })
