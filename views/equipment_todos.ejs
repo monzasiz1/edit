@@ -237,7 +237,7 @@
       <button type="button" class="eq-todo-tab" data-filter="done">Archiv</button>
       <button type="button" class="eq-todo-tab" data-filter="all">Alle</button>
     </div>
-    <button type="button" class="eq-todo-add-btn" onclick="openTodoModal()">
+    <button type="button" class="eq-todo-add-btn" data-todo-new="1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Neue To-do
     </button>
@@ -262,7 +262,7 @@
           data-description="<%= encodeURIComponent(t.description || '') %>"
           data-item-ids="<%= (t.items || []).map(function(i){ return i.id; }).join(',') %>"
           data-user-ids="<%= (t.users || []).map(function(u){ return u.id; }).join(',') %>">
-        <button type="button" class="eq-todo-checkbox" title="Erledigt umschalten" onclick="toggleTodo(<%= t.id %>, this)">
+        <button type="button" class="eq-todo-checkbox" title="Erledigt umschalten" data-todo-toggle="<%= t.id %>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>
         </button>
         <div class="eq-todo-body">
@@ -308,10 +308,10 @@
           </div>
         </div>
         <div class="eq-todo-actions">
-          <button type="button" class="eq-todo-iconbtn" title="Bearbeiten" onclick="openTodoModal(<%= t.id %>)">
+          <button type="button" class="eq-todo-iconbtn" title="Bearbeiten" data-todo-edit="<%= t.id %>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
           </button>
-          <button type="button" class="eq-todo-iconbtn is-danger" title="Löschen" onclick="deleteTodo(<%= t.id %>)">
+          <button type="button" class="eq-todo-iconbtn is-danger" title="Löschen" data-todo-delete="<%= t.id %>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
           </button>
         </div>
@@ -383,6 +383,76 @@
     </form>
   </div>
 </div>
+
+<script>
+// Robuste Event-Delegation, unabhaengig von spaeteren Script-Fehlern
+(function () {
+  function findCard(id) {
+    return document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
+  }
+  function currentTab() {
+    var t = document.querySelector('.eq-todo-tab.is-active');
+    return t ? t.dataset.filter : 'open';
+  }
+  function reapplyFilter() {
+    if (typeof window.eqTodoApplyFilter === 'function') window.eqTodoApplyFilter();
+  }
+  document.addEventListener('click', function (e) {
+    var tgl = e.target.closest('[data-todo-toggle]');
+    if (tgl) {
+      e.preventDefault();
+      var id = tgl.getAttribute('data-todo-toggle');
+      tgl.disabled = true;
+      fetch('/equipment/todos/' + id + '/toggle', { method: 'POST', headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (!res.ok || !res.j || !res.j.ok) { console.warn('[todo-toggle] fehlgeschlagen', res); return; }
+          var card = findCard(id); if (!card) return;
+          var done = !!res.j.done;
+          card.classList.toggle('is-done', done);
+          card.dataset.done = done ? '1' : '0';
+          var tab = currentTab();
+          var willHide = (tab === 'open' && done) || (tab === 'done' && !done);
+          if (willHide) {
+            card.classList.add('is-leaving');
+            setTimeout(function () { reapplyFilter(); card.classList.remove('is-leaving'); }, 320);
+          } else {
+            reapplyFilter();
+          }
+        })
+        .catch(function (err) { console.error('[todo-toggle] netzwerk', err); })
+        .finally(function () { tgl.disabled = false; });
+      return;
+    }
+    var edt = e.target.closest('[data-todo-edit]');
+    if (edt) {
+      e.preventDefault();
+      if (typeof window.openTodoModal === 'function') window.openTodoModal(parseInt(edt.getAttribute('data-todo-edit'), 10));
+      return;
+    }
+    var del = e.target.closest('[data-todo-delete]');
+    if (del) {
+      e.preventDefault();
+      var did = del.getAttribute('data-todo-delete');
+      if (!confirm('Diese To-do wirklich loeschen?')) return;
+      fetch('/equipment/todos/' + did + '/delete', { method: 'POST' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j && j.ok) {
+            var card = findCard(did); if (card) card.remove();
+            reapplyFilter();
+          }
+        });
+      return;
+    }
+    var nw = e.target.closest('[data-todo-new]');
+    if (nw) {
+      e.preventDefault();
+      if (typeof window.openTodoModal === 'function') window.openTodoModal();
+    }
+  });
+})();
+</script>
 
 <script>
 (function() {
@@ -467,6 +537,7 @@
   }));
   if (searchInp) searchInp.addEventListener('input', applyListFilter);
   applyListFilter();
+  window.eqTodoApplyFilter = applyListFilter;
 
   window.openTodoModal = function(todoId) {
     errorEl.textContent = '';
@@ -546,38 +617,14 @@
   };
 
   window.toggleTodo = function(id, btn) {
-    if (btn) btn.disabled = true;
-    fetch('/equipment/todos/' + id + '/toggle', { method: 'POST' })
-      .then(r => r.json())
-      .then(j => {
-        if (!j || !j.ok) { return; }
-        const card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
-        if (!card) return;
-        card.classList.toggle('is-done', !!j.done);
-        card.dataset.done = j.done ? '1' : '0';
-        // Wenn auf einen Tab gewechselt wo das Card nicht mehr passt: animiert ausblenden
-        const willHide = (currentTab === 'open' && j.done) || (currentTab === 'done' && !j.done);
-        if (willHide) {
-          card.classList.add('is-leaving');
-          setTimeout(() => { applyListFilter(); card.classList.remove('is-leaving'); }, 320);
-        } else {
-          applyListFilter();
-        }
-      })
-      .finally(() => { if (btn) btn.disabled = false; });
+    // Beibehalten fuer Rueckwaertskompatibilitaet; Hauptlogik laeuft ueber data-todo-toggle Delegation.
+    const fakeBtn = btn || document.querySelector('[data-todo-toggle="' + id + '"]');
+    if (fakeBtn) fakeBtn.click();
   };
 
   window.deleteTodo = function(id) {
-    if (!confirm('Diese To-do wirklich löschen?')) return;
-    fetch('/equipment/todos/' + id + '/delete', { method: 'POST' })
-      .then(r => r.json())
-      .then(j => {
-        if (j && j.ok) {
-          const card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
-          if (card) card.remove();
-          applyListFilter();
-        }
-      });
+    const btn = document.querySelector('[data-todo-delete="' + id + '"]');
+    if (btn) btn.click();
   };
 })();
 </script>
