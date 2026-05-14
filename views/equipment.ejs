@@ -1101,9 +1101,8 @@
   <div class="eq-meta"><strong><%= equipment.length %></strong> Equipment-Einträge</div>
 
   <% if (typeof equipmentStats !== 'undefined' && equipmentStats) { %>
-    <% const _avail = equipmentStats.availablePieces;
-       const _total = equipmentStats.totalPieces;
-       const _pct = _total > 0 ? Math.round((equipmentStats.assignedPieces / _total) * 100) : 0; %>
+    <% const _entries = equipmentStats.totalEntries;
+       const _pct = _entries > 0 ? Math.round((equipmentStats.assignedEntries / _entries) * 100) : 0; %>
     <div class="eq-stats-modal-backdrop" id="eqStatsModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="eqStatsTitle">
       <div class="eq-stats-modal" role="document">
         <div class="eq-stats-modal-head">
@@ -1115,19 +1114,24 @@
         </div>
         <section class="eq-stats" aria-label="Equipment-Statistik">
           <div class="eq-stat" data-tone="primary">
-            <span class="eq-stat-label">Gesamt</span>
-            <span class="eq-stat-val"><%= equipmentStats.totalPieces %></span>
-            <span class="eq-stat-sub">Stück (<%= equipmentStats.totalEntries %> Einträge)</span>
+            <span class="eq-stat-label">Einträge</span>
+            <span class="eq-stat-val"><%= equipmentStats.totalEntries %></span>
+            <span class="eq-stat-sub"><%= equipmentStats.totalPieces %> Stück gesamt</span>
           </div>
           <div class="eq-stat" data-tone="warn">
             <span class="eq-stat-label">Zugewiesen</span>
-            <span class="eq-stat-val"><%= equipmentStats.assignedPieces %></span>
-            <span class="eq-stat-sub"><%= _pct %>% ausgegeben</span>
+            <span class="eq-stat-val"><%= equipmentStats.assignedEntries %></span>
+            <span class="eq-stat-sub"><%= _pct %>% der Einträge</span>
           </div>
           <div class="eq-stat" data-tone="ok">
-            <span class="eq-stat-label">Frei</span>
-            <span class="eq-stat-val"><%= _avail %></span>
-            <span class="eq-stat-sub">nicht zugewiesen</span>
+            <span class="eq-stat-label">Ohne Zuweisung</span>
+            <span class="eq-stat-val"><%= equipmentStats.freeEntries %></span>
+            <span class="eq-stat-sub">Einträge frei</span>
+          </div>
+          <div class="eq-stat">
+            <span class="eq-stat-label">Stück ausgegeben</span>
+            <span class="eq-stat-val"><%= equipmentStats.assignedPieces %></span>
+            <span class="eq-stat-sub">Summe Zuweisungs-Mengen</span>
           </div>
           <div class="eq-stat">
             <span class="eq-stat-label">Kategorien</span>
@@ -1632,39 +1636,55 @@
     background: rgba(15, 35, 25, 0.55);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 300;
+    z-index: 1000;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.22s ease;
   }
-  .qr-modal-backdrop.open { display: flex; }
+  .qr-modal-backdrop.open { display: flex; opacity: 1; }
   .qr-modal {
     background: #fff;
-    border-radius: 1.1rem;
+    border-radius: 18px;
     width: 100%;
-    max-width: 460px;
-    max-height: 90vh;
+    max-width: 480px;
+    max-height: calc(100dvh - 1.5rem);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 16px 40px rgba(10, 30, 20, 0.35), 0 6px 18px rgba(10, 30, 20, 0.18);
+    transform: translateY(12px) scale(0.985);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.22s ease;
+  }
+  .qr-modal-backdrop.open .qr-modal { transform: translateY(0) scale(1); opacity: 1; }
+  @media (min-width: 769px) {
+    .qr-modal { max-width: 560px; }
   }
   .qr-modal-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.9rem 1.1rem;
-    border-bottom: 1px solid #e2efe6;
+    padding: 0.95rem 1.15rem;
+    background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+    color: #fff;
+    flex-shrink: 0;
   }
+  .qr-modal-head strong, .qr-modal-head h2, .qr-modal-head h3 { color: #fff; }
   .qr-modal-close {
-    background: transparent;
+    background: rgba(255,255,255,0.15);
     border: none;
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     cursor: pointer;
-    color: #4b5563;
-    padding: 0.2rem 0.5rem;
+    color: #fff;
+    width: 32px; height: 32px;
+    border-radius: 50%;
     line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.18s;
   }
+  .qr-modal-close:hover { background: rgba(255,255,255,0.3); }
   .qr-modal-body {
     padding: 1rem;
     display: flex;
@@ -1750,6 +1770,11 @@
   const manualInput = document.getElementById('qrManualInput');
 
   if (!btn) return;
+
+  // an body anhaengen, damit position:fixed nicht durch transform-Parent gebrochen wird
+  if (modal && modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
 
   let stream = null;
   let scanning = false;
@@ -1908,6 +1933,7 @@
   function openModal() {
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
     setStatus('');
     lastSubmitted = '';
     startCamera();
@@ -1916,6 +1942,7 @@
   function closeModal() {
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
     stopCamera();
   }
 

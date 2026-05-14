@@ -208,21 +208,24 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       ...h, count: h.items.length,
     }));
 
-    // Statistik fuer Zeugwart-Bereich
+    // Statistik fuer Zeugwart-Bereich (eintragsbasiert, matcht die Cards)
     const totalEntries = equipmentRows.length;
+    const assignedEntries = equipmentRows.filter(e => (e.assignments || []).length > 0).length;
+    const freeEntries = totalEntries - assignedEntries;
+    // Stueckzahlen (Summe quantity)
     const totalPieces = equipmentRows.reduce((sum, e) => sum + (parseInt(e.quantity, 10) || 0), 0);
     const assignedPieces = assignmentsListResult.rows.reduce(
       (sum, a) => sum + (parseInt(a.quantity, 10) || 0), 0
     );
-    const availablePieces = Math.max(totalPieces - assignedPieces, 0);
     const categoriesCount = categoriesResult.rows.length;
     const membersWithEquipment = usersWithEquipment.length;
     const holdersInUse = holdersWithEquipment.length;
     const equipmentStats = {
       totalEntries,
+      assignedEntries,
+      freeEntries,
       totalPieces,
       assignedPieces,
-      availablePieces,
       categoriesCount,
       membersWithEquipment,
       holdersInUse,
