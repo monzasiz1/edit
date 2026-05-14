@@ -1049,36 +1049,61 @@
       .puppet-tooltip {
         position: absolute;
         z-index: 100;
-        background: #fff;
-        border: 1px solid #c5e8d2;
-        border-radius: 12px;
-        padding: 0.65rem 2rem 0.65rem 0.9rem;
-        box-shadow: 0 8px 28px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.06);
-        min-width: 140px;
-        max-width: 210px;
+        background: #ffffff;
+        border: 1px solid #d9ecdf;
+        border-radius: 14px;
+        padding: 0;
+        box-shadow: 0 16px 36px rgba(15,55,35,0.18), 0 4px 12px rgba(15,55,35,0.08);
+        min-width: 200px;
+        max-width: 260px;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.18s, visibility 0s linear 0.18s, transform 0.18s;
-        transform: scale(0.94) translateY(3px);
+        transition: opacity 0.2s ease, visibility 0s linear 0.2s, transform 0.2s ease;
+        transform: scale(0.94) translateY(4px);
         pointer-events: none;
         font-size: 0.82rem;
         color: #1b2e2b;
         line-height: 1.4;
+        overflow: hidden;
       }
       .puppet-tooltip.visible {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.18s, visibility 0s linear 0s, transform 0.18s;
+        transition: opacity 0.2s ease, visibility 0s linear 0s, transform 0.2s ease;
         transform: scale(1) translateY(0);
         pointer-events: all;
       }
+      .puppet-tooltip-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 2.3rem 0.55rem 0.85rem;
+        background: linear-gradient(135deg, #1a7a45, #2a9858);
+        color: #fff;
+        position: relative;
+      }
       .puppet-tooltip-label {
-        font-size: 0.68rem;
+        font-size: 0.7rem;
         font-weight: 800;
-        letter-spacing: 0.09em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: #3da973;
-        margin-bottom: 0.4rem;
+        color: #fff;
+        flex: 1;
+      }
+      .puppet-tooltip-count {
+        font-size: 0.7rem;
+        font-weight: 700;
+        background: rgba(255,255,255,0.22);
+        color: #fff;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        line-height: 1.5;
+      }
+      .puppet-tooltip-body {
+        padding: 0;
+      }
+      .puppet-tooltip-body-inner {
+        padding: 0.6rem 0.7rem 0.7rem;
       }
       .puppet-tooltip ul {
         list-style: none;
@@ -1086,33 +1111,55 @@
         padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.28rem;
+        gap: 0.35rem;
       }
-      .puppet-tooltip li strong { font-size: 0.87rem; }
+      .puppet-tooltip li {
+        padding: 0.5rem 0.6rem;
+        background: #f6faf7;
+        border: 1px solid #e3efe7;
+        border-radius: 9px;
+      }
+      .puppet-tooltip li strong {
+        display: block;
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #14361f;
+        line-height: 1.25;
+      }
       .puppet-tooltip li small {
         display: block;
-        color: #6b7280;
-        font-size: 0.74rem;
+        color: #5b7567;
+        font-size: 0.72rem;
+        margin-top: 0.18rem;
+      }
+      .puppet-tooltip-empty {
+        display: block;
+        color: #94a3a0;
+        font-size: 0.78rem;
+        font-style: italic;
+        text-align: center;
+        padding: 0.4rem 0;
       }
       .puppet-tooltip-close {
         position: absolute;
-        top: 0.3rem;
-        right: 0.32rem;
-        width: 20px; height: 20px;
+        top: 50%;
+        right: 0.4rem;
+        transform: translateY(-50%);
+        width: 22px; height: 22px;
         border: none;
-        background: none;
+        background: rgba(255,255,255,0.22);
         cursor: pointer;
         font-size: 0.72rem;
-        color: #9ca3af;
+        color: #fff;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
         line-height: 1;
-        transition: background 0.14s, color 0.14s;
+        transition: background 0.14s;
       }
-      .puppet-tooltip-close:hover { background: #f3f4f6; color: #374151; }
+      .puppet-tooltip-close:hover { background: rgba(255,255,255,0.4); }
 
       /* Desktop: Puppe etwas größer, Dots größer */
       @media (min-width: 960px) {
@@ -1393,9 +1440,13 @@
         if (slot === 'handLeft' || slot === 'handRight') {
           (equipData.hands || []).forEach(function(i) { items.push(i); });
         }
-        var h = '<div class="puppet-tooltip-label">' + esc(label) + '</div>';
+        var h = '<div class="puppet-tooltip-header">' +
+                  '<span class="puppet-tooltip-label">' + esc(label) + '</span>' +
+                  (items.length ? '<span class="puppet-tooltip-count">' + items.length + '</span>' : '') +
+                '</div>';
+        h += '<div class="puppet-tooltip-body-inner">';
         if (!items.length) {
-          h += '<em style="color:#9ca3af;font-size:0.78rem;">Kein Equipment zugewiesen</em>';
+          h += '<span class="puppet-tooltip-empty">Kein Equipment zugewiesen</span>';
         } else {
           h += '<ul>';
           items.forEach(function(it) {
@@ -1406,6 +1457,7 @@
           });
           h += '</ul>';
         }
+        h += '</div>';
         return h;
       }
 
