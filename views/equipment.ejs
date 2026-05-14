@@ -1189,6 +1189,10 @@
   if (holdersEl) { try { holders = JSON.parse(holdersEl.textContent); } catch (e) {} }
 
   const modal = document.getElementById('ueqModal');
+  // Modal an <body> haengen, damit position:fixed nicht von einem transform-Parent gebrochen wird
+  if (modal && modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
   const closeBtn = document.getElementById('ueqClose');
   const avatarEl = document.getElementById('ueqAvatar');
   const nameEl = document.getElementById('ueqName');
