@@ -97,6 +97,74 @@
     .eq-stat-val { font-size: 1.3rem; }
   }
 
+  /* Statistik-Modal */
+  .eq-stats-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 28, 22, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+  .eq-stats-modal-backdrop.open { display: flex; opacity: 1; }
+  .eq-stats-modal {
+    background: #fff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 720px;
+    max-height: calc(100dvh - 1.5rem);
+    box-shadow: 0 16px 40px rgba(10, 30, 20, 0.35), 0 6px 18px rgba(10, 30, 20, 0.18);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(12px) scale(0.985);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.22s ease;
+  }
+  .eq-stats-modal-backdrop.open .eq-stats-modal { transform: translateY(0) scale(1); opacity: 1; }
+  .eq-stats-modal-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(145deg, #1a3d2a 0%, #2d6a45 60%, #3d8c5e 100%);
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .eq-stats-modal-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex: 1;
+  }
+  .eq-stats-modal-title svg { width: 18px; height: 18px; }
+  .eq-stats-modal-close {
+    background: rgba(255,255,255,0.15);
+    border: 0;
+    color: #fff;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.18s;
+  }
+  .eq-stats-modal-close:hover { background: rgba(255,255,255,0.3); }
+  .eq-stats-modal .eq-stats {
+    margin: 0;
+    padding: 1.1rem;
+    overflow-y: auto;
+  }
+
   .eq-grid {
     list-style: none;
     margin: 0;
@@ -976,6 +1044,10 @@
         </h1>
       </div>
       <div class="page-hero-actions">
+        <button type="button" id="eqStatsBtn" class="page-hero-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Statistik
+        </button>
         <button type="button" id="qrScanBtn" class="page-hero-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M20 14v3"/><path d="M14 20h3"/><path d="M17 17h.01"/><path d="M20 20h.01"/></svg>
           Scannen
@@ -1032,38 +1104,49 @@
     <% const _avail = equipmentStats.availablePieces;
        const _total = equipmentStats.totalPieces;
        const _pct = _total > 0 ? Math.round((equipmentStats.assignedPieces / _total) * 100) : 0; %>
-    <section class="eq-stats" aria-label="Equipment-Statistik">
-      <div class="eq-stat" data-tone="primary">
-        <span class="eq-stat-label">Gesamt</span>
-        <span class="eq-stat-val"><%= equipmentStats.totalPieces %></span>
-        <span class="eq-stat-sub">Stück (<%= equipmentStats.totalEntries %> Einträge)</span>
+    <div class="eq-stats-modal-backdrop" id="eqStatsModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="eqStatsTitle">
+      <div class="eq-stats-modal" role="document">
+        <div class="eq-stats-modal-head">
+          <h2 class="eq-stats-modal-title" id="eqStatsTitle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Statistik
+          </h2>
+          <button type="button" class="eq-stats-modal-close" id="eqStatsClose" aria-label="Schliessen">&times;</button>
+        </div>
+        <section class="eq-stats" aria-label="Equipment-Statistik">
+          <div class="eq-stat" data-tone="primary">
+            <span class="eq-stat-label">Gesamt</span>
+            <span class="eq-stat-val"><%= equipmentStats.totalPieces %></span>
+            <span class="eq-stat-sub">Stück (<%= equipmentStats.totalEntries %> Einträge)</span>
+          </div>
+          <div class="eq-stat" data-tone="warn">
+            <span class="eq-stat-label">Zugewiesen</span>
+            <span class="eq-stat-val"><%= equipmentStats.assignedPieces %></span>
+            <span class="eq-stat-sub"><%= _pct %>% ausgegeben</span>
+          </div>
+          <div class="eq-stat" data-tone="ok">
+            <span class="eq-stat-label">Frei</span>
+            <span class="eq-stat-val"><%= _avail %></span>
+            <span class="eq-stat-sub">nicht zugewiesen</span>
+          </div>
+          <div class="eq-stat">
+            <span class="eq-stat-label">Kategorien</span>
+            <span class="eq-stat-val"><%= equipmentStats.categoriesCount %></span>
+            <span class="eq-stat-sub">aktiv</span>
+          </div>
+          <div class="eq-stat">
+            <span class="eq-stat-label">Mitglieder</span>
+            <span class="eq-stat-val"><%= equipmentStats.membersWithEquipment %></span>
+            <span class="eq-stat-sub">mit Equipment</span>
+          </div>
+          <div class="eq-stat">
+            <span class="eq-stat-label">Lagerorte</span>
+            <span class="eq-stat-val"><%= equipmentStats.holdersInUse %></span>
+            <span class="eq-stat-sub">in Nutzung</span>
+          </div>
+        </section>
       </div>
-      <div class="eq-stat" data-tone="warn">
-        <span class="eq-stat-label">Zugewiesen</span>
-        <span class="eq-stat-val"><%= equipmentStats.assignedPieces %></span>
-        <span class="eq-stat-sub"><%= _pct %>% ausgegeben</span>
-      </div>
-      <div class="eq-stat" data-tone="ok">
-        <span class="eq-stat-label">Verfügbar</span>
-        <span class="eq-stat-val"><%= _avail %></span>
-        <span class="eq-stat-sub">auf Lager</span>
-      </div>
-      <div class="eq-stat">
-        <span class="eq-stat-label">Kategorien</span>
-        <span class="eq-stat-val"><%= equipmentStats.categoriesCount %></span>
-        <span class="eq-stat-sub">aktiv</span>
-      </div>
-      <div class="eq-stat">
-        <span class="eq-stat-label">Mitglieder</span>
-        <span class="eq-stat-val"><%= equipmentStats.membersWithEquipment %></span>
-        <span class="eq-stat-sub">mit Equipment</span>
-      </div>
-      <div class="eq-stat">
-        <span class="eq-stat-label">Lagerorte</span>
-        <span class="eq-stat-val"><%= equipmentStats.holdersInUse %></span>
-        <span class="eq-stat-sub">/ Fahrzeuge</span>
-      </div>
-    </section>
+    </div>
   <% } %>
 
   <% if (usersWithEquipment && usersWithEquipment.length) { %>
@@ -1272,6 +1355,32 @@
     if (!wrap) return;
     const collapsed = wrap.classList.toggle('is-collapsed');
     btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  });
+})();
+
+// Statistik-Modal Open/Close
+(() => {
+  const modal = document.getElementById('eqStatsModal');
+  const openBtn = document.getElementById('eqStatsBtn');
+  const closeBtn = document.getElementById('eqStatsClose');
+  if (!modal || !openBtn) return;
+  // an body anhaengen damit position:fixed sauber zur Viewport ist
+  if (modal.parentNode !== document.body) document.body.appendChild(modal);
+  const open = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+  const close = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+  openBtn.addEventListener('click', open);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) close();
   });
 })();
 </script>
