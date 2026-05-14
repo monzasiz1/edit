@@ -995,7 +995,11 @@
     box-shadow: 0 0 0 3px rgba(61,169,115,0.18);
   }
   @media (min-width: 769px) {
-    .ueq-items { gap: 0.5rem; }
+    .ueq-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.55rem;
+    }
     .ueq-item { padding: 0.7rem 0.85rem; }
   }
   .ueq-item-icon {
