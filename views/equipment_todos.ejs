@@ -385,18 +385,181 @@
 </div>
 
 <script>
-// Robuste Event-Delegation, unabhaengig von spaeteren Script-Fehlern
+// Zeugwart-To-dos: alles top-level (kein IIFE), damit ein Fehler nicht alles blockiert.
 (function () {
-  function findCard(id) {
-    return document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
+  function $(id) { return document.getElementById(id); }
+  function parseJsonScript(id) {
+    var el = $(id); if (!el) return [];
+    try { return JSON.parse(el.textContent || '[]'); } catch (e) { return []; }
   }
-  function currentTab() {
-    var t = document.querySelector('.eq-todo-tab.is-active');
-    return t ? t.dataset.filter : 'open';
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c];
+    });
   }
-  function reapplyFilter() {
-    if (typeof window.eqTodoApplyFilter === 'function') window.eqTodoApplyFilter();
+
+  var ALL_EQUIPMENT = parseJsonScript('eq-todo-equipment-data');
+  var ALL_USERS     = parseJsonScript('eq-todo-users-data');
+
+  function renderMulti(container, items, labelFn, subFn, prefix, selectedIds) {
+    if (!container) return;
+    var sel = {};
+    (selectedIds || []).forEach(function (id) { sel[id] = true; });
+    container.innerHTML = items.map(function (it) {
+      var checked = sel[it.id] ? 'checked' : '';
+      var sub = subFn(it);
+      var lbl = labelFn(it);
+      return '<label class="eq-todo-multi-option" data-search="' + esc((lbl + ' ' + (sub || '')).toLowerCase()) + '">' +
+               '<input type="checkbox" name="' + prefix + '" value="' + it.id + '" ' + checked + '>' +
+               '<span>' + esc(lbl) + (sub ? ' <small>&middot; ' + esc(sub) + '</small>' : '') + '</span>' +
+             '</label>';
+    }).join('');
   }
+  function filterMulti(container, q) {
+    if (!container) return;
+    q = (q || '').trim().toLowerCase();
+    container.querySelectorAll('.eq-todo-multi-option').forEach(function (opt) {
+      var s = opt.getAttribute('data-search') || '';
+      opt.style.display = (!q || s.indexOf(q) !== -1) ? '' : 'none';
+    });
+  }
+
+  // ---- Filter/Suche ----
+  var currentTab = 'open';
+  function applyListFilter() {
+    var listEl = $('eqTodoList'); if (!listEl) return;
+    var searchInp = $('eqTodoSearch');
+    var noResEl = $('eqTodoNoResults');
+    var q = (searchInp ? searchInp.value : '').trim().toLowerCase();
+    var visible = 0;
+    listEl.querySelectorAll('.eq-todo-card').forEach(function (card) {
+      var isDone = card.dataset.done === '1';
+      var okTab = true;
+      if (currentTab === 'open') okTab = !isDone;
+      else if (currentTab === 'done') okTab = isDone;
+      var okText = !q || card.textContent.toLowerCase().indexOf(q) !== -1;
+      var show = okTab && okText;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (noResEl) noResEl.style.display = (visible === 0 && listEl.children.length > 0) ? '' : 'none';
+  }
+  window.eqTodoApplyFilter = applyListFilter;
+
+  document.querySelectorAll('.eq-todo-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.eq-todo-tab').forEach(function (b) { b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      currentTab = btn.dataset.filter;
+      applyListFilter();
+    });
+  });
+  var searchInp = $('eqTodoSearch');
+  if (searchInp) searchInp.addEventListener('input', applyListFilter);
+  applyListFilter();
+
+  // ---- Modal ----
+  function setBackdropOpen(open) {
+    var backdrop = $('eqTodoBackdrop'); if (!backdrop) return;
+    if (open) {
+      backdrop.classList.add('open');
+      backdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    } else {
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+  }
+
+  window.openTodoModal = function (todoId) {
+    var errorEl = $('eqTodoError'); if (errorEl) errorEl.textContent = '';
+    var form = $('eqTodoForm');
+    var idEl = $('eqTodoId');
+    var titleEl = $('eqTodoModalTitle');
+    var titleInp = $('eqTodoTitle');
+    var descInp = $('eqTodoDescription');
+    var prioInp = $('eqTodoPriority');
+    var dueInp = $('eqTodoDueDate');
+    var eqList = $('eqTodoEqList');
+    var userList = $('eqTodoUserList');
+    var eqSearch = $('eqTodoEqSearch');
+    var userSearch = $('eqTodoUserSearch');
+
+    var selectedEq = [], selectedUsers = [];
+    if (todoId) {
+      var card = document.querySelector('.eq-todo-card[data-todo-id="' + todoId + '"]');
+      if (card) {
+        if (idEl) idEl.value = todoId;
+        if (titleEl) titleEl.textContent = 'To-do bearbeiten';
+        if (titleInp) titleInp.value = decodeURIComponent(card.dataset.title || '');
+        if (descInp)  descInp.value  = decodeURIComponent(card.dataset.description || '');
+        if (prioInp)  prioInp.value  = card.dataset.priority || 'normal';
+        if (dueInp)   dueInp.value   = card.dataset.due || '';
+        selectedEq    = (card.dataset.itemIds || '').split(',').map(function (s) { return parseInt(s, 10); }).filter(Boolean);
+        selectedUsers = (card.dataset.userIds || '').split(',').map(function (s) { return parseInt(s, 10); }).filter(Boolean);
+      }
+    } else {
+      if (idEl) idEl.value = '';
+      if (titleEl) titleEl.textContent = 'Neue To-do';
+      if (form) form.reset();
+      if (prioInp) prioInp.value = 'normal';
+    }
+    renderMulti(eqList, ALL_EQUIPMENT, function (it) { return it.name; }, function (it) { return it.serial_number; }, 'equipment_ids', selectedEq);
+    renderMulti(userList, ALL_USERS, function (it) { return it.full_name || it.username; }, function () { return ''; }, 'user_ids', selectedUsers);
+    if (eqSearch) eqSearch.value = '';
+    if (userSearch) userSearch.value = '';
+    setBackdropOpen(true);
+    setTimeout(function () { if (titleInp) titleInp.focus(); }, 80);
+  };
+
+  window.closeTodoModal = function () { setBackdropOpen(false); };
+
+  // Modal Suchen
+  var eqSearchEl = $('eqTodoEqSearch');
+  if (eqSearchEl) eqSearchEl.addEventListener('input', function (e) { filterMulti($('eqTodoEqList'), e.target.value); });
+  var userSearchEl = $('eqTodoUserSearch');
+  if (userSearchEl) userSearchEl.addEventListener('input', function (e) { filterMulti($('eqTodoUserList'), e.target.value); });
+
+  // Backdrop-Klick + ESC schliessen
+  var backdrop = $('eqTodoBackdrop');
+  if (backdrop) backdrop.addEventListener('click', function (e) { if (e.target === backdrop) window.closeTodoModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && backdrop && backdrop.classList.contains('open')) window.closeTodoModal();
+  });
+
+  // Submit
+  window.submitTodoForm = function (ev) {
+    ev.preventDefault();
+    var form = $('eqTodoForm'); if (!form) return false;
+    var errorEl = $('eqTodoError'); if (errorEl) errorEl.textContent = '';
+    var fd = new FormData(form);
+    var id = ($('eqTodoId') || {}).value || '';
+    var url = id ? ('/equipment/todos/' + id + '/edit') : '/equipment/todos';
+    var eqIds = Array.prototype.slice.call(form.querySelectorAll('input[name="equipment_ids"]:checked')).map(function (i) { return i.value; });
+    var userIds = Array.prototype.slice.call(form.querySelectorAll('input[name="user_ids"]:checked')).map(function (i) { return i.value; });
+    var body = new URLSearchParams();
+    body.append('title', fd.get('title') || '');
+    body.append('description', fd.get('description') || '');
+    body.append('priority', fd.get('priority') || 'normal');
+    body.append('due_date', fd.get('due_date') || '');
+    if (eqIds.length) body.append('equipment_ids', eqIds.join(','));
+    if (userIds.length) body.append('user_ids', userIds.join(','));
+    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j || !res.j.ok) {
+          if (errorEl) errorEl.textContent = (res.j && res.j.error === 'title_required') ? 'Bitte Titel angeben.' : 'Fehler beim Speichern.';
+          return;
+        }
+        window.closeTodoModal();
+        window.location.reload();
+      })
+      .catch(function () { if (errorEl) errorEl.textContent = 'Netzwerkfehler.'; });
+    return false;
+  };
+
+  // ---- Click-Delegation: Toggle / Edit / Delete / Neu ----
   document.addEventListener('click', function (e) {
     var tgl = e.target.closest('[data-todo-toggle]');
     if (tgl) {
@@ -407,17 +570,17 @@
         .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
         .then(function (res) {
           if (!res.ok || !res.j || !res.j.ok) { console.warn('[todo-toggle] fehlgeschlagen', res); return; }
-          var card = findCard(id); if (!card) return;
+          var card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
+          if (!card) return;
           var done = !!res.j.done;
           card.classList.toggle('is-done', done);
           card.dataset.done = done ? '1' : '0';
-          var tab = currentTab();
-          var willHide = (tab === 'open' && done) || (tab === 'done' && !done);
+          var willHide = (currentTab === 'open' && done) || (currentTab === 'done' && !done);
           if (willHide) {
             card.classList.add('is-leaving');
-            setTimeout(function () { reapplyFilter(); card.classList.remove('is-leaving'); }, 320);
+            setTimeout(function () { applyListFilter(); card.classList.remove('is-leaving'); }, 320);
           } else {
-            reapplyFilter();
+            applyListFilter();
           }
         })
         .catch(function (err) { console.error('[todo-toggle] netzwerk', err); })
@@ -427,7 +590,7 @@
     var edt = e.target.closest('[data-todo-edit]');
     if (edt) {
       e.preventDefault();
-      if (typeof window.openTodoModal === 'function') window.openTodoModal(parseInt(edt.getAttribute('data-todo-edit'), 10));
+      window.openTodoModal(parseInt(edt.getAttribute('data-todo-edit'), 10));
       return;
     }
     var del = e.target.closest('[data-todo-delete]');
@@ -439,192 +602,23 @@
         .then(function (r) { return r.json(); })
         .then(function (j) {
           if (j && j.ok) {
-            var card = findCard(did); if (card) card.remove();
-            reapplyFilter();
+            var card = document.querySelector('.eq-todo-card[data-todo-id="' + did + '"]');
+            if (card) card.remove();
+            applyListFilter();
           }
         });
       return;
     }
     var nw = e.target.closest('[data-todo-new]');
-    if (nw) {
-      e.preventDefault();
-      if (typeof window.openTodoModal === 'function') window.openTodoModal();
-    }
-  });
-})();
-</script>
-
-<script>
-(function() {
-  function parseJsonScript(id) {
-    const el = document.getElementById(id);
-    if (!el) return [];
-    try { return JSON.parse(el.textContent || '[]'); } catch (e) { return []; }
-  }
-  const ALL_EQUIPMENT = parseJsonScript('eq-todo-equipment-data');
-  const ALL_USERS     = parseJsonScript('eq-todo-users-data');
-
-  const backdrop  = document.getElementById('eqTodoBackdrop');
-  const form      = document.getElementById('eqTodoForm');
-  const titleEl   = document.getElementById('eqTodoModalTitle');
-  const idEl      = document.getElementById('eqTodoId');
-  const titleInp  = document.getElementById('eqTodoTitle');
-  const descInp   = document.getElementById('eqTodoDescription');
-  const prioInp   = document.getElementById('eqTodoPriority');
-  const dueInp    = document.getElementById('eqTodoDueDate');
-  const errorEl   = document.getElementById('eqTodoError');
-  const eqList    = document.getElementById('eqTodoEqList');
-  const userList  = document.getElementById('eqTodoUserList');
-  const eqSearch  = document.getElementById('eqTodoEqSearch');
-  const userSearch= document.getElementById('eqTodoUserSearch');
-
-  const searchInp = document.getElementById('eqTodoSearch');
-  const tabsEls   = document.querySelectorAll('.eq-todo-tab');
-  const listEl    = document.getElementById('eqTodoList');
-  const noResEl   = document.getElementById('eqTodoNoResults');
-  let currentTab = 'open';
-
-  function esc(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
-  }
-
-  function renderMulti(container, items, labelFn, subFn, prefix, selectedIds) {
-    const sel = new Set(selectedIds || []);
-    container.innerHTML = items.map(it => {
-      const checked = sel.has(it.id) ? 'checked' : '';
-      const sub = subFn(it);
-      return '<label class="eq-todo-multi-option" data-search="' + esc((labelFn(it) + ' ' + (sub || '')).toLowerCase()) + '">' +
-               '<input type="checkbox" name="' + prefix + '" value="' + it.id + '" ' + checked + '>' +
-               '<span>' + esc(labelFn(it)) + (sub ? ' <small>· ' + esc(sub) + '</small>' : '') + '</span>' +
-             '</label>';
-    }).join('');
-  }
-
-  function filterMulti(container, query) {
-    const q = (query || '').trim().toLowerCase();
-    container.querySelectorAll('.eq-todo-multi-option').forEach(opt => {
-      const s = opt.getAttribute('data-search') || '';
-      opt.style.display = (!q || s.includes(q)) ? '' : 'none';
-    });
-  }
-
-  if (eqSearch) eqSearch.addEventListener('input', e => filterMulti(eqList, e.target.value));
-  if (userSearch) userSearch.addEventListener('input', e => filterMulti(userList, e.target.value));
-
-  function applyListFilter() {
-    const q = (searchInp ? searchInp.value : '').trim().toLowerCase();
-    let visible = 0;
-    listEl.querySelectorAll('.eq-todo-card').forEach(card => {
-      const isDone = card.dataset.done === '1';
-      let okTab = true;
-      if (currentTab === 'open') okTab = !isDone;
-      else if (currentTab === 'done') okTab = isDone;
-      const okText = !q || card.textContent.toLowerCase().includes(q);
-      const show = okTab && okText;
-      card.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    if (noResEl) noResEl.style.display = (visible === 0 && listEl.children.length > 0) ? '' : 'none';
-  }
-
-  tabsEls.forEach(btn => btn.addEventListener('click', () => {
-    tabsEls.forEach(b => b.classList.remove('is-active'));
-    btn.classList.add('is-active');
-    currentTab = btn.dataset.filter;
-    applyListFilter();
-  }));
-  if (searchInp) searchInp.addEventListener('input', applyListFilter);
-  applyListFilter();
-  window.eqTodoApplyFilter = applyListFilter;
-
-  window.openTodoModal = function(todoId) {
-    errorEl.textContent = '';
-    let selectedEq = [], selectedUsers = [];
-    if (todoId) {
-      const card = document.querySelector('.eq-todo-card[data-todo-id="' + todoId + '"]');
-      if (card) {
-        idEl.value = todoId;
-        titleEl.textContent = 'To-do bearbeiten';
-        titleInp.value = decodeURIComponent(card.dataset.title || '');
-        descInp.value  = decodeURIComponent(card.dataset.description || '');
-        prioInp.value  = card.dataset.priority || 'normal';
-        dueInp.value   = card.dataset.due || '';
-        selectedEq    = (card.dataset.itemIds || '').split(',').map(s => parseInt(s, 10)).filter(Boolean);
-        selectedUsers = (card.dataset.userIds || '').split(',').map(s => parseInt(s, 10)).filter(Boolean);
-      }
-    } else {
-      idEl.value = '';
-      titleEl.textContent = 'Neue To-do';
-      form.reset();
-      prioInp.value = 'normal';
-    }
-    renderMulti(eqList, ALL_EQUIPMENT, it => it.name, it => it.serial_number, 'equipment_ids', selectedEq);
-    renderMulti(userList, ALL_USERS, it => it.full_name || it.username, () => '', 'user_ids', selectedUsers);
-    if (eqSearch) eqSearch.value = '';
-    if (userSearch) userSearch.value = '';
-    backdrop.classList.add('open');
-    backdrop.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => titleInp.focus(), 80);
-  };
-
-  window.closeTodoModal = function() {
-    backdrop.classList.remove('open');
-    backdrop.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  };
-
-  backdrop.addEventListener('click', e => {
-    if (e.target === backdrop) window.closeTodoModal();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && backdrop.classList.contains('open')) window.closeTodoModal();
+    if (nw) { e.preventDefault(); window.openTodoModal(); }
   });
 
-  window.submitTodoForm = function(ev) {
-    ev.preventDefault();
-    errorEl.textContent = '';
-    const fd = new FormData(form);
-    const id = idEl.value;
-    const url = id ? ('/equipment/todos/' + id + '/edit') : '/equipment/todos';
-    const eqIds = Array.from(form.querySelectorAll('input[name="equipment_ids"]:checked')).map(i => i.value);
-    const userIds = Array.from(form.querySelectorAll('input[name="user_ids"]:checked')).map(i => i.value);
-    const body = new URLSearchParams();
-    body.append('title', fd.get('title') || '');
-    body.append('description', fd.get('description') || '');
-    body.append('priority', fd.get('priority') || 'normal');
-    body.append('due_date', fd.get('due_date') || '');
-    if (eqIds.length) body.append('equipment_ids', eqIds.join(','));
-    if (userIds.length) body.append('user_ids', userIds.join(','));
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString()
-    })
-    .then(r => r.json().then(j => ({ ok: r.ok, j })))
-    .then(({ ok, j }) => {
-      if (!ok || !j.ok) {
-        errorEl.textContent = j.error === 'title_required' ? 'Bitte Titel angeben.' : 'Fehler beim Speichern.';
-        return;
-      }
-      window.closeTodoModal();
-      window.location.reload();
-    })
-    .catch(() => { errorEl.textContent = 'Netzwerkfehler.'; });
-    return false;
+  // Rueckwaertskompatible Aliase
+  window.toggleTodo = function (id) {
+    var b = document.querySelector('[data-todo-toggle="' + id + '"]'); if (b) b.click();
   };
-
-  window.toggleTodo = function(id, btn) {
-    // Beibehalten fuer Rueckwaertskompatibilitaet; Hauptlogik laeuft ueber data-todo-toggle Delegation.
-    const fakeBtn = btn || document.querySelector('[data-todo-toggle="' + id + '"]');
-    if (fakeBtn) fakeBtn.click();
-  };
-
-  window.deleteTodo = function(id) {
-    const btn = document.querySelector('[data-todo-delete="' + id + '"]');
-    if (btn) btn.click();
+  window.deleteTodo = function (id) {
+    var b = document.querySelector('[data-todo-delete="' + id + '"]'); if (b) b.click();
   };
 })();
 </script>
