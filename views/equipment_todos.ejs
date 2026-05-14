@@ -137,27 +137,46 @@
   .eq-todo-iconbtn.is-danger:hover { background: #fde8e8; color: #b21414; border-color: #f6c6c6; }
   .eq-todo-iconbtn svg { width: 15px; height: 15px; }
 
-  /* Todo-Modal */
+  /* Todo-Modal (Stil wie ueq-modal) */
   .eq-todo-backdrop {
-    position: fixed; inset: 0; background: rgba(15,25,18,0.55);
-    display: none; align-items: flex-start; justify-content: center;
-    padding: 4vh 1rem 1rem; z-index: 1500;
+    position: fixed; inset: 0;
+    background: rgba(15, 28, 22, 0.55);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 0.75rem; z-index: 1500;
+    overflow: hidden; overscroll-behavior: contain; touch-action: pan-y;
     opacity: 0; transition: opacity 0.22s ease;
   }
   .eq-todo-backdrop.open { display: flex; opacity: 1; }
-  .eq-todo-backdrop { overflow: hidden; overscroll-behavior: contain; touch-action: pan-y; }
   .eq-todo-modal {
-    width: 100%; max-width: 560px; max-height: 92vh;
-    overflow-y: auto; overflow-x: hidden;
-    overscroll-behavior: contain; touch-action: pan-y;
     background: #fff; border-radius: 18px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-    transform: translateY(20px) scale(0.97); opacity: 0;
-    transition: transform 0.25s ease, opacity 0.25s ease;
+    width: 100%; max-width: none;
+    box-shadow: 0 16px 40px rgba(10,30,20,0.35), 0 6px 18px rgba(10,30,20,0.18);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    height: auto; max-height: calc(100dvh - 1.5rem);
+    transform: translateY(12px) scale(0.985); opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22,0.61,0.36,1), opacity 0.22s ease;
+    will-change: transform, opacity;
+    overscroll-behavior: contain; touch-action: pan-y;
   }
-  .eq-todo-form { max-width: 100%; box-sizing: border-box; }
-  .eq-todo-form input, .eq-todo-form select, .eq-todo-form textarea { max-width: 100%; box-sizing: border-box; }
   .eq-todo-backdrop.open .eq-todo-modal { transform: translateY(0) scale(1); opacity: 1; }
+  .eq-todo-form {
+    padding: 1rem 1.1rem 1.1rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
+    max-width: 100%; box-sizing: border-box;
+    overflow-y: auto;
+  }
+  .eq-todo-form input, .eq-todo-form select, .eq-todo-form textarea { max-width: 100%; box-sizing: border-box; }
+  @media (min-width: 769px) {
+    .eq-todo-backdrop { padding: 2rem 1.5rem; }
+    .eq-todo-modal {
+      width: min(640px, 100%);
+      max-height: 90vh;
+      border-radius: 20px;
+      box-shadow: 0 28px 70px rgba(10,30,20,0.4), 0 10px 26px rgba(10,30,20,0.22);
+    }
+  }
   .eq-todo-modal-head {
     display: flex; align-items: center; gap: 0.6rem;
     padding: 0.95rem 1.1rem; border-bottom: 1px solid #e2efe6;
@@ -172,7 +191,6 @@
     font-size: 1.05rem;
   }
   .eq-todo-modal-close:hover { background: rgba(255,255,255,0.32); }
-  .eq-todo-form { padding: 1rem 1.1rem 1.1rem; display: flex; flex-direction: column; gap: 0.75rem; }
   .eq-todo-field label {
     display: block; font-size: 0.78rem; font-weight: 700;
     color: #1a3a26; margin-bottom: 0.3rem; letter-spacing: 0.02em;
