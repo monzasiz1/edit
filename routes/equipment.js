@@ -582,4 +582,29 @@ router.post('/assignment/:id/return', requireEquipmentAccess, async (req, res) =
   }
 });
 
+// ===== ZUWEISUNG BEARBEITEN =====
+router.post('/assignment/:id/edit', requireEquipmentAccess, async (req, res) => {
+  try {
+    const { serial_number, quantity, notes } = req.body;
+    const serialClean = (serial_number || '').toString().trim().slice(0, 100) || null;
+    const qty = parseInt(quantity, 10);
+    const safeQty = Number.isInteger(qty) && qty > 0 ? qty : 1;
+    const notesClean = (notes || '').toString().slice(0, 2000);
+
+    const r = await db.query(
+      `UPDATE equipment_assignments
+         SET serial_number = $1, quantity = $2, notes = $3
+       WHERE id = $4
+       RETURNING equipment_id`,
+      [serialClean, safeQty, notesClean, req.params.id]
+    );
+    const equipmentId = r.rows[0]?.equipment_id;
+    if (!equipmentId) return res.redirect('/equipment?error=Zuweisung%20nicht%20gefunden');
+    res.redirect(`/equipment/${equipmentId}/assign?success=Zuweisung%20aktualisiert`);
+  } catch (err) {
+    console.error(err);
+    res.redirect('/equipment?error=Fehler');
+  }
+});
+
 module.exports = router;

@@ -203,6 +203,97 @@
   .holder-badge.is-vehicle  { color: #3a5ec0; background: #e8edfb; border: 1px solid #c8d3f4; }
   .holder-badge.is-external { color: #6b21a8; background: #f3e8fb; border: 1px solid #e0c6f6; }
   .holder-badge.is-other    { color: #4b5563; background: #f1f5f9; border: 1px solid #d4dde6; }
+
+  /* Inline-Edit pro Zuweisung */
+  .assign-edit-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: 1px solid #d6e3da;
+    color: #1a7a45;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .assign-edit-btn:hover { background: #e6f4ec; }
+  .assign-edit-btn svg { width: 11px; height: 11px; }
+
+  .assign-edit-form {
+    display: none;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-top: 0.4rem;
+    padding: 0.7rem 0.8rem;
+    background: #f6faf3;
+    border: 1px solid #d9ead9;
+    border-radius: 10px;
+  }
+  .assign-edit-form.open { display: flex; }
+  .assign-edit-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1b2e2b;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .assign-edit-form .aef-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .assign-edit-form .aef-row label { flex: 1 1 140px; }
+  .assign-edit-form .aef-qty { flex: 0 1 110px !important; }
+  .assign-edit-form input,
+  .assign-edit-form textarea {
+    padding: 0.45rem 0.65rem;
+    border: 1px solid #d4dfcf;
+    border-radius: 0.55rem;
+    background: #fff;
+    font-size: 0.88rem;
+    color: #1b2e2b;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    outline: none;
+    font-family: inherit;
+  }
+  .assign-edit-form input:focus,
+  .assign-edit-form textarea:focus {
+    border-color: #3da973;
+    box-shadow: 0 0 0 3px rgba(61,169,115,0.15);
+  }
+  .assign-edit-form .aef-actions {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .assign-edit-form .aef-save {
+    background: linear-gradient(135deg, #3da973 0%, #2d8f55 100%);
+    color: #fff;
+    border: 0;
+    border-radius: 0.55rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .assign-edit-form .aef-cancel {
+    background: #fff;
+    color: #6b7280;
+    border: 1px solid #d4dfcf;
+    border-radius: 0.55rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
 </style>
 
 <%- include('partials/zeugwart_page_styles') %>
@@ -374,10 +465,34 @@
                   <span>SN:&nbsp;<strong><%= assignment.serial_number %></strong></span>
                 <% } %>
                 <span>Seit:&nbsp;<%= new Date(assignment.assigned_at).toLocaleDateString('de-DE') %></span>
+                <button type="button" class="assign-edit-btn" data-edit-toggle="<%= assignment.id %>" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                  Bearbeiten
+                </button>
               </div>
               <% if (assignment.notes) { %>
                 <div class="assign-note"><%= assignment.notes %></div>
               <% } %>
+              <form method="POST" action="/equipment/assignment/<%= assignment.id %>/edit" class="assign-edit-form" data-edit-form="<%= assignment.id %>">
+                <div class="aef-row">
+                  <label>
+                    <span>SN / Stück-Nr.</span>
+                    <input type="text" name="serial_number" value="<%= assignment.serial_number || '' %>" maxlength="100" placeholder="optional">
+                  </label>
+                  <label class="aef-qty">
+                    <span>Anzahl</span>
+                    <input type="number" name="quantity" value="<%= assignment.quantity %>" min="1" max="<%= equipment.quantity %>">
+                  </label>
+                </div>
+                <label class="aef-notes">
+                  <span>Notiz</span>
+                  <textarea name="notes" rows="2" placeholder="Optional"><%= assignment.notes || '' %></textarea>
+                </label>
+                <div class="aef-actions">
+                  <button type="submit" class="aef-save">Speichern</button>
+                  <button type="button" class="aef-cancel" data-edit-cancel="<%= assignment.id %>">Abbrechen</button>
+                </div>
+              </form>
             </div>
           <% }) %>
         </div>
@@ -400,5 +515,32 @@
       }
     });
     if (cancel) cancel.addEventListener('click', () => form.classList.remove('open'));
+  })();
+
+  // Inline-Edit pro Zuweisung
+  (() => {
+    document.addEventListener('click', (ev) => {
+      const tgl = ev.target.closest('[data-edit-toggle]');
+      if (tgl) {
+        const id = tgl.getAttribute('data-edit-toggle');
+        const form = document.querySelector('[data-edit-form="' + id + '"]');
+        if (!form) return;
+        const open = form.classList.toggle('open');
+        tgl.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+          const first = form.querySelector('input, textarea');
+          if (first) first.focus();
+        }
+        return;
+      }
+      const cnl = ev.target.closest('[data-edit-cancel]');
+      if (cnl) {
+        const id = cnl.getAttribute('data-edit-cancel');
+        const form = document.querySelector('[data-edit-form="' + id + '"]');
+        if (form) form.classList.remove('open');
+        const tglBtn = document.querySelector('[data-edit-toggle="' + id + '"]');
+        if (tglBtn) tglBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
   })();
 </script>
