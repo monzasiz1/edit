@@ -382,6 +382,16 @@ async function ensureDatabaseSchema() {
       PRIMARY KEY (todo_id, user_id)
     )
   `);
+  // Fehlende Spalten nachziehen, falls die Tabelle aus einer aelteren Version stammt
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS done BOOLEAN NOT NULL DEFAULT FALSE`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS done_at TIMESTAMP`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS done_by INTEGER REFERENCES users(id) ON DELETE SET NULL`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS priority VARCHAR(10) NOT NULL DEFAULT 'normal'`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS due_date DATE`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS description TEXT`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
+  await db.query(`ALTER TABLE equipment_todos ADD COLUMN IF NOT EXISTS created_by INTEGER REFERENCES users(id) ON DELETE SET NULL`);
+
   await db.query(`
     CREATE INDEX IF NOT EXISTS idx_equipment_todos_done
       ON equipment_todos(done, created_at DESC)
