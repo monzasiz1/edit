@@ -37,6 +37,66 @@
   }
   .eq-meta strong { color: #1a7a45; }
 
+  .eq-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.7rem;
+    margin: 0 0 1.1rem;
+  }
+  .eq-stat {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e2efe6;
+    border-radius: 14px;
+    padding: 0.75rem 0.9rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    box-shadow: 0 1px 2px rgba(15, 40, 28, 0.04);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  }
+  .eq-stat:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(15, 40, 28, 0.08);
+    border-color: #cfe5d8;
+  }
+  .eq-stat::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: #cfe5d8;
+  }
+  .eq-stat[data-tone="primary"]::before { background: linear-gradient(180deg, #3da973, #1a7a45); }
+  .eq-stat[data-tone="warn"]::before    { background: linear-gradient(180deg, #f0a83c, #d97706); }
+  .eq-stat[data-tone="ok"]::before      { background: linear-gradient(180deg, #4ec97e, #198a4c); }
+  .eq-stat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+  .eq-stat-val {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #1a3d2a;
+    font-variant-numeric: tabular-nums;
+  }
+  .eq-stat[data-tone="warn"] .eq-stat-val { color: #b8650a; }
+  .eq-stat[data-tone="ok"]   .eq-stat-val { color: #198a4c; }
+  .eq-stat-sub {
+    font-size: 0.72rem;
+    color: #6b7280;
+  }
+  @media (max-width: 600px) {
+    .eq-stats { grid-template-columns: repeat(2, 1fr); gap: 0.55rem; }
+    .eq-stat { padding: 0.6rem 0.7rem 0.65rem; }
+    .eq-stat-val { font-size: 1.3rem; }
+  }
+
   .eq-grid {
     list-style: none;
     margin: 0;
@@ -967,6 +1027,44 @@
   </form>
 
   <div class="eq-meta"><strong><%= equipment.length %></strong> Equipment-Einträge</div>
+
+  <% if (typeof equipmentStats !== 'undefined' && equipmentStats) { %>
+    <% const _avail = equipmentStats.availablePieces;
+       const _total = equipmentStats.totalPieces;
+       const _pct = _total > 0 ? Math.round((equipmentStats.assignedPieces / _total) * 100) : 0; %>
+    <section class="eq-stats" aria-label="Equipment-Statistik">
+      <div class="eq-stat" data-tone="primary">
+        <span class="eq-stat-label">Gesamt</span>
+        <span class="eq-stat-val"><%= equipmentStats.totalPieces %></span>
+        <span class="eq-stat-sub">Stück (<%= equipmentStats.totalEntries %> Einträge)</span>
+      </div>
+      <div class="eq-stat" data-tone="warn">
+        <span class="eq-stat-label">Zugewiesen</span>
+        <span class="eq-stat-val"><%= equipmentStats.assignedPieces %></span>
+        <span class="eq-stat-sub"><%= _pct %>% ausgegeben</span>
+      </div>
+      <div class="eq-stat" data-tone="ok">
+        <span class="eq-stat-label">Verfügbar</span>
+        <span class="eq-stat-val"><%= _avail %></span>
+        <span class="eq-stat-sub">auf Lager</span>
+      </div>
+      <div class="eq-stat">
+        <span class="eq-stat-label">Kategorien</span>
+        <span class="eq-stat-val"><%= equipmentStats.categoriesCount %></span>
+        <span class="eq-stat-sub">aktiv</span>
+      </div>
+      <div class="eq-stat">
+        <span class="eq-stat-label">Mitglieder</span>
+        <span class="eq-stat-val"><%= equipmentStats.membersWithEquipment %></span>
+        <span class="eq-stat-sub">mit Equipment</span>
+      </div>
+      <div class="eq-stat">
+        <span class="eq-stat-label">Lagerorte</span>
+        <span class="eq-stat-val"><%= equipmentStats.holdersInUse %></span>
+        <span class="eq-stat-sub">/ Fahrzeuge</span>
+      </div>
+    </section>
+  <% } %>
 
   <% if (usersWithEquipment && usersWithEquipment.length) { %>
     <div class="eq-section-title">

@@ -208,6 +208,26 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       ...h, count: h.items.length,
     }));
 
+    // Statistik fuer Zeugwart-Bereich
+    const totalEntries = equipmentRows.length;
+    const totalPieces = equipmentRows.reduce((sum, e) => sum + (parseInt(e.quantity, 10) || 0), 0);
+    const assignedPieces = assignmentsListResult.rows.reduce(
+      (sum, a) => sum + (parseInt(a.quantity, 10) || 0), 0
+    );
+    const availablePieces = Math.max(totalPieces - assignedPieces, 0);
+    const categoriesCount = categoriesResult.rows.length;
+    const membersWithEquipment = usersWithEquipment.length;
+    const holdersInUse = holdersWithEquipment.length;
+    const equipmentStats = {
+      totalEntries,
+      totalPieces,
+      assignedPieces,
+      availablePieces,
+      categoriesCount,
+      membersWithEquipment,
+      holdersInUse,
+    };
+
     res.render('equipment', {
       layout: 'layout',
       equipment: equipmentRows,
@@ -215,6 +235,7 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       usersWithEquipment,
       holdersWithEquipment,
       bodyPartLabels: BODY_PART_LABELS,
+      equipmentStats,
       search,
       selectedCategory: category,
       success: req.query.success,
