@@ -165,10 +165,12 @@
     padding: 1rem 1.1rem 1.1rem;
     display: flex; flex-direction: column; gap: 0.75rem;
     max-width: 100%; box-sizing: border-box;
-    overflow-y: auto; flex: 1 1 auto; min-height: 0;
+    overflow-y: auto; overflow-x: hidden;
+    overscroll-behavior: contain; touch-action: pan-y;
+    flex: 1 1 auto; min-height: 0;
   }
   .eq-todo-form input, .eq-todo-form select, .eq-todo-form textarea { max-width: 100%; box-sizing: border-box; }
-  .eq-todo-modal-head { flex-shrink: 0; }
+  .eq-todo-modal-head { flex-shrink: 0; touch-action: none; user-select: none; -webkit-user-select: none; }
   @media (max-width: 768px) {
     .eq-todo-backdrop { padding: 0.5rem; align-items: flex-end; }
     .eq-todo-modal {
