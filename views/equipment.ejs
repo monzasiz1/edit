@@ -1834,33 +1834,98 @@
       return;
     }
 
+    // HTTPS-Check (Kamera-API erfordert sichere Verbindung, ausser localhost)
+    const isSecure = window.isSecureContext
+      || location.protocol === 'https:'
+      || ['localhost', '127.0.0.1'].includes(location.hostname);
+    if (!isSecure) {
+      hint.textContent = 'Kamera braucht HTTPS';
+      setStatus('Kamera funktioniert nur ueber HTTPS. Bitte Code manuell eingeben.', 'error');
+      return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      hint.textContent = 'Kamera nicht unterstuetzt';
+      setStatus('Dieser Browser unterstuetzt keinen Kamerazugriff. Bitte Code manuell eingeben.', 'error');
+      return;
+    }
+
     try {
-      zxingReader = new ZX.BrowserMultiFormatReader();
+      // Format-Hints: alle gaengigen Codes inkl. QR, Data Matrix, Aztec, PDF417, EAN, Code128 / 39
+      const hints = new Map();
+      try {
+        const F = ZX.BarcodeFormat;
+        const DF = ZX.DecodeHintType;
+        if (F && DF) {
+          hints.set(DF.POSSIBLE_FORMATS, [
+            F.QR_CODE, F.DATA_MATRIX, F.AZTEC, F.PDF_417,
+            F.CODE_128, F.CODE_39, F.CODE_93, F.CODABAR, F.ITF,
+            F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E
+          ]);
+          hints.set(DF.TRY_HARDER, true);
+        }
+      } catch (e) { /* Hints optional */ }
+
+      zxingReader = new ZX.BrowserMultiFormatReader(hints);
       hint.textContent = 'QR / Barcode in den Rahmen halten';
       setStatus('Kamera startet…', 'info');
       scanning = true;
 
-      // Bevorzugt Rückkamera – ZXing wählt selbst, fällt notfalls auf erste Kamera zurück.
-      let deviceId;
-      try {
-        const devices = await ZX.BrowserMultiFormatReader.listVideoInputDevices?.()
-          || await navigator.mediaDevices.enumerateDevices().then(ds => ds.filter(d => d.kind === 'videoinput'));
-        const back = devices.find(d => /back|rear|environment|hinten/i.test(d.label));
-        deviceId = (back || devices[devices.length - 1] || {}).deviceId;
-      } catch (e) { /* egal */ }
-
-      zxingControls = await zxingReader.decodeFromVideoDevice(deviceId || null, video, (result, err) => {
-        if (!scanning) return;
-        if (result && result.getText) {
-          handleCode(result.getText());
+      // Direkt per facingMode='environment' starten – funktioniert auch ohne vorherige
+      // Permission und ohne Device-Labels (typisch fuer iOS Safari & Android Chrome).
+      const constraints = {
+        audio: false,
+        video: {
+          facingMode: { ideal: 'environment' },
+          width:  { ideal: 1280 },
+          height: { ideal: 720 }
         }
-        // err NotFoundException ist normal pro Frame – nicht loggen
-      });
+      };
+
+      const callback = (result, err) => {
+        if (!scanning) return;
+        if (result && result.getText) handleCode(result.getText());
+        // NotFoundException ist normal pro Frame – nicht loggen
+      };
+
+      try {
+        if (typeof zxingReader.decodeFromConstraints === 'function') {
+          zxingControls = await zxingReader.decodeFromConstraints(constraints, video, callback);
+        } else {
+          // Fallback aelteres ZXing: getUserMedia + decodeFromVideoElement
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+          video.srcObject = stream;
+          await video.play().catch(() => {});
+          zxingReader.decodeFromVideoElement(video, callback);
+        }
+      } catch (e1) {
+        console.warn('[QR] Rueckkamera nicht verfuegbar, versuche Standard-Kamera', e1);
+        // Fallback: irgendeine Kamera
+        const fallback = { audio: false, video: true };
+        if (typeof zxingReader.decodeFromConstraints === 'function') {
+          zxingControls = await zxingReader.decodeFromConstraints(fallback, video, callback);
+        } else {
+          stream = await navigator.mediaDevices.getUserMedia(fallback);
+          video.srcObject = stream;
+          await video.play().catch(() => {});
+          zxingReader.decodeFromVideoElement(video, callback);
+        }
+      }
       setStatus('');
     } catch (err) {
       console.error('[QR] Kamera-Start fehlgeschlagen', err);
+      const name = err && err.name;
+      let msg = 'Kamera nicht verfuegbar – bitte Seriennummer manuell eingeben.';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        msg = 'Kamera-Zugriff wurde abgelehnt. Bitte in den Browser-Einstellungen erlauben oder Code manuell eingeben.';
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        msg = 'Keine Kamera gefunden. Bitte Seriennummer manuell eingeben.';
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        msg = 'Kamera wird gerade von einer anderen App genutzt. Bitte schliessen und erneut versuchen.';
+      } else if (name === 'OverconstrainedError') {
+        msg = 'Rueckkamera nicht verfuegbar. Bitte Seriennummer manuell eingeben.';
+      }
       hint.textContent = 'Kein Kamerazugriff';
-      setStatus('Kamera nicht verfügbar – bitte Seriennummer manuell eingeben.', 'error');
+      setStatus(msg, 'error');
     }
   }
 
