@@ -507,6 +507,13 @@
   applyListFilter();
 
   // ---- Modal ----
+  // Modal-Backdrop an body verschieben, damit position:fixed nicht von transformierten
+  // Vorfahren (z. B. .container, page-hero) eingeschraenkt wird
+  (function () {
+    var bd = document.getElementById('eqTodoBackdrop');
+    if (bd && bd.parentNode !== document.body) document.body.appendChild(bd);
+  })();
+
   function setBackdropOpen(open) {
     var backdrop = $('eqTodoBackdrop'); if (!backdrop) return;
     if (open) {
