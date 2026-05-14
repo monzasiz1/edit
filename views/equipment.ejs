@@ -619,6 +619,27 @@
   }
   .eq-section-title svg { width: 14px; height: 14px; color: #1a7a45; }
 
+  /* Aufklappbare Sektionen */
+  .eq-collapse { display: block; }
+  .eq-collapse > summary { list-style: none; cursor: pointer; user-select: none; }
+  .eq-collapse > summary::-webkit-details-marker { display: none; }
+  .eq-collapse-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.1rem;
+    border-radius: 0.4rem;
+    transition: background 0.15s;
+  }
+  .eq-collapse-summary:hover { background: rgba(26,122,69,0.06); }
+  .eq-collapse-chev {
+    width: 14px; height: 14px;
+    color: #6b8a76;
+    margin-left: auto;
+    transition: transform 0.22s ease;
+  }
+  .eq-collapse[open] > summary .eq-collapse-chev { transform: rotate(180deg); }
+
   .users-grid {
     list-style: none;
     margin: 0 0 0.5rem 0;
@@ -1568,10 +1589,12 @@
   </div>
 
   <% if (usersWithEquipment && usersWithEquipment.length) { %>
-    <div class="eq-section-title">
+    <details class="eq-collapse" open>
+    <summary class="eq-section-title eq-collapse-summary">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
       Wer hat was? (<%= usersWithEquipment.length %>)
-    </div>
+      <svg class="eq-collapse-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
     <ul class="users-grid">
       <% usersWithEquipment.forEach(u => {
            const displayName = u.full_name || u.username;
@@ -1594,13 +1617,16 @@
     <script type="application/json" id="users-equipment-data">
       <%- JSON.stringify(usersWithEquipment).replace(/<\/script/gi, '<\\/script') %>
     </script>
+    </details>
   <% } %>
 
   <% if (typeof holdersWithEquipment !== 'undefined' && holdersWithEquipment && holdersWithEquipment.length) { %>
-    <div class="eq-section-title" style="margin-top: 1.2rem;">
+    <details class="eq-collapse" open>
+    <summary class="eq-section-title eq-collapse-summary" style="margin-top: 1.2rem;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Lagerorte &amp; Fahrzeuge (<%= holdersWithEquipment.length %>)
-    </div>
+      <svg class="eq-collapse-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
     <ul class="users-grid">
       <% holdersWithEquipment.forEach(h => {
            const isVehicle = h.holder_type === 'vehicle';
@@ -1625,6 +1651,7 @@
     <script type="application/json" id="holders-equipment-data">
       <%- JSON.stringify(holdersWithEquipment).replace(/<\/script/gi, '<\\/script') %>
     </script>
+    </details>
   <% } %>
 
   <div class="eq-section-title" style="margin-top: 1.4rem;">
@@ -1835,6 +1862,7 @@
   const openBtn = document.getElementById('eqMenuBtn');
   if (!sheet || !openBtn) return;
   if (sheet.parentNode !== document.body) document.body.appendChild(sheet);
+  const panel = sheet.querySelector('.eq-sheet');
   const open = () => {
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
@@ -1844,12 +1872,53 @@
     sheet.classList.remove('open');
     sheet.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    if (panel) { panel.style.transform = ''; panel.style.transition = ''; }
   };
   openBtn.addEventListener('click', open);
   sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sheet.classList.contains('open')) close();
   });
+
+  // Swipe-down zum Schliessen
+  if (panel) {
+    let startY = 0;
+    let currentY = 0;
+    let dragging = false;
+    const onTouchStart = (e) => {
+      if (panel.scrollTop > 0) return; // nur wenn ganz oben
+      startY = e.touches[0].clientY;
+      currentY = startY;
+      dragging = true;
+      panel.style.transition = 'none';
+    };
+    const onTouchMove = (e) => {
+      if (!dragging) return;
+      currentY = e.touches[0].clientY;
+      const delta = currentY - startY;
+      if (delta > 0) {
+        panel.style.transform = `translateY(${delta}px)`;
+      } else {
+        panel.style.transform = '';
+      }
+    };
+    const onTouchEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      const delta = currentY - startY;
+      panel.style.transition = '';
+      if (delta > 90) {
+        close();
+      } else {
+        panel.style.transform = '';
+      }
+    };
+    panel.addEventListener('touchstart', onTouchStart, { passive: true });
+    panel.addEventListener('touchmove', onTouchMove, { passive: true });
+    panel.addEventListener('touchend', onTouchEnd);
+    panel.addEventListener('touchcancel', onTouchEnd);
+  }
+
   // Aktionen aus dem Sheet auf die Hero-Buttons mappen
   sheet.querySelectorAll('[data-sheet-action]').forEach(btn => {
     btn.addEventListener('click', () => {
