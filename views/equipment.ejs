@@ -1897,6 +1897,8 @@
       currentY = e.touches[0].clientY;
       const delta = currentY - startY;
       if (delta > 0) {
+        // Browser-Scroll/Rubber-Band unterdruecken, sonst wandert der Hintergrund mit
+        if (e.cancelable) e.preventDefault();
         panel.style.transform = `translateY(${delta}px)`;
       } else {
         panel.style.transform = '';
@@ -1914,7 +1916,7 @@
       }
     };
     panel.addEventListener('touchstart', onTouchStart, { passive: true });
-    panel.addEventListener('touchmove', onTouchMove, { passive: true });
+    panel.addEventListener('touchmove', onTouchMove, { passive: false });
     panel.addEventListener('touchend', onTouchEnd);
     panel.addEventListener('touchcancel', onTouchEnd);
   }
