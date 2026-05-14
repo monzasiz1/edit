@@ -83,6 +83,10 @@
     border-radius: 50%;
     background: #fff;
     border: 2px solid rgba(255,255,255,0.9);
+    padding: 0;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -639,18 +643,18 @@
   <div class="profil-header">
     <div class="profil-avatar-section">
       <div class="profil-avatar-container">
-        <div class="profil-avatar" id="profil-avatar">
+        <div class="profil-avatar" id="profil-avatar" role="button" tabindex="0" aria-label="Profilbild aendern">
           <% if (user.avatar) { %>
             <img src="<%= user.avatar %>" alt="Avatar" />
           <% } else { %>
             <%= user.username.slice(0,2).toUpperCase() %>
           <% } %>
         </div>
-        <div class="profil-avatar-upload" onclick="document.getElementById('avatar-input').click()">
+        <button type="button" class="profil-avatar-upload" id="profil-avatar-upload-btn" aria-label="Profilbild hochladen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h1.586a1 1 0 0 1 .707.293l.707.707A1 1 0 0 0 12.414 11H13m-3 3v3m0 0v3m0-3h3m-3 0H6"/>
           </svg>
-        </div>
+        </button>
       </div>
       <h1 class="profil-name"><%= user.username %></h1>
       <span class="profil-role">
@@ -1578,21 +1582,31 @@
 </div>
 
 <script>
-  // Desktop: alle Karten auf-, Mobile: zusammenklappen (Pers. Infos bleibt offen)
+  // Karten bleiben standardmaessig geschlossen (Nutzer klappt selbst auf)
   (function () {
-    var isMobile = window.matchMedia('(max-width: 640px)').matches;
-    var cards = document.querySelectorAll('details.profil-card');
-    cards.forEach(function (card, idx) {
-      if (isMobile) {
-        card.open = (idx === 0);
-      } else {
-        card.open = true;
-      }
+    document.querySelectorAll('details.profil-card').forEach(function (card) {
+      card.open = false;
     });
   })();
 
   // Avatar Upload Handling
-  document.getElementById('avatar-input').addEventListener('change', function(e) {
+  const avatarInputEl = document.getElementById('avatar-input');
+  const avatarBtn = document.getElementById('profil-avatar-upload-btn');
+  const avatarEl = document.getElementById('profil-avatar');
+
+  function openAvatarPicker(ev) {
+    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+    if (avatarInputEl) avatarInputEl.click();
+  }
+  if (avatarBtn) avatarBtn.addEventListener('click', openAvatarPicker);
+  if (avatarEl) {
+    avatarEl.addEventListener('click', openAvatarPicker);
+    avatarEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') openAvatarPicker(e);
+    });
+  }
+
+  avatarInputEl.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
       // Basic validation
