@@ -332,6 +332,27 @@ async function ensureDatabaseSchema() {
       ADD COLUMN IF NOT EXISTS serial_number VARCHAR(100)
   `);
 
+  // Equipment-Aufgaben (Defekt-Meldungen, Rueckgabe-Anmeldungen) fuer Zeugwart
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS equipment_requests (
+      id SERIAL PRIMARY KEY,
+      equipment_id INTEGER REFERENCES equipment(id) ON DELETE CASCADE,
+      assignment_id INTEGER REFERENCES equipment_assignments(id) ON DELETE SET NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      type VARCHAR(20) NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'open',
+      note TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      resolved_at TIMESTAMP,
+      resolved_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      resolution_note TEXT
+    )
+  `);
+  await db.query(`
+    CREATE INDEX IF NOT EXISTS idx_equipment_requests_status
+      ON equipment_requests(status)
+  `);
+
   await db.query(`
     INSERT INTO equipment_categories (name, icon) VALUES
       ('Instrumente', 'instrument'),

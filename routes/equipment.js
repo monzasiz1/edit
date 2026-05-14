@@ -231,6 +231,40 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       holdersInUse,
     };
 
+    // Inbox: offene Anfragen (Defekt-Meldungen, Rueckgabe-Anmeldungen) und Langzeit-Ausgaben
+    let inboxRequests = [];
+    let longOutCount = 0;
+    let inboxCounts = { defect: 0, return: 0, longOut: 0, total: 0 };
+    try {
+      const reqRes = await db.query(`
+        SELECT er.id, er.type, er.note, er.created_at,
+               e.id AS equipment_id, e.name AS equipment_name,
+               COALESCE(NULLIF(ea.serial_number, ''), e.serial_number) AS serial_number,
+               u.id AS user_id, u.username, u.full_name
+          FROM equipment_requests er
+          LEFT JOIN equipment e ON er.equipment_id = e.id
+          LEFT JOIN equipment_assignments ea ON er.assignment_id = ea.id
+          LEFT JOIN users u ON er.user_id = u.id
+         WHERE er.status = 'open'
+         ORDER BY er.created_at DESC
+         LIMIT 50
+      `);
+      inboxRequests = reqRes.rows;
+      const longOutRes = await db.query(`
+        SELECT COUNT(*)::int AS c
+          FROM equipment_assignments
+         WHERE returned_at IS NULL
+           AND assigned_at < NOW() - INTERVAL '90 days'
+      `);
+      longOutCount = longOutRes.rows[0]?.c || 0;
+      inboxCounts.defect = inboxRequests.filter(r => r.type === 'defect').length;
+      inboxCounts.return = inboxRequests.filter(r => r.type === 'return').length;
+      inboxCounts.longOut = longOutCount;
+      inboxCounts.total = inboxCounts.defect + inboxCounts.return + inboxCounts.longOut;
+    } catch (e) {
+      console.warn('[equipment] Inbox konnte nicht geladen werden:', e.message);
+    }
+
     res.render('equipment', {
       layout: 'layout',
       equipment: equipmentRows,
@@ -239,6 +273,8 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       holdersWithEquipment,
       bodyPartLabels: BODY_PART_LABELS,
       equipmentStats,
+      inboxRequests,
+      inboxCounts,
       search,
       selectedCategory: category,
       success: req.query.success,
@@ -627,6 +663,103 @@ router.post('/assignment/:id/edit', requireEquipmentAccess, async (req, res) => 
     res.redirect(`/equipment/${equipmentId}/assign?success=Zuweisung%20aktualisiert`);
   } catch (err) {
     console.error(err);
+    res.redirect('/equipment?error=Fehler');
+  }
+});
+
+// ===== EQUIPMENT-REQUESTS (Defekt / Rueckgabe-Anmeldung) =====
+// Jeder eingeloggte Nutzer darf eigene Requests anlegen (fuer Teile die ihm zugewiesen sind).
+router.post('/request', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  try {
+    const userId = req.session.user.id;
+    const type = (req.body.type || '').toString();
+    if (!['defect', 'return'].includes(type)) {
+      return res.redirect('/profil?error=Ungültiger%20Anfragetyp');
+    }
+    const assignmentId = parseInt(req.body.assignment_id, 10);
+    if (!Number.isInteger(assignmentId) || assignmentId <= 0) {
+      return res.redirect('/profil?error=Zuweisung%20fehlt');
+    }
+    const note = (req.body.note || '').toString().slice(0, 1000);
+
+    // Pruefen: gehoert die Zuweisung dem User und ist noch aktiv?
+    const a = await db.query(
+      `SELECT id, equipment_id, user_id FROM equipment_assignments
+        WHERE id = $1 AND returned_at IS NULL`,
+      [assignmentId]
+    );
+    const row = a.rows[0];
+    if (!row) return res.redirect('/profil?error=Zuweisung%20nicht%20gefunden');
+    const isAdmin = req.session.user.is_admin;
+    const canManage = await userHasPerm(userId, 'can_manage_equipment');
+    if (row.user_id !== userId && !isAdmin && !canManage) {
+      return res.redirect('/profil?error=Keine%20Berechtigung');
+    }
+
+    // Doppelte offene Anfrage gleichen Typs vermeiden
+    const dup = await db.query(
+      `SELECT id FROM equipment_requests
+        WHERE assignment_id = $1 AND type = $2 AND status = 'open'
+        LIMIT 1`,
+      [assignmentId, type]
+    );
+    if (dup.rows.length) {
+      return res.redirect('/profil?success=Anfrage%20liegt%20bereits%20vor');
+    }
+
+    await db.query(
+      `INSERT INTO equipment_requests
+         (equipment_id, assignment_id, user_id, type, status, note)
+       VALUES ($1, $2, $3, $4, 'open', $5)`,
+      [row.equipment_id, assignmentId, userId, type, note]
+    );
+    const msg = type === 'defect' ? 'Defekt%20gemeldet' : 'Rückgabe%20angemeldet';
+    res.redirect('/profil?success=' + msg);
+  } catch (err) {
+    console.error('[equipment/request]', err);
+    res.redirect('/profil?error=Fehler');
+  }
+});
+
+// Zeugwart: Anfrage erledigen / ablehnen
+router.post('/request/:id/resolve', requireEquipmentAccess, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const action = (req.body.action || 'done').toString(); // 'done' | 'reject'
+    const status = action === 'reject' ? 'rejected' : 'done';
+    const resolutionNote = (req.body.resolution_note || '').toString().slice(0, 1000);
+
+    // Anfrage holen, ggf. Rueckgabe automatisch durchfuehren
+    const r = await db.query(
+      `SELECT type, assignment_id FROM equipment_requests WHERE id = $1`,
+      [id]
+    );
+    const reqRow = r.rows[0];
+    if (!reqRow) return res.redirect('/equipment?error=Anfrage%20nicht%20gefunden');
+
+    if (status === 'done' && reqRow.type === 'return' && reqRow.assignment_id) {
+      await db.query(
+        `UPDATE equipment_assignments
+            SET returned_at = NOW()
+          WHERE id = $1 AND returned_at IS NULL`,
+        [reqRow.assignment_id]
+      );
+    }
+
+    await db.query(
+      `UPDATE equipment_requests
+          SET status = $1,
+              resolved_at = NOW(),
+              resolved_by = $2,
+              resolution_note = $3
+        WHERE id = $4`,
+      [status, req.session.user.id, resolutionNote, id]
+    );
+
+    res.redirect('/equipment?success=Anfrage%20erledigt#inbox');
+  } catch (err) {
+    console.error('[equipment/request/resolve]', err);
     res.redirect('/equipment?error=Fehler');
   }
 });

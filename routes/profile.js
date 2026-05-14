@@ -57,6 +57,7 @@ router.get('/', async (req, res) => {
     // Zugewiesenes Equipment laden
     const equipmentQuery = `
       SELECT
+        ea.id AS assignment_id,
         e.id, e.name, e.description, e.condition,
         COALESCE(NULLIF(ea.serial_number, ''), e.serial_number) AS serial_number,
         ec.name AS category_name, ec.icon AS category_icon,
@@ -68,11 +69,33 @@ router.get('/', async (req, res) => {
       ORDER BY ea.assigned_at DESC
     `;
     const equipmentResult = await pool.query(equipmentQuery, [userId]);
-    const assignedEquipment = equipmentResult.rows.map(item => ({
-      ...item,
-      category_icon_svg: getIconSvg(item.category_icon),
-      category_icon_emoji: getIconEmoji(item.category_icon),
-    }));
+
+    // Offene Anfragen (Defekt / Rueckgabe) zu diesen Zuweisungen
+    const pendingByAssignment = new Map();
+    try {
+      const pr = await pool.query(
+        `SELECT assignment_id, type FROM equipment_requests
+          WHERE user_id = $1 AND status = 'open'`,
+        [userId]
+      );
+      pr.rows.forEach(r => {
+        if (!pendingByAssignment.has(r.assignment_id)) {
+          pendingByAssignment.set(r.assignment_id, new Set());
+        }
+        pendingByAssignment.get(r.assignment_id).add(r.type);
+      });
+    } catch (e) { /* Tabelle evtl. noch nicht migriert */ }
+
+    const assignedEquipment = equipmentResult.rows.map(item => {
+      const pending = pendingByAssignment.get(item.assignment_id) || new Set();
+      return {
+        ...item,
+        category_icon_svg: getIconSvg(item.category_icon),
+        category_icon_emoji: getIconEmoji(item.category_icon),
+        pending_defect: pending.has('defect'),
+        pending_return: pending.has('return'),
+      };
+    });
 
     // Rollen des Users laden
     const rolesQuery = `

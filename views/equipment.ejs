@@ -165,6 +165,147 @@
     overflow-y: auto;
   }
 
+  /* Inbox-Modal */
+  .eq-inbox-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(15,28,22,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+  .eq-inbox-backdrop.open { display: flex; opacity: 1; }
+  .eq-inbox-modal {
+    background: #fff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 760px;
+    max-height: calc(100dvh - 1.5rem);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 16px 40px rgba(10,30,20,0.35), 0 6px 18px rgba(10,30,20,0.18);
+    transform: translateY(12px) scale(0.985);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22,0.61,0.36,1), opacity 0.22s ease;
+  }
+  .eq-inbox-backdrop.open .eq-inbox-modal { transform: translateY(0) scale(1); opacity: 1; }
+  .eq-inbox-head {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(145deg, #b8590a 0%, #d97f1a 60%, #f0a042 100%);
+    color: #fff; flex-shrink: 0;
+  }
+  .eq-inbox-title { margin: 0; flex: 1; display: flex; align-items: center; gap: 0.55rem; font-size: 1.05rem; font-weight: 800; }
+  .eq-inbox-title svg { width: 18px; height: 18px; }
+  .eq-inbox-close {
+    background: rgba(255,255,255,0.15); border: 0; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%;
+    font-size: 1.3rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.18s;
+  }
+  .eq-inbox-close:hover { background: rgba(255,255,255,0.3); }
+  .eq-inbox-summary {
+    display: flex; flex-wrap: wrap; gap: 0.45rem;
+    padding: 0.85rem 1.1rem;
+    background: #fffaf2;
+    border-bottom: 1px solid #f3e6cb;
+  }
+  .eq-inbox-chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #fff;
+    border: 1px solid #e2efe6;
+    color: #1a3d2a;
+  }
+  .eq-inbox-chip .eq-inbox-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor;
+  }
+  .eq-inbox-chip-warn   { color: #92500a; background: #fff7e6; border-color: #fde2a8; }
+  .eq-inbox-chip-info   { color: #1a4d7a; background: #eaf4ff; border-color: #c7dffb; }
+  .eq-inbox-chip-danger { color: #b21414; background: #fde8e8; border-color: #f6c6c6; }
+  .eq-inbox-body {
+    overflow-y: auto;
+    padding: 0.6rem 0.8rem 1rem;
+  }
+  .eq-inbox-list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 0.55rem;
+  }
+  .eq-inbox-item {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 0.65rem;
+    align-items: start;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid #e2efe6;
+    background: #fff;
+    border-radius: 0.85rem;
+  }
+  .eq-inbox-item.is-defect { border-left: 4px solid #d97f1a; }
+  .eq-inbox-item.is-return { border-left: 4px solid #2d6a45; }
+  .eq-inbox-item-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #f1f8f3; color: #2d6a45;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .eq-inbox-item.is-defect .eq-inbox-item-icon { background: #fff7e6; color: #b8590a; }
+  .eq-inbox-item-icon svg { width: 18px; height: 18px; }
+  .eq-inbox-item-main { min-width: 0; }
+  .eq-inbox-item-title { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .eq-inbox-item-title strong { font-size: 0.95rem; color: #1a3d2a; }
+  .eq-inbox-item-type {
+    font-size: 0.68rem; font-weight: 800;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.1rem 0.55rem; border-radius: 999px;
+    background: #eef6f1; color: #1a7a45;
+  }
+  .eq-inbox-item.is-defect .eq-inbox-item-type { background: #fff7e6; color: #b8590a; }
+  .eq-inbox-item-sub { font-size: 0.8rem; color: #4b5563; display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.15rem; }
+  .eq-inbox-item-note {
+    font-size: 0.82rem; color: #1a3d2a; font-style: italic;
+    background: #f7fbf8; border: 1px dashed #cfe5d8;
+    padding: 0.35rem 0.55rem; border-radius: 0.5rem;
+    margin-top: 0.35rem;
+  }
+  .eq-inbox-item-actions { display: flex; flex-direction: column; gap: 0.3rem; }
+  .eq-inbox-btn {
+    font-family: inherit; font-weight: 700; font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 0.55rem;
+    border: 0; cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+  }
+  .eq-inbox-btn-primary { background: #1a7a45; color: #fff; }
+  .eq-inbox-btn-primary:hover { background: #156236; }
+  .eq-inbox-btn-ghost { background: #f1f8f3; color: #1a7a45; border: 1px solid #cfe5d8; }
+  .eq-inbox-btn-ghost:hover { background: #e2efe6; }
+  .eq-inbox-empty {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 1.1rem;
+    color: #1a7a45;
+    background: #f1f8f3;
+    border: 1px dashed #cfe5d8;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    margin: 0.4rem 0.2rem;
+  }
+  .eq-inbox-empty svg { width: 20px; height: 20px; }
+  @media (max-width: 640px) {
+    .eq-inbox-item { grid-template-columns: 32px 1fr; }
+    .eq-inbox-item-actions { grid-column: 1 / -1; flex-direction: row; }
+    .eq-inbox-btn { flex: 1; }
+  }
+
   .eq-grid {
     list-style: none;
     margin: 0;
@@ -1014,6 +1155,113 @@
     border-color: rgba(255,255,255,0.4);
   }
   .page-hero-btn svg { width: 14px; height: 14px; }
+  .page-hero-btn.has-badge {
+    background: linear-gradient(135deg, #ffb547 0%, #ff7a45 100%);
+    color: #fff;
+    border-color: rgba(255,255,255,0.65);
+    animation: heroBtnPulse 2.4s ease-in-out infinite;
+  }
+  .page-hero-btn.has-badge:hover { color: #fff; background: linear-gradient(135deg, #ffa224, #ff5e22); }
+  .page-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    margin-left: 0.15rem;
+    border-radius: 999px;
+    background: #fff;
+    color: #b8590a;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  @keyframes heroBtnPulse {
+    0%, 100% { box-shadow: 0 6px 18px rgba(255, 122, 69, 0.45); }
+    50%      { box-shadow: 0 6px 24px rgba(255, 122, 69, 0.75); }
+  }
+  .show-on-mobile { display: none !important; }
+  @media (max-width: 640px) {
+    .hide-on-mobile { display: none !important; }
+    .show-on-mobile { display: inline-flex !important; }
+  }
+
+  /* Zeugwart-Sheet (Mobile) */
+  .eq-sheet-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(15,28,22,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1100;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+  .eq-sheet-backdrop.open { display: block; opacity: 1; }
+  .eq-sheet {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: #fff;
+    border-radius: 1.4rem 1.4rem 0 0;
+    padding: 0.6rem 0.9rem 1.4rem;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.22,0.61,0.36,1);
+    box-shadow: 0 -8px 32px rgba(10,30,20,0.3);
+    max-height: 85dvh;
+    overflow-y: auto;
+  }
+  .eq-sheet-backdrop.open .eq-sheet { transform: translateY(0); }
+  .eq-sheet-handle {
+    width: 44px; height: 5px;
+    border-radius: 999px;
+    background: #d1e0d6;
+    margin: 0.4rem auto 0.85rem;
+  }
+  .eq-sheet-title {
+    font-size: 0.78rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: #6b7c70;
+    padding: 0 0.35rem 0.5rem;
+  }
+  .eq-sheet-list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .eq-sheet-item {
+    display: flex; align-items: center; gap: 0.75rem;
+    width: 100%;
+    padding: 0.8rem 0.85rem;
+    background: #f7fbf8;
+    border: 1px solid #e2efe6;
+    border-radius: 0.85rem;
+    color: #1a3d2a;
+    text-decoration: none;
+    font-weight: 700; font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.18s, border-color 0.18s;
+  }
+  .eq-sheet-item:hover, .eq-sheet-item:active {
+    background: #eef6f1; border-color: #cfe5d8;
+  }
+  .eq-sheet-item-icon {
+    width: 34px; height: 34px;
+    background: #fff; border: 1px solid #cfe5d8;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a7a45; flex-shrink: 0;
+  }
+  .eq-sheet-item-icon svg { width: 18px; height: 18px; }
+  .eq-sheet-item-text { flex: 1; min-width: 0; }
+  .eq-sheet-item-sub { font-size: 0.75rem; font-weight: 600; color: #6b7c70; }
+  .eq-sheet-badge {
+    background: #ff7a45; color: #fff;
+    font-size: 0.75rem; font-weight: 800;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+  }
 
   @media (max-width: 640px) {
     .page-hero { padding: 1.1rem 1.1rem; border-radius: 1.1rem 1.1rem 1.6rem 1.6rem; margin-bottom: 1.2rem; }
@@ -1044,7 +1292,14 @@
         </h1>
       </div>
       <div class="page-hero-actions">
-        <button type="button" id="eqStatsBtn" class="page-hero-btn">
+        <button type="button" id="eqInboxBtn" class="page-hero-btn<%= (typeof inboxCounts !== 'undefined' && inboxCounts.total > 0) ? ' has-badge' : '' %>">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+          Aufgaben
+          <% if (typeof inboxCounts !== 'undefined' && inboxCounts.total > 0) { %>
+            <span class="page-hero-badge"><%= inboxCounts.total %></span>
+          <% } %>
+        </button>
+        <button type="button" id="eqStatsBtn" class="page-hero-btn hide-on-mobile">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           Statistik
         </button>
@@ -1056,14 +1311,18 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Neu
         </a>
-        <a href="/equipment/categories" class="page-hero-btn">
+        <a href="/equipment/categories" class="page-hero-btn hide-on-mobile">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
           Kategorien
         </a>
-        <a href="/dashboard" class="page-hero-btn ghost">
+        <a href="/dashboard" class="page-hero-btn ghost hide-on-mobile">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           Zurück
         </a>
+        <button type="button" id="eqMenuBtn" class="page-hero-btn show-on-mobile" aria-label="Mehr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Mehr
+        </button>
       </div>
     </div>
   </header>
@@ -1152,6 +1411,161 @@
       </div>
     </div>
   <% } %>
+
+  <!-- Inbox-Modal: offene Anfragen + Langzeit-Ausgaben -->
+  <% if (typeof inboxCounts !== 'undefined') { %>
+    <div class="eq-inbox-backdrop" id="eqInboxModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="eqInboxTitle">
+      <div class="eq-inbox-modal" role="document">
+        <div class="eq-inbox-head">
+          <h2 class="eq-inbox-title" id="eqInboxTitle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            Aufgaben-Inbox
+          </h2>
+          <button type="button" class="eq-inbox-close" id="eqInboxClose" aria-label="Schliessen">&times;</button>
+        </div>
+        <div class="eq-inbox-summary">
+          <span class="eq-inbox-chip eq-inbox-chip-warn">
+            <span class="eq-inbox-dot"></span>
+            <%= inboxCounts.defect %> Defekt-Meldung<%= inboxCounts.defect === 1 ? '' : 'en' %>
+          </span>
+          <span class="eq-inbox-chip eq-inbox-chip-info">
+            <span class="eq-inbox-dot"></span>
+            <%= inboxCounts.return %> Rückgabe<%= inboxCounts.return === 1 ? '' : 'n' %> angemeldet
+          </span>
+          <span class="eq-inbox-chip eq-inbox-chip-danger">
+            <span class="eq-inbox-dot"></span>
+            <%= inboxCounts.longOut %> Teile &gt; 90 Tage nicht zurück
+          </span>
+        </div>
+
+        <div class="eq-inbox-body">
+          <% if (inboxRequests && inboxRequests.length) { %>
+            <ul class="eq-inbox-list">
+              <% inboxRequests.forEach(r => {
+                   const isDefect = r.type === 'defect';
+                   const personName = r.full_name || r.username || 'Unbekannt';
+                   const created = r.created_at ? new Date(r.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+              %>
+                <li class="eq-inbox-item <%= isDefect ? 'is-defect' : 'is-return' %>">
+                  <div class="eq-inbox-item-icon">
+                    <% if (isDefect) { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <% } else { %>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                    <% } %>
+                  </div>
+                  <div class="eq-inbox-item-main">
+                    <div class="eq-inbox-item-title">
+                      <strong><%= r.equipment_name || '—' %></strong>
+                      <span class="eq-inbox-item-type"><%= isDefect ? 'Defekt' : 'Rückgabe' %></span>
+                    </div>
+                    <div class="eq-inbox-item-sub">
+                      <span><%= personName %></span>
+                      <% if (r.serial_number) { %><span>· SN: <%= r.serial_number %></span><% } %>
+                      <% if (created) { %><span>· <%= created %></span><% } %>
+                    </div>
+                    <% if (r.note) { %>
+                      <div class="eq-inbox-item-note">„<%= r.note %>"</div>
+                    <% } %>
+                  </div>
+                  <div class="eq-inbox-item-actions">
+                    <form method="post" action="/equipment/request/<%= r.id %>/resolve" style="display:inline-flex; gap:0.35rem;">
+                      <button type="submit" name="action" value="done" class="eq-inbox-btn eq-inbox-btn-primary">Erledigt</button>
+                      <button type="submit" name="action" value="reject" class="eq-inbox-btn eq-inbox-btn-ghost" title="Anfrage ablehnen">Ablehnen</button>
+                    </form>
+                  </div>
+                </li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <div class="eq-inbox-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Keine offenen Anfragen — alles sauber!</span>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Zeugwart-Sheet (Mobile-Menue) -->
+  <div class="eq-sheet-backdrop" id="eqSheetBackdrop" aria-hidden="true">
+    <div class="eq-sheet" role="dialog" aria-modal="true" aria-label="Zeugwart-Menü">
+      <div class="eq-sheet-handle" aria-hidden="true"></div>
+      <div class="eq-sheet-title">Zeugwart</div>
+      <ul class="eq-sheet-list">
+        <li>
+          <button type="button" class="eq-sheet-item" data-sheet-action="inbox">
+            <span class="eq-sheet-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            </span>
+            <span class="eq-sheet-item-text">
+              Aufgaben
+              <span class="eq-sheet-item-sub">Defekte, Rückgaben, Langzeit-Ausgaben</span>
+            </span>
+            <% if (typeof inboxCounts !== 'undefined' && inboxCounts.total > 0) { %>
+              <span class="eq-sheet-badge"><%= inboxCounts.total %></span>
+            <% } %>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="eq-sheet-item" data-sheet-action="stats">
+            <span class="eq-sheet-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </span>
+            <span class="eq-sheet-item-text">
+              Statistik
+              <span class="eq-sheet-item-sub">Bestand, Zugewiesen, Frei</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="eq-sheet-item" data-sheet-action="scan">
+            <span class="eq-sheet-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+            </span>
+            <span class="eq-sheet-item-text">
+              Scannen
+              <span class="eq-sheet-item-sub">QR / Seriennummer</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <a href="/equipment/add" class="eq-sheet-item">
+            <span class="eq-sheet-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+            <span class="eq-sheet-item-text">
+              Neues Equipment
+              <span class="eq-sheet-item-sub">Eintrag anlegen</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="/equipment/categories" class="eq-sheet-item">
+            <span class="eq-sheet-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            <span class="eq-sheet-item-text">
+              Kategorien
+              <span class="eq-sheet-item-sub">Verwalten</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard" class="eq-sheet-item">
+            <span class="eq-sheet-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </span>
+            <span class="eq-sheet-item-text">
+              Zurück
+              <span class="eq-sheet-item-sub">Dashboard</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
   <% if (usersWithEquipment && usersWithEquipment.length) { %>
     <div class="eq-section-title">
@@ -1385,6 +1799,68 @@
   modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+})();
+
+// Inbox-Modal Open/Close
+(() => {
+  const modal = document.getElementById('eqInboxModal');
+  const openBtn = document.getElementById('eqInboxBtn');
+  const closeBtn = document.getElementById('eqInboxClose');
+  if (!modal || !openBtn) return;
+  if (modal.parentNode !== document.body) document.body.appendChild(modal);
+  const open = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+  const close = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+  openBtn.addEventListener('click', open);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+  // Auto-open wenn URL #inbox enthaelt
+  if (location.hash === '#inbox') open();
+})();
+
+// Zeugwart-Sheet (Mobile-Menu)
+(() => {
+  const sheet = document.getElementById('eqSheetBackdrop');
+  const openBtn = document.getElementById('eqMenuBtn');
+  if (!sheet || !openBtn) return;
+  if (sheet.parentNode !== document.body) document.body.appendChild(sheet);
+  const open = () => {
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+  const close = () => {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+  openBtn.addEventListener('click', open);
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sheet.classList.contains('open')) close();
+  });
+  // Aktionen aus dem Sheet auf die Hero-Buttons mappen
+  sheet.querySelectorAll('[data-sheet-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.getAttribute('data-sheet-action');
+      close();
+      setTimeout(() => {
+        if (action === 'inbox') document.getElementById('eqInboxBtn')?.click();
+        else if (action === 'stats') document.getElementById('eqStatsBtn')?.click();
+        else if (action === 'scan') document.getElementById('qrScanBtn')?.click();
+      }, 220);
+    });
   });
 })();
 </script>
