@@ -143,6 +143,62 @@
     color: #6b7280;
     margin-bottom: 0.1rem;
   }
+  .eq-assigned-count {
+    margin-left: 0.3rem;
+    color: #9ca3af;
+    font-weight: 600;
+  }
+  .eq-assignee-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+    width: 100%;
+  }
+  .eq-card-assigned.is-collapsible .eq-assignee-list {
+    position: relative;
+    max-height: 4.6rem; /* ~2 Reihen Chips */
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .eq-card-assigned.is-collapsible.is-collapsed .eq-assignee-list::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1.6rem;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 90%);
+    pointer-events: none;
+  }
+  .eq-card-assigned.is-collapsible:not(.is-collapsed) .eq-assignee-list {
+    max-height: 9999px;
+  }
+  .eq-assigned-toggle {
+    margin-top: 0.35rem;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #f1f5f3;
+    border: 1px solid #d6e3da;
+    color: #1a7a45;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.1s;
+  }
+  .eq-assigned-toggle:hover { background: #e6f4ec; }
+  .eq-assigned-toggle:active { transform: scale(0.97); }
+  .eq-assigned-toggle svg { width: 12px; height: 12px; }
+  .eq-card-assigned.is-collapsed .eq-assigned-toggle-less { display: none; }
+  .eq-card-assigned:not(.is-collapsed) .eq-assigned-toggle-more { display: none; }
+  .eq-assigned-toggle-more,
+  .eq-assigned-toggle-less {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
   .eq-assignee {
     display: inline-flex;
     align-items: center;
@@ -954,8 +1010,13 @@
           </div>
 
           <% if (item.assignments && item.assignments.length > 0) { %>
-            <div class="eq-card-assigned">
-              <span class="eq-card-assigned-label">Zugewiesen an</span>
+            <% const _assignCount = item.assignments.length; const _collapsible = _assignCount > 6; %>
+            <div class="eq-card-assigned <%= _collapsible ? 'is-collapsible is-collapsed' : '' %>" data-assigned-wrap>
+              <span class="eq-card-assigned-label">
+                Zugewiesen an
+                <span class="eq-assigned-count">(<%= _assignCount %>)</span>
+              </span>
+              <div class="eq-assignee-list" data-assignee-list>
               <% item.assignments.forEach(a => { %>
                 <span class="eq-assignee <%= a.kind === 'holder' ? 'is-holder' : '' %>" title="<%= a.name %>">
                   <% if (a.kind === 'holder') { %>
@@ -968,6 +1029,19 @@
                   <% if (a.quantity && a.quantity > 1) { %><span class="eq-assignee-qty">×<%= a.quantity %></span><% } %>
                 </span>
               <% }) %>
+              </div>
+              <% if (_collapsible) { %>
+                <button type="button" class="eq-assigned-toggle" data-assigned-toggle aria-expanded="false">
+                  <span class="eq-assigned-toggle-more">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    Alle <%= _assignCount %> anzeigen
+                  </span>
+                  <span class="eq-assigned-toggle-less">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    Einklappen
+                  </span>
+                </button>
+              <% } %>
             </div>
           <% } %>
 
@@ -1014,6 +1088,20 @@
     </div>
   </div>
 </main>
+
+<script>
+// Toggle: Zuweisungs-Liste einklappen/ausklappen
+(() => {
+  document.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('[data-assigned-toggle]');
+    if (!btn) return;
+    const wrap = btn.closest('[data-assigned-wrap]');
+    if (!wrap) return;
+    const collapsed = wrap.classList.toggle('is-collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  });
+})();
+</script>
 
 <script>
 (() => {
