@@ -353,6 +353,40 @@ async function ensureDatabaseSchema() {
       ON equipment_requests(status)
   `);
 
+  // Zeugwart-To-do-Liste (mit Verknuepfungen zu Equipment + Mitgliedern)
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS equipment_todos (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT,
+      priority VARCHAR(10) NOT NULL DEFAULT 'normal',
+      due_date DATE,
+      done BOOLEAN NOT NULL DEFAULT FALSE,
+      done_at TIMESTAMP,
+      done_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      created_at TIMESTAMP DEFAULT NOW(),
+      created_by INTEGER REFERENCES users(id) ON DELETE SET NULL
+    )
+  `);
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS equipment_todo_items (
+      todo_id INTEGER NOT NULL REFERENCES equipment_todos(id) ON DELETE CASCADE,
+      equipment_id INTEGER NOT NULL REFERENCES equipment(id) ON DELETE CASCADE,
+      PRIMARY KEY (todo_id, equipment_id)
+    )
+  `);
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS equipment_todo_users (
+      todo_id INTEGER NOT NULL REFERENCES equipment_todos(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      PRIMARY KEY (todo_id, user_id)
+    )
+  `);
+  await db.query(`
+    CREATE INDEX IF NOT EXISTS idx_equipment_todos_done
+      ON equipment_todos(done, created_at DESC)
+  `);
+
   await db.query(`
     INSERT INTO equipment_categories (name, icon) VALUES
       ('Instrumente', 'instrument'),

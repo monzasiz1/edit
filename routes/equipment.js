@@ -265,6 +265,69 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       console.warn('[equipment] Inbox konnte nicht geladen werden:', e.message);
     }
 
+    // Zeugwart-To-dos (inkl. verknuepfter Equipment-Items + Mitglieder)
+    let todos = [];
+    let allEquipmentForTodos = [];
+    let allUsersForTodos = [];
+    try {
+      const tRes = await db.query(`
+        SELECT t.id, t.title, t.description, t.priority, t.due_date,
+               t.done, t.done_at, t.created_at,
+               cu.username AS created_by_username, cu.full_name AS created_by_full_name,
+               du.username AS done_by_username,    du.full_name AS done_by_full_name
+          FROM equipment_todos t
+          LEFT JOIN users cu ON t.created_by = cu.id
+          LEFT JOIN users du ON t.done_by    = du.id
+         ORDER BY t.done ASC,
+                  CASE t.priority WHEN 'high' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END,
+                  t.due_date NULLS LAST,
+                  t.created_at DESC
+         LIMIT 200
+      `);
+      todos = tRes.rows;
+      if (todos.length) {
+        const ids = todos.map(t => t.id);
+        const linkItems = await db.query(`
+          SELECT ti.todo_id, e.id, e.name, e.serial_number
+            FROM equipment_todo_items ti
+            JOIN equipment e ON ti.equipment_id = e.id
+           WHERE ti.todo_id = ANY($1::int[])
+           ORDER BY e.name
+        `, [ids]);
+        const linkUsers = await db.query(`
+          SELECT tu.todo_id, u.id, u.username, u.full_name
+            FROM equipment_todo_users tu
+            JOIN users u ON tu.user_id = u.id
+           WHERE tu.todo_id = ANY($1::int[])
+           ORDER BY COALESCE(u.full_name, u.username)
+        `, [ids]);
+        const itemsByTodo = {};
+        linkItems.rows.forEach(r => {
+          (itemsByTodo[r.todo_id] = itemsByTodo[r.todo_id] || []).push({ id: r.id, name: r.name, serial_number: r.serial_number });
+        });
+        const usersByTodo = {};
+        linkUsers.rows.forEach(r => {
+          (usersByTodo[r.todo_id] = usersByTodo[r.todo_id] || []).push({ id: r.id, username: r.username, full_name: r.full_name });
+        });
+        todos.forEach(t => {
+          t.items = itemsByTodo[t.id] || [];
+          t.users = usersByTodo[t.id] || [];
+        });
+      }
+      // Auswahllisten fuer das Modal
+      const allEqRes = await db.query(`
+        SELECT id, name, serial_number FROM equipment ORDER BY name
+      `);
+      allEquipmentForTodos = allEqRes.rows;
+      const allUsRes = await db.query(`
+        SELECT id, username, full_name FROM users
+         ORDER BY COALESCE(full_name, username)
+      `);
+      allUsersForTodos = allUsRes.rows;
+    } catch (e) {
+      console.warn('[equipment] Todos konnten nicht geladen werden:', e.message);
+    }
+
     res.render('equipment', {
       layout: 'layout',
       equipment: equipmentRows,
@@ -275,6 +338,9 @@ router.get('/', requireEquipmentAccess, async (req, res) => {
       equipmentStats,
       inboxRequests,
       inboxCounts,
+      todos,
+      allEquipmentForTodos,
+      allUsersForTodos,
       search,
       selectedCategory: category,
       success: req.query.success,
@@ -761,6 +827,176 @@ router.post('/request/:id/resolve', requireEquipmentAccess, async (req, res) => 
   } catch (err) {
     console.error('[equipment/request/resolve]', err);
     res.redirect('/equipment?error=Fehler');
+  }
+});
+
+// ===== ZEUGWART TO-DO LISTE (JSON API) =====
+function todoToPayload(row, items = [], users = []) {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description || '',
+    priority: row.priority || 'normal',
+    due_date: row.due_date,
+    done: !!row.done,
+    done_at: row.done_at,
+    created_at: row.created_at,
+    created_by_name: row.created_by_full_name || row.created_by_username || null,
+    done_by_name: row.done_by_full_name || row.done_by_username || null,
+    items,
+    users
+  };
+}
+
+async function loadTodoLinks(todoId) {
+  const it = await db.query(`
+    SELECT e.id, e.name, e.serial_number
+      FROM equipment_todo_items ti
+      JOIN equipment e ON ti.equipment_id = e.id
+     WHERE ti.todo_id = $1
+     ORDER BY e.name
+  `, [todoId]);
+  const us = await db.query(`
+    SELECT u.id, u.username, u.full_name
+      FROM equipment_todo_users tu
+      JOIN users u ON tu.user_id = u.id
+     WHERE tu.todo_id = $1
+     ORDER BY COALESCE(u.full_name, u.username)
+  `, [todoId]);
+  return { items: it.rows, users: us.rows };
+}
+
+function parseIdList(value) {
+  if (!value) return [];
+  const arr = Array.isArray(value) ? value : String(value).split(',');
+  return Array.from(new Set(
+    arr.map(v => parseInt(v, 10)).filter(Number.isInteger)
+  ));
+}
+
+// Neue To-do anlegen
+router.post('/todos', requireEquipmentAccess, async (req, res) => {
+  try {
+    const title = (req.body.title || '').toString().trim().slice(0, 200);
+    if (!title) return res.status(400).json({ error: 'title_required' });
+    const description = (req.body.description || '').toString().slice(0, 2000);
+    let priority = (req.body.priority || 'normal').toString();
+    if (!['low', 'normal', 'high'].includes(priority)) priority = 'normal';
+    const dueDate = (req.body.due_date || '').toString().trim() || null;
+    const equipmentIds = parseIdList(req.body.equipment_ids);
+    const userIds = parseIdList(req.body.user_ids);
+
+    const ins = await db.query(`
+      INSERT INTO equipment_todos (title, description, priority, due_date, created_by)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, title, description, priority, due_date, done, done_at, created_at
+    `, [title, description, priority, dueDate, req.session.user.id]);
+    const todo = ins.rows[0];
+
+    if (equipmentIds.length) {
+      const values = equipmentIds.map((_, i) => `($1, $${i + 2})`).join(',');
+      await db.query(
+        `INSERT INTO equipment_todo_items (todo_id, equipment_id) VALUES ${values}
+         ON CONFLICT DO NOTHING`,
+        [todo.id, ...equipmentIds]
+      );
+    }
+    if (userIds.length) {
+      const values = userIds.map((_, i) => `($1, $${i + 2})`).join(',');
+      await db.query(
+        `INSERT INTO equipment_todo_users (todo_id, user_id) VALUES ${values}
+         ON CONFLICT DO NOTHING`,
+        [todo.id, ...userIds]
+      );
+    }
+    const links = await loadTodoLinks(todo.id);
+    res.json({ ok: true, todo: todoToPayload(todo, links.items, links.users) });
+  } catch (err) {
+    console.error('[equipment/todos:create]', err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// To-do bearbeiten (Titel, Beschreibung, Priorit., Faelligkeit, Verknuepfungen)
+router.post('/todos/:id/edit', requireEquipmentAccess, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: 'bad_id' });
+    const title = (req.body.title || '').toString().trim().slice(0, 200);
+    if (!title) return res.status(400).json({ error: 'title_required' });
+    const description = (req.body.description || '').toString().slice(0, 2000);
+    let priority = (req.body.priority || 'normal').toString();
+    if (!['low', 'normal', 'high'].includes(priority)) priority = 'normal';
+    const dueDate = (req.body.due_date || '').toString().trim() || null;
+    const equipmentIds = parseIdList(req.body.equipment_ids);
+    const userIds = parseIdList(req.body.user_ids);
+
+    const upd = await db.query(`
+      UPDATE equipment_todos
+         SET title = $1, description = $2, priority = $3, due_date = $4
+       WHERE id = $5
+       RETURNING id, title, description, priority, due_date, done, done_at, created_at
+    `, [title, description, priority, dueDate, id]);
+    if (!upd.rows.length) return res.status(404).json({ error: 'not_found' });
+
+    await db.query(`DELETE FROM equipment_todo_items WHERE todo_id = $1`, [id]);
+    await db.query(`DELETE FROM equipment_todo_users WHERE todo_id = $1`, [id]);
+    if (equipmentIds.length) {
+      const values = equipmentIds.map((_, i) => `($1, $${i + 2})`).join(',');
+      await db.query(
+        `INSERT INTO equipment_todo_items (todo_id, equipment_id) VALUES ${values}
+         ON CONFLICT DO NOTHING`,
+        [id, ...equipmentIds]
+      );
+    }
+    if (userIds.length) {
+      const values = userIds.map((_, i) => `($1, $${i + 2})`).join(',');
+      await db.query(
+        `INSERT INTO equipment_todo_users (todo_id, user_id) VALUES ${values}
+         ON CONFLICT DO NOTHING`,
+        [id, ...userIds]
+      );
+    }
+    const links = await loadTodoLinks(id);
+    res.json({ ok: true, todo: todoToPayload(upd.rows[0], links.items, links.users) });
+  } catch (err) {
+    console.error('[equipment/todos:edit]', err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// To-do erledigt/offen umschalten
+router.post('/todos/:id/toggle', requireEquipmentAccess, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: 'bad_id' });
+    const cur = await db.query(`SELECT done FROM equipment_todos WHERE id = $1`, [id]);
+    if (!cur.rows.length) return res.status(404).json({ error: 'not_found' });
+    const newDone = !cur.rows[0].done;
+    await db.query(`
+      UPDATE equipment_todos
+         SET done = $1,
+             done_at = CASE WHEN $1 THEN NOW() ELSE NULL END,
+             done_by = CASE WHEN $1 THEN $2 ELSE NULL END
+       WHERE id = $3
+    `, [newDone, req.session.user.id, id]);
+    res.json({ ok: true, done: newDone });
+  } catch (err) {
+    console.error('[equipment/todos:toggle]', err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// To-do loeschen
+router.post('/todos/:id/delete', requireEquipmentAccess, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: 'bad_id' });
+    await db.query(`DELETE FROM equipment_todos WHERE id = $1`, [id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[equipment/todos:delete]', err);
+    res.status(500).json({ error: 'server_error' });
   }
 });
 

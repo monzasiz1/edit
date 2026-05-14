@@ -640,6 +640,179 @@
   }
   .eq-collapse[open] > summary .eq-collapse-chev { transform: rotate(180deg); }
 
+  /* Zeugwart To-do-Liste */
+  .eq-todo-section { margin-top: 1.2rem; }
+  .eq-todo-add-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: linear-gradient(135deg, #1a7a45, #2a9858);
+    color: #fff; border: none; padding: 0.5rem 0.95rem;
+    border-radius: 999px; font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; box-shadow: 0 2px 6px rgba(26,122,69,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .eq-todo-add-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(26,122,69,0.35); }
+  .eq-todo-add-btn svg { width: 16px; height: 16px; }
+  .eq-todo-summary-actions { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+  .eq-todo-list {
+    display: flex; flex-direction: column; gap: 0.55rem;
+    margin: 0.6rem 0 0; padding: 0; list-style: none;
+  }
+  .eq-todo-empty {
+    padding: 1rem; text-align: center; color: #6b8a76;
+    background: #f4faf6; border: 1px dashed #cfe5d8; border-radius: 12px;
+    font-size: 0.9rem;
+  }
+  .eq-todo-card {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    background: #fff; border: 1px solid #d8e7de; border-left: 4px solid #6b8a76;
+    border-radius: 12px; padding: 0.7rem 0.85rem;
+    transition: box-shadow 0.18s ease, transform 0.15s ease;
+  }
+  .eq-todo-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+  .eq-todo-card.is-done { opacity: 0.62; border-left-color: #a8c7b5; background: #f7fbf9; }
+  .eq-todo-card.is-done .eq-todo-title { text-decoration: line-through; }
+  .eq-todo-card.is-prio-high { border-left-color: #d94545; }
+  .eq-todo-card.is-prio-low  { border-left-color: #c5cdc8; }
+  .eq-todo-checkbox {
+    flex-shrink: 0; width: 22px; height: 22px;
+    border: 2px solid #1a7a45; border-radius: 6px;
+    background: #fff; cursor: pointer; position: relative;
+    margin-top: 0.15rem; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .eq-todo-checkbox:hover { background: #eaf6ef; }
+  .eq-todo-checkbox svg { width: 14px; height: 14px; color: #fff; opacity: 0; transition: opacity 0.15s ease; }
+  .eq-todo-card.is-done .eq-todo-checkbox { background: #1a7a45; }
+  .eq-todo-card.is-done .eq-todo-checkbox svg { opacity: 1; }
+  .eq-todo-body { flex: 1; min-width: 0; }
+  .eq-todo-title-row {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+  }
+  .eq-todo-title { font-weight: 700; font-size: 0.95rem; color: #1a3a26; word-break: break-word; }
+  .eq-todo-prio {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.1rem 0.5rem; border-radius: 999px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .eq-todo-prio-high   { color: #b21414; background: #fde8e8; }
+  .eq-todo-prio-normal { color: #1a4d7a; background: #eaf4ff; }
+  .eq-todo-prio-low    { color: #6b6b6b; background: #ececec; }
+  .eq-todo-due {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-size: 0.74rem; color: #6b8a76; font-weight: 600;
+  }
+  .eq-todo-due.is-overdue { color: #b21414; }
+  .eq-todo-due svg { width: 13px; height: 13px; }
+  .eq-todo-desc { font-size: 0.84rem; color: #4a5e52; margin: 0.15rem 0 0.35rem; white-space: pre-wrap; word-break: break-word; }
+  .eq-todo-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+  .eq-todo-tag {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    background: #eaf6ef; color: #1a7a45; border: 1px solid #cfe5d8;
+    padding: 0.18rem 0.55rem; border-radius: 999px;
+    font-size: 0.74rem; font-weight: 600;
+  }
+  .eq-todo-tag.is-user { background: #fff4ea; color: #92500a; border-color: #fde2a8; }
+  .eq-todo-tag svg { width: 12px; height: 12px; }
+  .eq-todo-meta { font-size: 0.7rem; color: #889c91; margin-top: 0.35rem; }
+  .eq-todo-actions {
+    display: flex; flex-direction: column; gap: 0.3rem; flex-shrink: 0;
+  }
+  .eq-todo-iconbtn {
+    width: 30px; height: 30px; padding: 0; border: 1px solid #d8e7de;
+    background: #fff; border-radius: 8px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #4a5e52; transition: background 0.15s ease, color 0.15s ease;
+  }
+  .eq-todo-iconbtn:hover { background: #eaf6ef; color: #1a7a45; }
+  .eq-todo-iconbtn.is-danger:hover { background: #fde8e8; color: #b21414; border-color: #f6c6c6; }
+  .eq-todo-iconbtn svg { width: 15px; height: 15px; }
+
+  /* Todo-Modal */
+  .eq-todo-backdrop {
+    position: fixed; inset: 0; background: rgba(15,25,18,0.55);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 4vh 1rem 1rem; z-index: 1500;
+    opacity: 0; transition: opacity 0.22s ease;
+  }
+  .eq-todo-backdrop.open { display: flex; opacity: 1; }
+  .eq-todo-modal {
+    width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
+    background: #fff; border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    transform: translateY(20px) scale(0.97); opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .eq-todo-backdrop.open .eq-todo-modal { transform: translateY(0) scale(1); opacity: 1; }
+  .eq-todo-modal-head {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.95rem 1.1rem; border-bottom: 1px solid #e2efe6;
+    background: linear-gradient(135deg, #1a7a45, #2a9858);
+    color: #fff; border-radius: 18px 18px 0 0;
+  }
+  .eq-todo-modal-head h3 { margin: 0; flex: 1; font-size: 1.05rem; font-weight: 700; }
+  .eq-todo-modal-close {
+    border: none; background: rgba(255,255,255,0.18); color: #fff;
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.05rem;
+  }
+  .eq-todo-modal-close:hover { background: rgba(255,255,255,0.32); }
+  .eq-todo-form { padding: 1rem 1.1rem 1.1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .eq-todo-field label {
+    display: block; font-size: 0.78rem; font-weight: 700;
+    color: #1a3a26; margin-bottom: 0.3rem; letter-spacing: 0.02em;
+  }
+  .eq-todo-field input[type="text"],
+  .eq-todo-field input[type="date"],
+  .eq-todo-field textarea,
+  .eq-todo-field select {
+    width: 100%; padding: 0.55rem 0.7rem;
+    border: 1px solid #cfe5d8; border-radius: 10px;
+    font-size: 0.92rem; background: #fff; font-family: inherit;
+  }
+  .eq-todo-field input:focus,
+  .eq-todo-field textarea:focus,
+  .eq-todo-field select:focus {
+    outline: none; border-color: #1a7a45;
+    box-shadow: 0 0 0 3px rgba(26,122,69,0.18);
+  }
+  .eq-todo-field textarea { resize: vertical; min-height: 64px; }
+  .eq-todo-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  @media (max-width: 460px) { .eq-todo-field-row { grid-template-columns: 1fr; } }
+  .eq-todo-multi {
+    border: 1px solid #cfe5d8; border-radius: 10px; padding: 0.4rem;
+    max-height: 160px; overflow-y: auto; background: #fafdfb;
+  }
+  .eq-todo-multi-search {
+    width: 100%; padding: 0.4rem 0.6rem; border: 1px solid #cfe5d8;
+    border-radius: 8px; font-size: 0.85rem; margin-bottom: 0.35rem;
+  }
+  .eq-todo-multi-option {
+    display: flex; align-items: center; gap: 0.45rem;
+    padding: 0.3rem 0.45rem; border-radius: 6px; cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .eq-todo-multi-option:hover { background: #eaf6ef; }
+  .eq-todo-multi-option input { width: 15px; height: 15px; accent-color: #1a7a45; }
+  .eq-todo-multi-option small { color: #889c91; }
+  .eq-todo-modal-actions {
+    display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.4rem;
+  }
+  .eq-todo-btn {
+    padding: 0.55rem 1rem; border-radius: 999px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .eq-todo-btn-secondary { background: #ececec; color: #4a5e52; }
+  .eq-todo-btn-secondary:hover { background: #dde3df; }
+  .eq-todo-btn-primary {
+    background: linear-gradient(135deg, #1a7a45, #2a9858);
+    color: #fff;
+  }
+  .eq-todo-btn-primary:hover { transform: translateY(-1px); }
+  .eq-todo-error { color: #b21414; font-size: 0.82rem; min-height: 1em; }
+
   .users-grid {
     list-style: none;
     margin: 0 0 0.5rem 0;
@@ -1726,6 +1899,110 @@
     </details>
   <% } %>
 
+  <% /* ===== ZEUGWART TO-DO LISTE ===== */ %>
+  <details class="eq-collapse eq-todo-section" open>
+    <summary class="eq-section-title eq-collapse-summary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Meine To-dos
+      <% if (typeof todos !== 'undefined') { %>
+        <% const openCount = todos.filter(t => !t.done).length; %>
+        <span style="font-weight:600;color:#6b8a76;font-size:0.85rem;">(<%= openCount %> offen<% if (todos.length > openCount) { %>, <%= todos.length - openCount %> erledigt<% } %>)</span>
+      <% } %>
+      <span class="eq-todo-summary-actions">
+        <button type="button" class="eq-todo-add-btn" id="eqTodoAddBtn" onclick="event.stopPropagation(); event.preventDefault(); openTodoModal();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Neue To-do
+        </button>
+        <svg class="eq-collapse-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </summary>
+    <ul class="eq-todo-list" id="eqTodoList">
+      <% if (typeof todos !== 'undefined' && todos.length) { %>
+        <% todos.forEach(function(t) { %>
+          <% const prioClass = t.priority === 'high' ? 'is-prio-high' : (t.priority === 'low' ? 'is-prio-low' : ''); %>
+          <% let dueStr = ''; let isOverdue = false; %>
+          <% if (t.due_date) {
+               const d = new Date(t.due_date);
+               dueStr = d.toLocaleDateString('de-DE');
+               const today = new Date(); today.setHours(0,0,0,0);
+               isOverdue = !t.done && d < today;
+             } %>
+          <li class="eq-todo-card <%= t.done ? 'is-done' : '' %> <%= prioClass %>"
+              data-todo-id="<%= t.id %>"
+              data-priority="<%= t.priority %>"
+              data-due="<%= t.due_date || '' %>"
+              data-title="<%= encodeURIComponent(t.title || '') %>"
+              data-description="<%= encodeURIComponent(t.description || '') %>"
+              data-item-ids="<%= (t.items || []).map(i => i.id).join(',') %>"
+              data-user-ids="<%= (t.users || []).map(u => u.id).join(',') %>">
+            <button type="button" class="eq-todo-checkbox" title="Erledigt umschalten" onclick="toggleTodo(<%= t.id %>, this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>
+            </button>
+            <div class="eq-todo-body">
+              <div class="eq-todo-title-row">
+                <span class="eq-todo-title"><%= t.title %></span>
+                <% if (t.priority === 'high') { %>
+                  <span class="eq-todo-prio eq-todo-prio-high">Wichtig</span>
+                <% } else if (t.priority === 'low') { %>
+                  <span class="eq-todo-prio eq-todo-prio-low">Niedrig</span>
+                <% } %>
+                <% if (dueStr) { %>
+                  <span class="eq-todo-due <%= isOverdue ? 'is-overdue' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <%= dueStr %><%= isOverdue ? ' (überfällig)' : '' %>
+                  </span>
+                <% } %>
+              </div>
+              <% if (t.description) { %>
+                <div class="eq-todo-desc"><%= t.description %></div>
+              <% } %>
+              <% if ((t.items && t.items.length) || (t.users && t.users.length)) { %>
+                <div class="eq-todo-tags">
+                  <% (t.items || []).forEach(function(it) { %>
+                    <span class="eq-todo-tag" title="Equipment">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                      <%= it.name %><% if (it.serial_number) { %> · <%= it.serial_number %><% } %>
+                    </span>
+                  <% }) %>
+                  <% (t.users || []).forEach(function(u) { %>
+                    <span class="eq-todo-tag is-user" title="Mitglied">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <%= u.full_name || u.username %>
+                    </span>
+                  <% }) %>
+                </div>
+              <% } %>
+              <div class="eq-todo-meta">
+                <% if (t.done) { %>
+                  Erledigt<% if (t.done_by_name) { %> von <%= t.done_by_name %><% } %>
+                <% } else { %>
+                  Angelegt<% if (t.created_by_name) { %> von <%= t.created_by_name %><% } %>
+                <% } %>
+              </div>
+            </div>
+            <div class="eq-todo-actions">
+              <button type="button" class="eq-todo-iconbtn" title="Bearbeiten" onclick="openTodoModal(<%= t.id %>)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+              </button>
+              <button type="button" class="eq-todo-iconbtn is-danger" title="Löschen" onclick="deleteTodo(<%= t.id %>)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
+            </div>
+          </li>
+        <% }) %>
+      <% } %>
+    </ul>
+    <% if (typeof todos === 'undefined' || !todos.length) { %>
+      <div class="eq-todo-empty" id="eqTodoEmpty">Noch keine To-dos. Lege deine erste Aufgabe an &mdash; mit Equipment und Mitgliedern verknüpft.</div>
+    <% } %>
+    <script type="application/json" id="eq-todo-equipment-data">
+      <%- JSON.stringify(typeof allEquipmentForTodos !== 'undefined' ? allEquipmentForTodos : []).replace(/<\/script/gi, '<\\/script') %>
+    </script>
+    <script type="application/json" id="eq-todo-users-data">
+      <%- JSON.stringify(typeof allUsersForTodos !== 'undefined' ? allUsersForTodos : []).replace(/<\/script/gi, '<\\/script') %>
+    </script>
+  </details>
+
   <div class="eq-section-title" style="margin-top: 1.4rem;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
     Alle Einträge
@@ -2716,5 +2993,214 @@
     const v = manualInput.value.trim();
     if (v) handleCode(v);
   });
+})();
+</script>
+
+<!-- ===== ZEUGWART TO-DO MODAL ===== -->
+<div class="eq-todo-backdrop" id="eqTodoBackdrop" aria-hidden="true">
+  <div class="eq-todo-modal" role="dialog" aria-modal="true" aria-labelledby="eqTodoModalTitle">
+    <div class="eq-todo-modal-head">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <h3 id="eqTodoModalTitle">Neue To-do</h3>
+      <button type="button" class="eq-todo-modal-close" onclick="closeTodoModal()" aria-label="Schließen">✕</button>
+    </div>
+    <form class="eq-todo-form" id="eqTodoForm" onsubmit="return submitTodoForm(event)">
+      <input type="hidden" name="id" id="eqTodoId" value="">
+      <div class="eq-todo-field">
+        <label for="eqTodoTitle">Titel *</label>
+        <input type="text" id="eqTodoTitle" name="title" maxlength="200" required placeholder="z.B. Krawattennadel reparieren">
+      </div>
+      <div class="eq-todo-field">
+        <label for="eqTodoDescription">Beschreibung</label>
+        <textarea id="eqTodoDescription" name="description" maxlength="2000" placeholder="Details, Schritte, Bemerkungen ..."></textarea>
+      </div>
+      <div class="eq-todo-field-row">
+        <div class="eq-todo-field">
+          <label for="eqTodoPriority">Priorität</label>
+          <select id="eqTodoPriority" name="priority">
+            <option value="low">Niedrig</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">Wichtig</option>
+          </select>
+        </div>
+        <div class="eq-todo-field">
+          <label for="eqTodoDueDate">Fällig bis</label>
+          <input type="date" id="eqTodoDueDate" name="due_date">
+        </div>
+      </div>
+      <div class="eq-todo-field">
+        <label>Equipment verknüpfen (mehrere möglich)</label>
+        <input type="text" class="eq-todo-multi-search" id="eqTodoEqSearch" placeholder="Suchen ..." autocomplete="off">
+        <div class="eq-todo-multi" id="eqTodoEqList"></div>
+      </div>
+      <div class="eq-todo-field">
+        <label>Mitglieder verknüpfen (für wen?)</label>
+        <input type="text" class="eq-todo-multi-search" id="eqTodoUserSearch" placeholder="Suchen ..." autocomplete="off">
+        <div class="eq-todo-multi" id="eqTodoUserList"></div>
+      </div>
+      <div class="eq-todo-error" id="eqTodoError"></div>
+      <div class="eq-todo-modal-actions">
+        <button type="button" class="eq-todo-btn eq-todo-btn-secondary" onclick="closeTodoModal()">Abbrechen</button>
+        <button type="submit" class="eq-todo-btn eq-todo-btn-primary" id="eqTodoSaveBtn">Speichern</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function() {
+  function parseJsonScript(id) {
+    const el = document.getElementById(id);
+    if (!el) return [];
+    try { return JSON.parse(el.textContent || '[]'); } catch (e) { return []; }
+  }
+  const ALL_EQUIPMENT = parseJsonScript('eq-todo-equipment-data');
+  const ALL_USERS     = parseJsonScript('eq-todo-users-data');
+
+  const backdrop  = document.getElementById('eqTodoBackdrop');
+  const form      = document.getElementById('eqTodoForm');
+  const titleEl   = document.getElementById('eqTodoModalTitle');
+  const idEl      = document.getElementById('eqTodoId');
+  const titleInp  = document.getElementById('eqTodoTitle');
+  const descInp   = document.getElementById('eqTodoDescription');
+  const prioInp   = document.getElementById('eqTodoPriority');
+  const dueInp    = document.getElementById('eqTodoDueDate');
+  const errorEl   = document.getElementById('eqTodoError');
+  const eqList    = document.getElementById('eqTodoEqList');
+  const userList  = document.getElementById('eqTodoUserList');
+  const eqSearch  = document.getElementById('eqTodoEqSearch');
+  const userSearch= document.getElementById('eqTodoUserSearch');
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function renderMulti(container, items, labelFn, subFn, prefix, selectedIds) {
+    const sel = new Set(selectedIds || []);
+    container.innerHTML = items.map(it => {
+      const checked = sel.has(it.id) ? 'checked' : '';
+      const sub = subFn(it);
+      return '<label class="eq-todo-multi-option" data-search="' + esc((labelFn(it) + ' ' + (sub || '')).toLowerCase()) + '">' +
+               '<input type="checkbox" name="' + prefix + '" value="' + it.id + '" ' + checked + '>' +
+               '<span>' + esc(labelFn(it)) + (sub ? ' <small>· ' + esc(sub) + '</small>' : '') + '</span>' +
+             '</label>';
+    }).join('');
+  }
+
+  function filterMulti(container, query) {
+    const q = (query || '').trim().toLowerCase();
+    container.querySelectorAll('.eq-todo-multi-option').forEach(opt => {
+      const s = opt.getAttribute('data-search') || '';
+      opt.style.display = (!q || s.includes(q)) ? '' : 'none';
+    });
+  }
+
+  if (eqSearch) eqSearch.addEventListener('input', e => filterMulti(eqList, e.target.value));
+  if (userSearch) userSearch.addEventListener('input', e => filterMulti(userList, e.target.value));
+
+  window.openTodoModal = function(todoId) {
+    errorEl.textContent = '';
+    let selectedEq = [], selectedUsers = [];
+    if (todoId) {
+      const card = document.querySelector('.eq-todo-card[data-todo-id="' + todoId + '"]');
+      if (card) {
+        idEl.value = todoId;
+        titleEl.textContent = 'To-do bearbeiten';
+        titleInp.value = decodeURIComponent(card.dataset.title || '');
+        descInp.value  = decodeURIComponent(card.dataset.description || '');
+        prioInp.value  = card.dataset.priority || 'normal';
+        dueInp.value   = card.dataset.due || '';
+        selectedEq    = (card.dataset.itemIds || '').split(',').map(s => parseInt(s, 10)).filter(Boolean);
+        selectedUsers = (card.dataset.userIds || '').split(',').map(s => parseInt(s, 10)).filter(Boolean);
+      }
+    } else {
+      idEl.value = '';
+      titleEl.textContent = 'Neue To-do';
+      form.reset();
+      prioInp.value = 'normal';
+    }
+    renderMulti(eqList, ALL_EQUIPMENT, it => it.name, it => it.serial_number, 'equipment_ids', selectedEq);
+    renderMulti(userList, ALL_USERS, it => it.full_name || it.username, () => '', 'user_ids', selectedUsers);
+    if (eqSearch) eqSearch.value = '';
+    if (userSearch) userSearch.value = '';
+    backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => titleInp.focus(), 80);
+  };
+
+  window.closeTodoModal = function() {
+    backdrop.classList.remove('open');
+    backdrop.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) window.closeTodoModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && backdrop.classList.contains('open')) window.closeTodoModal();
+  });
+
+  window.submitTodoForm = function(ev) {
+    ev.preventDefault();
+    errorEl.textContent = '';
+    const fd = new FormData(form);
+    const id = idEl.value;
+    const url = id ? ('/equipment/todos/' + id + '/edit') : '/equipment/todos';
+    const eqIds = Array.from(form.querySelectorAll('input[name="equipment_ids"]:checked')).map(i => i.value);
+    const userIds = Array.from(form.querySelectorAll('input[name="user_ids"]:checked')).map(i => i.value);
+    const body = new URLSearchParams();
+    body.append('title', fd.get('title') || '');
+    body.append('description', fd.get('description') || '');
+    body.append('priority', fd.get('priority') || 'normal');
+    body.append('due_date', fd.get('due_date') || '');
+    if (eqIds.length) body.append('equipment_ids', eqIds.join(','));
+    if (userIds.length) body.append('user_ids', userIds.join(','));
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    })
+    .then(r => r.json().then(j => ({ ok: r.ok, j })))
+    .then(({ ok, j }) => {
+      if (!ok || !j.ok) {
+        errorEl.textContent = j.error === 'title_required' ? 'Bitte Titel angeben.' : 'Fehler beim Speichern.';
+        return;
+      }
+      window.closeTodoModal();
+      window.location.reload();
+    })
+    .catch(() => { errorEl.textContent = 'Netzwerkfehler.'; });
+    return false;
+  };
+
+  window.toggleTodo = function(id, btn) {
+    if (btn) btn.disabled = true;
+    fetch('/equipment/todos/' + id + '/toggle', { method: 'POST' })
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.ok) {
+          const card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
+          if (card) card.classList.toggle('is-done', !!j.done);
+        }
+      })
+      .finally(() => { if (btn) btn.disabled = false; setTimeout(() => window.location.reload(), 400); });
+  };
+
+  window.deleteTodo = function(id) {
+    if (!confirm('Diese To-do wirklich löschen?')) return;
+    fetch('/equipment/todos/' + id + '/delete', { method: 'POST' })
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.ok) {
+          const card = document.querySelector('.eq-todo-card[data-todo-id="' + id + '"]');
+          if (card) card.remove();
+          window.location.reload();
+        }
+      });
+  };
 })();
 </script>
