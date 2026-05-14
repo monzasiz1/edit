@@ -512,6 +512,7 @@
     border-radius: 999px;
     padding: 0.25rem 0.7rem;
     cursor: pointer;
+    white-space: nowrap;
     transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.12s;
   }
   .profil-equipment-action svg { width: 13px; height: 13px; stroke-width: 2.2; }
@@ -534,6 +535,7 @@
     border: 1px dashed #fde2a8;
     border-radius: 999px;
     padding: 0.22rem 0.65rem;
+    white-space: nowrap;
   }
   .profil-equipment-pending svg { width: 13px; height: 13px; stroke-width: 2.2; }
   @media (max-width: 640px) {
@@ -552,6 +554,18 @@
     .profil-equipment-cat { font-size: 0.6rem; letter-spacing: 0.05em; }
     .profil-equipment-meta { font-size: 0.72rem; }
     .profil-equipment-tag { font-size: 0.62rem; padding: 0.05rem 0.4rem; }
+    .profil-equipment-actions { gap: 0.25rem; margin-top: 0.35rem; }
+    .profil-equipment-action,
+    .profil-equipment-pending {
+      font-size: 0.62rem;
+      padding: 0.18rem 0.5rem;
+      gap: 0.22rem;
+      letter-spacing: 0;
+    }
+    .profil-equipment-action svg,
+    .profil-equipment-pending svg { width: 11px; height: 11px; }
+    .profil-equipment-action .profil-equipment-action-label,
+    .profil-equipment-pending .profil-equipment-pending-label { white-space: nowrap; }
   }
   @media (max-width: 460px) {
     .profil-equipment-grid { grid-template-columns: 1fr; }
