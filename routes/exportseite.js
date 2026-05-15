@@ -318,29 +318,13 @@ function drawPageChrome(doc) {
   doc.rect(0, 0, pageW, HEADER_H).fill(COLORS.headerBg);
   doc.restore();
 
-  // Logo auf weisser Plakette mit weichem Schatten - kein farbiger Rand mehr
+  // Logo direkt auf dem grünen Header - ohne weiße Plakette
   try {
-    const badgeSize = 70;
-    const badgeX = PAGE_MARGIN;
-    const badgeY = (HEADER_H - badgeSize) / 2;
-    const radius = 12;
-
-    // Weicher Schatten
-    doc.save();
-    doc.fillColor('#000000').opacity(0.25);
-    doc.roundedRect(badgeX + 2, badgeY + 3, badgeSize, badgeSize, radius).fill();
-    doc.restore();
-
-    // Weisse Plakette
-    doc.save();
-    doc.fillColor('#ffffff').opacity(1);
-    doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).fill();
-    doc.restore();
-
-    // Logo mit klarem Padding zentriert
-    const pad = 8;
-    doc.image(LOGO_PATH, badgeX + pad, badgeY + pad, {
-      fit: [badgeSize - pad * 2, badgeSize - pad * 2],
+    const logoSize = 56;
+    const logoX = PAGE_MARGIN;
+    const logoY = (HEADER_H - logoSize) / 2;
+    doc.image(LOGO_PATH, logoX, logoY, {
+      fit: [logoSize, logoSize],
       align: 'center',
       valign: 'center'
     });
@@ -457,25 +441,21 @@ function drawZugsauBox(doc, top) {
   const x = PAGE_MARGIN;
   const width = doc.page.width - PAGE_MARGIN * 2;
   const y = doc.y + 4;
-  const h = 64;
+  const h = 30;
 
-  // Dezenter dunkler Block - klar abgegrenzt vom Gesamtbetrag, ohne Gold
+  // Kompakter dunkler Streifen
   doc.save();
-  doc.roundedRect(x, y, width, h, 8).fill('#1e293b');
+  doc.roundedRect(x, y, width, h, 6).fill('#1e293b');
   doc.restore();
 
-  // Label oben
+  // Label links
   doc.fillColor('#94a3b8').font('Helvetica-Bold').fontSize(9)
-     .text('ZUGSAU DES EXPORTS', x + 16, y + 12, { characterSpacing: 1.2, lineBreak: false });
+     .text('Zugsau', x + 14, y + 11, { characterSpacing: 0.8, lineBreak: false });
 
-  // Name gross
-  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18)
-     .text(top.name, x + 16, y + 26, { width: width - 32, lineBreak: false, ellipsis: true });
-
-  // Details unten
-  doc.font('Helvetica').fontSize(10).fillColor('#cbd5e1')
-     .text(`${top.count} Eintrag${top.count === 1 ? '' : 'e'}  ·  ${formatEuro(top.sum)}`,
-           x + 16, y + 48, { lineBreak: false });
+  // Name + Details rechts
+  const info = `${top.name}  ·  ${top.count} Eintrag${top.count === 1 ? '' : 'e'}  ·  ${formatEuro(top.sum)}`;
+  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11)
+     .text(info, x, y + 10, { width: width - 14, align: 'right', lineBreak: false, ellipsis: true });
 
   doc.y = y + h + 4;
   doc.fillColor(COLORS.text);
