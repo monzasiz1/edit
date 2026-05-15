@@ -559,9 +559,13 @@ router.get('/:id/assign', requireEquipmentAccess, async (req, res) => {
 
 router.post('/:id/assign', requireEquipmentAccess, async (req, res) => {
   try {
-    const { target, quantity, notes, serial_number } = req.body;
+    const { target, quantity, notes, serial_number, condition } = req.body;
     const assignedBy = req.session.user.id;
     const serialClean = (serial_number || '').toString().trim().slice(0, 100) || null;
+    const allowedConditions = ['neu', 'gut', 'gebraucht', 'reparaturbedürftig', 'defekt'];
+    const conditionClean = allowedConditions.includes((condition || '').toString())
+      ? condition
+      : 'gut';
 
     if (!target || typeof target !== 'string' || !target.includes(':')) {
       return res.redirect(`/equipment/${req.params.id}/assign?error=Ziel%20fehlt`);
@@ -592,9 +596,9 @@ router.post('/:id/assign', requireEquipmentAccess, async (req, res) => {
     }
 
     await db.query(
-      `INSERT INTO equipment_assignments (equipment_id, user_id, holder_id, assigned_by, quantity, notes, serial_number)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [req.params.id, userId, holderId, assignedBy, quantity || 1, notes, serialClean]
+      `INSERT INTO equipment_assignments (equipment_id, user_id, holder_id, assigned_by, quantity, notes, serial_number, condition)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [req.params.id, userId, holderId, assignedBy, quantity || 1, notes, serialClean, conditionClean]
     );
     res.redirect(`/equipment/${req.params.id}/assign?success=Zugewiesen`);
   } catch (err) {
@@ -645,18 +649,22 @@ router.post('/assignment/:id/return', requireEquipmentAccess, async (req, res) =
 // ===== ZUWEISUNG BEARBEITEN =====
 router.post('/assignment/:id/edit', requireEquipmentAccess, async (req, res) => {
   try {
-    const { serial_number, quantity, notes } = req.body;
+    const { serial_number, quantity, notes, condition } = req.body;
     const serialClean = (serial_number || '').toString().trim().slice(0, 100) || null;
     const qty = parseInt(quantity, 10);
     const safeQty = Number.isInteger(qty) && qty > 0 ? qty : 1;
     const notesClean = (notes || '').toString().slice(0, 2000);
+    const allowedConditions = ['neu', 'gut', 'gebraucht', 'reparaturbedürftig', 'defekt'];
+    const conditionClean = allowedConditions.includes((condition || '').toString())
+      ? condition
+      : 'gut';
 
     const r = await db.query(
       `UPDATE equipment_assignments
-         SET serial_number = $1, quantity = $2, notes = $3
-       WHERE id = $4
+         SET serial_number = $1, quantity = $2, notes = $3, condition = $4
+       WHERE id = $5
        RETURNING equipment_id`,
-      [serialClean, safeQty, notesClean, req.params.id]
+      [serialClean, safeQty, notesClean, conditionClean, req.params.id]
     );
     const equipmentId = r.rows[0]?.equipment_id;
     if (!equipmentId) return res.redirect('/equipment?error=Zuweisung%20nicht%20gefunden');

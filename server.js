@@ -332,6 +332,12 @@ async function ensureDatabaseSchema() {
       ADD COLUMN IF NOT EXISTS serial_number VARCHAR(100)
   `);
 
+  // Migration: Zustand auf Zuweisungs-Ebene (pro zugewiesenem Stueck)
+  await db.query(`
+    ALTER TABLE equipment_assignments
+      ADD COLUMN IF NOT EXISTS condition VARCHAR(40) DEFAULT 'gut'
+  `);
+
   // Equipment-Aufgaben (Defekt-Meldungen, Rueckgabe-Anmeldungen) fuer Zeugwart
   await db.query(`
     CREATE TABLE IF NOT EXISTS equipment_requests (

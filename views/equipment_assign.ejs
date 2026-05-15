@@ -383,6 +383,17 @@
         </div>
 
         <div class="apple-form-group">
+          <label>Zustand dieses Stücks</label>
+          <select name="condition" class="apple-input">
+            <option value="neu">Neu</option>
+            <option value="gut" selected>Gut</option>
+            <option value="gebraucht">Gebraucht</option>
+            <option value="reparaturbedürftig">Reparaturbedürftig</option>
+            <option value="defekt">Defekt</option>
+          </select>
+        </div>
+
+        <div class="apple-form-group">
           <label>Notiz</label>
           <textarea name="notes" class="apple-input" rows="2" placeholder="Optional"></textarea>
         </div>
@@ -464,6 +475,9 @@
                 <% if (assignment.serial_number) { %>
                   <span>SN:&nbsp;<strong><%= assignment.serial_number %></strong></span>
                 <% } %>
+                <% if (assignment.condition) { %>
+                  <span>Zustand:&nbsp;<strong><%= assignment.condition %></strong></span>
+                <% } %>
                 <span>Seit:&nbsp;<%= new Date(assignment.assigned_at).toLocaleDateString('de-DE') %></span>
                 <button type="button" class="assign-edit-btn" data-edit-toggle="<%= assignment.id %>" aria-expanded="false">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
@@ -484,6 +498,17 @@
                     <input type="number" name="quantity" value="<%= assignment.quantity %>" min="1" max="<%= equipment.quantity %>">
                   </label>
                 </div>
+                <label>
+                  <span>Zustand</span>
+                  <select name="condition">
+                    <% const _curCond = assignment.condition || 'gut'; %>
+                    <option value="neu" <%= _curCond === 'neu' ? 'selected' : '' %>>Neu</option>
+                    <option value="gut" <%= _curCond === 'gut' ? 'selected' : '' %>>Gut</option>
+                    <option value="gebraucht" <%= _curCond === 'gebraucht' ? 'selected' : '' %>>Gebraucht</option>
+                    <option value="reparaturbedürftig" <%= _curCond === 'reparaturbedürftig' ? 'selected' : '' %>>Reparaturbedürftig</option>
+                    <option value="defekt" <%= _curCond === 'defekt' ? 'selected' : '' %>>Defekt</option>
+                  </select>
+                </label>
                 <label class="aef-notes">
                   <span>Notiz</span>
                   <textarea name="notes" rows="2" placeholder="Optional"><%= assignment.notes || '' %></textarea>
