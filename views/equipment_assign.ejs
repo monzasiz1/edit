@@ -73,16 +73,16 @@
   .assign-return-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    justify-content: center;
+    gap: 0.35rem;
     font-size: 0.82rem;
     font-weight: 600;
-    padding: 0.4rem 0.75rem;
+    padding: 0.45rem 0.85rem;
     border-radius: 0.55rem;
     border: 1px solid #0e9f6e;
     background: linear-gradient(135deg, #10b981 0%, #0e9f6e 100%);
     color: #fff;
     cursor: pointer;
-    align-self: flex-start;
     transition: transform 0.1s, box-shadow 0.14s;
   }
   .assign-return-btn:hover {
@@ -90,6 +90,27 @@
     box-shadow: 0 4px 12px rgba(16,185,129,0.25);
   }
   .assign-return-btn svg { width: 14px; height: 14px; }
+
+  /* Action-Row pro Zuweisung */
+  .assign-item-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.1rem;
+    flex-wrap: wrap;
+  }
+  .assign-item-actions > form { margin: 0; flex: 1 1 140px; min-width: 0; display: flex; }
+  .assign-item-actions .assign-return-btn,
+  .assign-item-actions .assign-edit-btn {
+    flex: 1 1 auto;
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 0.55rem;
+  }
+  @media (max-width: 480px) {
+    .assign-item-actions > form,
+    .assign-item-actions .assign-edit-btn { flex-basis: 100%; }
+  }
 
   .assign-empty {
     text-align: center;
@@ -206,22 +227,23 @@
 
   /* Inline-Edit pro Zuweisung */
   .assign-edit-btn {
-    margin-left: auto;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    background: none;
+    justify-content: center;
+    gap: 0.35rem;
+    background: #fff;
     border: 1px solid #d6e3da;
     color: #1a7a45;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 0.15rem 0.55rem;
-    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.45rem 0.85rem;
+    border-radius: 0.55rem;
     cursor: pointer;
-    transition: background 0.12s;
+    transition: background 0.12s, border-color 0.12s, transform 0.1s;
   }
-  .assign-edit-btn:hover { background: #e6f4ec; }
-  .assign-edit-btn svg { width: 11px; height: 11px; }
+  .assign-edit-btn:hover { background: #e6f4ec; border-color: #b8d8c0; }
+  .assign-edit-btn:active { transform: scale(0.98); }
+  .assign-edit-btn svg { width: 13px; height: 13px; }
 
   .assign-edit-form {
     display: none;
@@ -463,12 +485,6 @@
                     <%= badgeLabel %>
                   </span>
                 </span>
-                <form method="POST" action="/equipment/assignment/<%= assignment.id %>/return" style="margin: 0; flex-shrink: 0;">
-                  <button type="submit" class="assign-return-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    Zurück
-                  </button>
-                </form>
               </div>
               <div class="assign-meta">
                 <span>Anzahl:&nbsp;<strong><%= assignment.quantity %></strong></span>
@@ -479,14 +495,22 @@
                   <span>Zustand:&nbsp;<strong><%= assignment.condition %></strong></span>
                 <% } %>
                 <span>Seit:&nbsp;<%= new Date(assignment.assigned_at).toLocaleDateString('de-DE') %></span>
-                <button type="button" class="assign-edit-btn" data-edit-toggle="<%= assignment.id %>" aria-expanded="false">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                  Bearbeiten
-                </button>
               </div>
               <% if (assignment.notes) { %>
                 <div class="assign-note"><%= assignment.notes %></div>
               <% } %>
+              <div class="assign-item-actions">
+                <button type="button" class="assign-edit-btn" data-edit-toggle="<%= assignment.id %>" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                  Bearbeiten
+                </button>
+                <form method="POST" action="/equipment/assignment/<%= assignment.id %>/return">
+                  <button type="submit" class="assign-return-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Zurück
+                  </button>
+                </form>
+              </div>
               <form method="POST" action="/equipment/assignment/<%= assignment.id %>/edit" class="assign-edit-form" data-edit-form="<%= assignment.id %>">
                 <div class="aef-row">
                   <label>
