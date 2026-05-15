@@ -101,11 +101,11 @@
   /* ── Cards ─────────────────────────────────────── */
   .dev-card {
     background: #fff;
-    border: 1px solid #e1eae3;
-    border-radius: 1.1rem;
-    padding: 1.4rem 1.5rem;
-    box-shadow: 0 4px 18px rgba(60,120,80,0.07), 0 1px 4px rgba(0,0,0,0.03);
-    margin-bottom: 1.2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.25rem 1.35rem;
+    box-shadow: none;
+    margin-bottom: 1.1rem;
   }
 
   /* ── Form Elements ─────────────────────────────── */
@@ -113,31 +113,31 @@
   .apple-form-group label {
     display: block;
     font-weight: 600;
-    color: #2a3e32;
+    color: #0f172a;
     margin-bottom: 0.4rem;
-    font-size: 0.93rem;
+    font-size: 0.88rem;
   }
   .apple-input,
   input.apple-input,
   select.apple-input,
   textarea.apple-input {
     width: 100%;
-    padding: 0.7rem 0.95rem;
-    border: 2px solid #d4dfcf;
-    border-radius: 10px;
-    font-size: 1rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
     font-family: inherit;
     background: #fff;
-    color: #1b2e2b;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    color: #0f172a;
+    transition: border-color 0.15s, box-shadow 0.15s;
     box-sizing: border-box;
   }
   .apple-input:focus,
   textarea.apple-input:focus,
   select.apple-input:focus {
     outline: none;
-    border-color: #3da973;
-    box-shadow: 0 0 0 4px rgba(61, 169, 115, 0.15);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
   }
   textarea.apple-input { resize: vertical; min-height: 80px; }
 
@@ -157,47 +157,49 @@
   /* ── Buttons ───────────────────────────────────── */
   .dev-btn-primary {
     display: inline-block;
-    padding: 0.7rem 1.4rem;
-    background: #3da973;
+    padding: 0.7rem 1.3rem;
+    background: #15803d;
     color: #fff;
-    border: none;
-    border-radius: 10px;
+    border: 1px solid #15803d;
+    border-radius: 8px;
     font-weight: 600;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
-    transition: all 0.2s;
-    box-shadow: 0 3px 10px rgba(61, 169, 115, 0.25);
+    transition: background 0.15s, border-color 0.15s, transform 0.08s;
+    box-shadow: none;
   }
   .dev-btn-primary:hover {
-    background: #2d8f55;
-    transform: translateY(-1px);
-    box-shadow: 0 5px 14px rgba(61, 169, 115, 0.35);
+    background: #166534;
+    border-color: #166534;
+    transform: none;
+    box-shadow: none;
   }
+  .dev-btn-primary:active { transform: scale(0.99); }
   .dev-btn-danger {
     display: inline-block;
-    padding: 0.55rem 1.1rem;
+    padding: 0.6rem 1.1rem;
     background: #fff;
     color: #b91c1c;
-    border: 1.5px solid #fecaca;
-    border-radius: 10px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
     font-weight: 600;
     font-family: inherit;
     font-size: 0.9rem;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.18s;
+    transition: background 0.15s, border-color 0.15s;
   }
   .dev-btn-danger:hover { background: #fef2f2; border-color: #f87171; }
   .dev-btn-ghost {
     display: inline-block;
-    padding: 0.55rem 1.1rem;
+    padding: 0.6rem 1.1rem;
     background: #fff;
-    color: #2a3e32;
-    border: 1.5px solid #d4dfcf;
-    border-radius: 10px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     font-weight: 600;
     font-family: inherit;
     font-size: 0.9rem;
