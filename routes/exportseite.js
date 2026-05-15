@@ -110,7 +110,6 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
       const subtotal = entries.reduce((acc, r) => acc + Number(r.amount), 0);
 
       ensureSpace(doc, 110);
-      const groupStartY = doc.y;
       drawMemberHeading(doc, name, entries.length, subtotal);
 
       drawTable(doc, entries, [
@@ -120,12 +119,6 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
         { label: 'Betrag',     prop: 'amount', width: 70, align: 'right' },
         { label: 'Spieß',      prop: 'admin',  width: 90 }
       ]);
-
-      // Goldener Akzentstreifen links über Heading + Tabelle (Klammer)
-      doc.save();
-      doc.rect(PAGE_MARGIN, groupStartY, 4, doc.y - groupStartY - 4).fill('#fbbf24');
-      doc.restore();
-      doc.fillColor(COLORS.text);
 
       if (idx < memberNames.length - 1) {
         doc.moveDown(1.2);
@@ -325,7 +318,7 @@ function drawPageChrome(doc) {
   doc.rect(0, 0, pageW, HEADER_H).fill(COLORS.headerBg);
   doc.restore();
 
-  // Logo auf weisser Plakette mit Schatten + goldener Akzentlinie
+  // Logo auf weisser Plakette mit weichem Schatten - kein farbiger Rand mehr
   try {
     const badgeSize = 70;
     const badgeX = PAGE_MARGIN;
@@ -334,7 +327,7 @@ function drawPageChrome(doc) {
 
     // Weicher Schatten
     doc.save();
-    doc.fillColor('#000000').opacity(0.22);
+    doc.fillColor('#000000').opacity(0.25);
     doc.roundedRect(badgeX + 2, badgeY + 3, badgeSize, badgeSize, radius).fill();
     doc.restore();
 
@@ -342,12 +335,6 @@ function drawPageChrome(doc) {
     doc.save();
     doc.fillColor('#ffffff').opacity(1);
     doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).fill();
-    doc.restore();
-
-    // Akzent-Rand (gold)
-    doc.save();
-    doc.lineWidth(1.5).strokeColor('#fbbf24');
-    doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).stroke();
     doc.restore();
 
     // Logo mit klarem Padding zentriert
@@ -433,19 +420,14 @@ function drawMemberHeading(doc, name, count, subtotal) {
   doc.rect(x, y, width, h).fill(COLORS.accentDark);
   doc.restore();
 
-  // Goldener Akzentstreifen links als Klammer ueber Heading + Tabelle (Heading-Teil)
-  doc.save();
-  doc.rect(x, y, 4, h).fill('#fbbf24');
-  doc.restore();
-
   // Mitgliedsname links
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13)
-     .text(name, x + 14, y + 9, { width: width - 28 - 180, lineBreak: false, ellipsis: true });
+     .text(name, x + 12, y + 9, { width: width - 24 - 180, lineBreak: false, ellipsis: true });
 
   // Anzahl + Summe rechts
   const right = `${count} Eintrag${count === 1 ? '' : 'e'}  ·  ${formatEuro(subtotal)}`;
   doc.font('Helvetica-Bold').fontSize(11).fillColor('#d1fae5')
-     .text(right, x, y + 11, { width: width - 14, align: 'right', lineBreak: false });
+     .text(right, x, y + 11, { width: width - 12, align: 'right', lineBreak: false });
 
   // KEIN Abstand zur Tabelle - sie sitzt direkt darunter und gehoert sichtbar zusammen
   doc.y = y + h;
@@ -477,28 +459,23 @@ function drawZugsauBox(doc, top) {
   const y = doc.y + 4;
   const h = 64;
 
-  // Hintergrund: warmes Gelb mit goldenem Rand
+  // Dezenter dunkler Block - klar abgegrenzt vom Gesamtbetrag, ohne Gold
   doc.save();
-  doc.roundedRect(x, y, width, h, 8).fillAndStroke('#fef3c7', '#f59e0b');
-  doc.restore();
-
-  // Linker Akzent-Balken in Gold
-  doc.save();
-  doc.rect(x, y, 5, h).fill('#f59e0b');
+  doc.roundedRect(x, y, width, h, 8).fill('#1e293b');
   doc.restore();
 
   // Label oben
-  doc.fillColor('#92400e').font('Helvetica-Bold').fontSize(9)
-     .text('ZUGSAU DES EXPORTS', x + 18, y + 12, { characterSpacing: 1.2, lineBreak: false });
+  doc.fillColor('#94a3b8').font('Helvetica-Bold').fontSize(9)
+     .text('ZUGSAU DES EXPORTS', x + 16, y + 12, { characterSpacing: 1.2, lineBreak: false });
 
   // Name gross
-  doc.fillColor('#78350f').font('Helvetica-Bold').fontSize(18)
-     .text(top.name, x + 18, y + 26, { width: width - 36, lineBreak: false, ellipsis: true });
+  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18)
+     .text(top.name, x + 16, y + 26, { width: width - 32, lineBreak: false, ellipsis: true });
 
   // Details unten
-  doc.font('Helvetica').fontSize(10).fillColor('#92400e')
-     .text(`${top.count} Eintrag${top.count === 1 ? '' : 'e'}  -  ${formatEuro(top.sum)}`,
-           x + 18, y + 48, { lineBreak: false });
+  doc.font('Helvetica').fontSize(10).fillColor('#cbd5e1')
+     .text(`${top.count} Eintrag${top.count === 1 ? '' : 'e'}  ·  ${formatEuro(top.sum)}`,
+           x + 16, y + 48, { lineBreak: false });
 
   doc.y = y + h + 4;
   doc.fillColor(COLORS.text);
