@@ -311,33 +311,40 @@ function createPdfDoc() {
 
 function drawPageChrome(doc) {
   const pageW = doc.page.width;
+  const HEADER_H = 92;
 
   // Header-Streifen
   doc.save();
-  doc.rect(0, 0, pageW, 78).fill(COLORS.headerBg);
+  doc.rect(0, 0, pageW, HEADER_H).fill(COLORS.headerBg);
   doc.restore();
 
-  // Logo auf weißer Plakette mit Schatten (sonst geht das gruene Logo im gruenen Header unter)
+  // Logo auf weisser Plakette mit Schatten + goldener Akzentlinie
   try {
+    const badgeSize = 70;
     const badgeX = PAGE_MARGIN;
-    const badgeY = 12;
-    const badgeSize = 54;
-    const radius = 10;
+    const badgeY = (HEADER_H - badgeSize) / 2;
+    const radius = 12;
 
-    // Schatten
+    // Weicher Schatten
     doc.save();
-    doc.fillColor('#000000').opacity(0.18);
-    doc.roundedRect(badgeX + 1.5, badgeY + 2.5, badgeSize, badgeSize, radius).fill();
+    doc.fillColor('#000000').opacity(0.22);
+    doc.roundedRect(badgeX + 2, badgeY + 3, badgeSize, badgeSize, radius).fill();
     doc.restore();
 
-    // Weiße Plakette
+    // Weisse Plakette
     doc.save();
     doc.fillColor('#ffffff').opacity(1);
     doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).fill();
     doc.restore();
 
-    // Logo zentriert auf der Plakette (mit Padding)
-    const pad = 5;
+    // Akzent-Rand (gold)
+    doc.save();
+    doc.lineWidth(1.5).strokeColor('#fbbf24');
+    doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).stroke();
+    doc.restore();
+
+    // Logo mit klarem Padding zentriert
+    const pad = 8;
     doc.image(LOGO_PATH, badgeX + pad, badgeY + pad, {
       fit: [badgeSize - pad * 2, badgeSize - pad * 2],
       align: 'center',
@@ -346,16 +353,17 @@ function drawPageChrome(doc) {
   } catch (_) { /* logo optional */ }
 
   // App-Name rechts neben Logo
+  const textX = PAGE_MARGIN + 86;
   doc.fillColor(COLORS.headerText)
-     .font('Helvetica-Bold').fontSize(16)
-     .text('Spießbuch', PAGE_MARGIN + 68, 22, { lineBreak: false });
-  doc.font('Helvetica').fontSize(9).fillColor('#d1fae5')
-     .text('Strafenverwaltung', PAGE_MARGIN + 68, 44, { lineBreak: false });
+     .font('Helvetica-Bold').fontSize(18)
+     .text('Spießbuch', textX, 28, { lineBreak: false });
+  doc.font('Helvetica').fontSize(10).fillColor('#d1fae5')
+     .text('Strafenverwaltung', textX, 52, { lineBreak: false });
 
   // Datum rechts
   const dateStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
   doc.font('Helvetica').fontSize(9).fillColor('#d1fae5')
-     .text(`Erstellt am ${dateStr}`, 0, 32, { width: pageW - PAGE_MARGIN, align: 'right' });
+     .text(`Erstellt am ${dateStr}`, 0, 38, { width: pageW - PAGE_MARGIN, align: 'right' });
 
   // Reset
   doc.fillColor(COLORS.text);
