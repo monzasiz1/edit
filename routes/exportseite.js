@@ -137,16 +137,16 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
     ensureSpace(doc, 110);
     drawGrandTotal(doc, grandTotal);
 
-    // "Zugsau" - Mitglied mit den meisten Strafen
+    // "Zugsau" - Mitglied mit dem hoechsten Strafenbetrag
     const ranking = memberNames
       .map(name => {
         const entries = groups.get(name);
         const sum = entries.reduce((acc, r) => acc + Number(r.amount), 0);
         return { name, count: entries.length, sum };
       })
-      .sort((a, b) => b.count - a.count || b.sum - a.sum);
+      .sort((a, b) => b.sum - a.sum || b.count - a.count);
 
-    if (ranking.length && ranking[0].count > 0) {
+    if (ranking.length && ranking[0].sum > 0) {
       drawZugsauBox(doc, ranking[0]);
     }
 
@@ -475,26 +475,30 @@ function drawZugsauBox(doc, top) {
   const x = PAGE_MARGIN;
   const width = doc.page.width - PAGE_MARGIN * 2;
   const y = doc.y + 4;
-  const h = 56;
+  const h = 64;
 
-  // Hintergrund: warmes Rot/Orange, sticht raus
+  // Hintergrund: warmes Gelb mit goldenem Rand
   doc.save();
   doc.roundedRect(x, y, width, h, 8).fillAndStroke('#fef3c7', '#f59e0b');
   doc.restore();
 
-  // "Pokal"-Emoji links
-  doc.fillColor('#b45309').font('Helvetica-Bold').fontSize(22)
-     .text('🏆', x + 14, y + 14, { lineBreak: false, width: 30 });
+  // Linker Akzent-Balken in Gold
+  doc.save();
+  doc.rect(x, y, 5, h).fill('#f59e0b');
+  doc.restore();
 
-  doc.fillColor('#92400e').font('Helvetica').fontSize(9)
-     .text('ZUGSAU DES EXPORTS', x + 50, y + 10, { characterSpacing: 0.8, lineBreak: false });
+  // Label oben
+  doc.fillColor('#92400e').font('Helvetica-Bold').fontSize(9)
+     .text('ZUGSAU DES EXPORTS', x + 18, y + 12, { characterSpacing: 1.2, lineBreak: false });
 
-  doc.fillColor('#78350f').font('Helvetica-Bold').fontSize(15)
-     .text(top.name, x + 50, y + 22, { width: width - 60 - 160, lineBreak: false, ellipsis: true });
+  // Name gross
+  doc.fillColor('#78350f').font('Helvetica-Bold').fontSize(18)
+     .text(top.name, x + 18, y + 26, { width: width - 36, lineBreak: false, ellipsis: true });
 
+  // Details unten
   doc.font('Helvetica').fontSize(10).fillColor('#92400e')
-     .text(`${top.count} Eintrag${top.count === 1 ? '' : 'e'} · ${formatEuro(top.sum)}`,
-           x + 50, y + 40, { lineBreak: false });
+     .text(`${top.count} Eintrag${top.count === 1 ? '' : 'e'}  -  ${formatEuro(top.sum)}`,
+           x + 18, y + 48, { lineBreak: false });
 
   doc.y = y + h + 4;
   doc.fillColor(COLORS.text);
