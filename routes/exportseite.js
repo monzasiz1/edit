@@ -304,17 +304,40 @@ function drawPageChrome(doc) {
   doc.rect(0, 0, pageW, 78).fill(COLORS.headerBg);
   doc.restore();
 
-  // Logo
+  // Logo auf weißer Plakette mit Schatten (sonst geht das gruene Logo im gruenen Header unter)
   try {
-    doc.image(LOGO_PATH, PAGE_MARGIN, 14, { width: 50, height: 50 });
+    const badgeX = PAGE_MARGIN;
+    const badgeY = 12;
+    const badgeSize = 54;
+    const radius = 10;
+
+    // Schatten
+    doc.save();
+    doc.fillColor('#000000').opacity(0.18);
+    doc.roundedRect(badgeX + 1.5, badgeY + 2.5, badgeSize, badgeSize, radius).fill();
+    doc.restore();
+
+    // Weiße Plakette
+    doc.save();
+    doc.fillColor('#ffffff').opacity(1);
+    doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).fill();
+    doc.restore();
+
+    // Logo zentriert auf der Plakette (mit Padding)
+    const pad = 5;
+    doc.image(LOGO_PATH, badgeX + pad, badgeY + pad, {
+      fit: [badgeSize - pad * 2, badgeSize - pad * 2],
+      align: 'center',
+      valign: 'center'
+    });
   } catch (_) { /* logo optional */ }
 
   // App-Name rechts neben Logo
   doc.fillColor(COLORS.headerText)
      .font('Helvetica-Bold').fontSize(16)
-     .text('Spießbuch', PAGE_MARGIN + 64, 22, { lineBreak: false });
+     .text('Spießbuch', PAGE_MARGIN + 68, 22, { lineBreak: false });
   doc.font('Helvetica').fontSize(9).fillColor('#d1fae5')
-     .text('Strafenverwaltung', PAGE_MARGIN + 64, 44, { lineBreak: false });
+     .text('Strafenverwaltung', PAGE_MARGIN + 68, 44, { lineBreak: false });
 
   // Datum rechts
   const dateStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
