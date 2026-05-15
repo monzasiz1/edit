@@ -321,12 +321,29 @@ function drawPageChrome(doc) {
   doc.rect(0, 0, pageW, HEADER_H).fill(COLORS.headerBg);
   doc.restore();
 
-  // Logo direkt auf dem grünen Header - ohne weiße Plakette
+  // Logo auf knapper weisser Plakette - Plakette nur so gross wie Logo + Schatten
   try {
     const logoSize = 56;
-    const logoX = PAGE_MARGIN;
-    const logoY = (HEADER_H - logoSize) / 2;
-    doc.image(LOGO_PATH, logoX, logoY, {
+    const pad = 2;
+    const badgeSize = logoSize + pad * 2;
+    const badgeX = PAGE_MARGIN;
+    const badgeY = (HEADER_H - badgeSize) / 2;
+    const radius = 8;
+
+    // Weicher Schatten
+    doc.save();
+    doc.fillColor('#000000').opacity(0.22);
+    doc.roundedRect(badgeX + 2, badgeY + 2, badgeSize, badgeSize, radius).fill();
+    doc.restore();
+
+    // Weisse Plakette - knapp am Logo
+    doc.save();
+    doc.fillColor('#ffffff').opacity(1);
+    doc.roundedRect(badgeX, badgeY, badgeSize, badgeSize, radius).fill();
+    doc.restore();
+
+    // Logo zentriert in der Plakette
+    doc.image(LOGO_PATH, badgeX + pad, badgeY + pad, {
       fit: [logoSize, logoSize],
       align: 'center',
       valign: 'center'
