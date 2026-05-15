@@ -422,6 +422,8 @@
     flex-wrap: wrap;
     gap: 0.28rem;
     margin-top: 0.15rem;
+    width: 100%;
+    min-width: 0;
   }
   .eq-card-assigned-label {
     width: 100%;
@@ -494,18 +496,20 @@
     gap: 0.4rem;
     font-size: 0.72rem;
     font-weight: 600;
-    padding: 0.22rem 0.55rem;
+    padding: 0.22rem 0.5rem;
     border-radius: 8px;
     background: #f5faf7;
     border: 1px solid #e2efe6;
     color: #1f4d33;
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+    overflow: hidden;
   }
   .eq-assignee.is-holder { background: #f6f2fe; border-color: #e4daf8; color: #4427a3; }
   .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.75; }
   .eq-assignee-name {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -518,17 +522,22 @@
     color: #6b7280;
   }
   .eq-assignee-sn {
-    flex-shrink: 0;
-    font-size: 0.62rem;
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.6rem;
     font-weight: 600;
     font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    color: #6b7280;
+    color: #94a3b8;
     background: transparent;
     border: none;
     padding: 0;
     letter-spacing: 0;
   }
-  .eq-assignee.is-holder .eq-assignee-sn { color: #7c5cc9; }
+  .eq-assignee.is-holder .eq-assignee-sn { color: #a89bd1; }
 
   .eq-card-actions {
     display: flex;
