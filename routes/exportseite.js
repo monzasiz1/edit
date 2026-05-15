@@ -288,8 +288,8 @@ const COLORS = {
   accentText: '#334155',        // Tabellenkopf text
   accentDark: '#e2e8f0',        // Mitglied bg
   accentDarkText: '#1e293b',    // Mitglied text
-  totalBg: '#1e293b',           // Gesamtbetrag bg (dunkles Anthrazit)
-  totalText: '#ffffff'          // Gesamtbetrag text
+  totalBg: '#cbd5e1',           // Gesamtbetrag bg (mittleres Grau - klar abgesetzt)
+  totalText: '#000000'          // Gesamtbetrag text (schwarz, klar lesbar)
 };
 
 const PAGE_MARGIN = 42;
