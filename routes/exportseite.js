@@ -397,7 +397,7 @@ function drawSummaryBox(doc, cells) {
     doc.font('Helvetica').fontSize(9).fillColor(COLORS.muted)
        .text(cell.label.toUpperCase(), cx + 12, y + 10, { width: cellW - 16, characterSpacing: 0.6 });
     doc.font('Helvetica-Bold').fontSize(cell.highlight ? 16 : 13)
-       .fillColor(cell.highlight ? COLORS.accent : COLORS.text)
+       .fillColor(COLORS.text)
        .text(String(cell.value || '—'), cx + 12, y + 24, { width: cellW - 16, lineBreak: false, ellipsis: true });
 
     // Trenner zwischen Zellen
