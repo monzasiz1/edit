@@ -280,13 +280,16 @@ const COLORS = {
   muted: '#64748b',
   border: '#e2e8f0',
   subtleBg: '#f8fafc',
-  headerBg: '#15803d',
+  headerBg: '#15803d',          // Seitenkopf bleibt sattes Gruen
   headerText: '#ffffff',
-  zebra: '#f1f5f9',
-  accent: '#15803d',
-  accentDark: '#166534',
-  totalBg: '#15803d',
-  totalText: '#ffffff'
+  zebra: '#f8fafc',
+  // Dezente Gruentoene fuer Mitglied/Tabellenkopf/Gesamtbetrag
+  accent: '#ecfdf5',            // Tabellenkopf bg (sehr hell)
+  accentText: '#166534',        // Tabellenkopf text
+  accentDark: '#d1fae5',        // Mitglied bg
+  accentDarkText: '#166534',    // Mitglied text
+  totalBg: '#bbf7d0',           // Gesamtbetrag bg (etwas kraeftiger als Mitglied)
+  totalText: '#14532d'          // Gesamtbetrag text
 };
 
 const PAGE_MARGIN = 42;
@@ -399,18 +402,18 @@ function drawMemberHeading(doc, name, count, subtotal) {
   const y = doc.y;
   const h = 30;
 
-  // Dunkelgruener Block (Farbe wie Tabellenkopf -> verschmilzt visuell zu einer Einheit)
+  // Dezenter hellgruener Block - verschmilzt mit Tabellenkopf zu einer Einheit
   doc.save();
   doc.rect(x, y, width, h).fill(COLORS.accentDark);
   doc.restore();
 
   // Mitgliedsname links
-  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13)
+  doc.fillColor(COLORS.accentDarkText).font('Helvetica-Bold').fontSize(13)
      .text(name, x + 12, y + 9, { width: width - 24 - 180, lineBreak: false, ellipsis: true });
 
   // Anzahl + Summe rechts
   const right = `${count} Eintrag${count === 1 ? '' : 'e'}  ·  ${formatEuro(subtotal)}`;
-  doc.font('Helvetica-Bold').fontSize(11).fillColor('#d1fae5')
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.accentDarkText)
      .text(right, x, y + 11, { width: width - 12, align: 'right', lineBreak: false });
 
   // KEIN Abstand zur Tabelle - sie sitzt direkt darunter und gehoert sichtbar zusammen
@@ -524,7 +527,7 @@ function drawTable(doc, rows, columns) {
     doc.save();
     doc.rect(tableX, y, totalW, minRowHeight).fill(COLORS.accent);
     doc.restore();
-    doc.font('Helvetica-Bold').fontSize(10).fillColor('#ffffff');
+    doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.accentText);
     columns.forEach((col, i) => {
       doc.text(col.label, colX[i] + cellPadX, y + cellPadY, {
         width: col.width - cellPadX * 2,
