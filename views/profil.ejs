@@ -238,6 +238,25 @@
     width: 18px;
     height: 18px;
   }
+
+  /* Vereinsausstattung: gesamten Inhalt etwas kompakter */
+  .profil-card-equipment .profil-card-body { font-size: 0.88rem; }
+  .profil-card-equipment .equip-slot { padding: 0.5rem 0.75rem 0.55rem; border-radius: 12px; }
+  .profil-card-equipment .equip-slot-label { font-size: 0.7rem; }
+  .profil-card-equipment .equip-slot-count { font-size: 0.62rem; padding: 0.05rem 0.42rem; }
+  .profil-card-equipment .equip-slot-dot { width: 8px; height: 8px; }
+  .profil-card-equipment .equip-slot-items { gap: 0.32rem; margin-top: 0.4rem; }
+  .profil-card-equipment .equip-item { padding: 0.35rem 0.55rem 0.4rem 0.7rem; border-radius: 8px; }
+  .profil-card-equipment .equip-item-name { font-size: 0.8rem; gap: 0.35rem; }
+  .profil-card-equipment .equip-item-desc { font-size: 0.7rem; }
+  .profil-card-equipment .equip-item-tags { gap: 0.25rem; margin-top: 0.28rem; }
+  .profil-card-equipment .equip-tag { font-size: 0.6rem; padding: 0.18rem 0.4rem; }
+  .profil-card-equipment .equip-tag .equip-tag-k { font-size: 0.54rem; }
+  .profil-card-equipment .equip-qty { font-size: 0.68rem; padding: 0.04rem 0.35rem; }
+  .profil-card-equipment .equip-item-notes { font-size: 0.66rem; padding: 0.26rem 0.45rem; }
+  .profil-card-equipment .equip-summary-value { font-size: 1.2rem; }
+  .profil-card-equipment .equip-summary-label { font-size: 0.66rem; }
+  .profil-card-equipment .equip-legend-empty { font-size: 0.78rem; }
   details.profil-card > summary.profil-card-title:hover {
     background: rgba(61,169,115,0.05);
   }
@@ -814,8 +833,8 @@
 
     <!-- Equipment-Männchen (Vereinsausstattung) -->
     <% if (assignedEquipment && assignedEquipment.length > 0) { %>
-      <details class="profil-card">
-        <summary class="profil-card-title profil-card-title-sm">
+      <details class="profil-card profil-card-equipment">
+        <summary class="profil-card-title">
           <svg class="profil-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="5" r="3"/>
             <path d="M12 8v6"/>
