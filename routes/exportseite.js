@@ -529,7 +529,12 @@ function drawTable(doc, rows, columns) {
   const cellPadY = 5;
   const minRowHeight = 22;
   const tableX = PAGE_MARGIN;
-  const totalW = columns.reduce((a, c) => a + c.width, 0);
+  // Inhalts-Breite exakt wie Mitglied-/Gesamtbetrag-/Zugsau-Streifen
+  const totalW = doc.page.width - PAGE_MARGIN * 2;
+
+  // Spalten proportional auf totalW skalieren, damit Tabelle genauso breit ist
+  const rawSum = columns.reduce((a, c) => a + c.width, 0) || 1;
+  columns = columns.map(c => ({ ...c, width: (c.width / rawSum) * totalW }));
 
   // Spalten-Startpositionen
   const colX = [tableX];
