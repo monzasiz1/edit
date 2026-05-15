@@ -2723,3 +2723,221 @@
   });
 })();
 </script>
+
+<style>
+  /* ─── Zeugwart-Seite: Override für App-Design (Slate + Green-Primary) ─── */
+
+  /* Basis */
+  html, body {
+    background: #ffffff;
+  }
+
+  /* Hero: dezenter, kleinere Radien, weniger Glow */
+  .page-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #15803d 100%) !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.18) !important;
+    padding: 1.2rem 1.4rem !important;
+    margin: 0 0 1.4rem !important;
+    animation: none !important;
+  }
+  .page-hero::after { display: none !important; }
+  .page-hero-orb { display: none !important; }
+  .page-hero-kicker {
+    font-size: 0.66rem !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    color: rgba(255,255,255,0.7) !important;
+    margin: 0 0 0.25rem !important;
+  }
+  .page-hero-title {
+    font-size: 1.45rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    color: #fff !important;
+    text-shadow: none !important;
+  }
+  .page-hero-title svg { color: rgba(255,255,255,0.9) !important; }
+  .page-hero-btn {
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 0.85rem !important;
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    box-shadow: none !important;
+    transition: background 0.15s, border-color 0.15s !important;
+  }
+  .page-hero-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    transform: none !important;
+  }
+  .page-hero-btn.primary {
+    background: #fff !important;
+    color: #15803d !important;
+    border-color: transparent !important;
+  }
+  .page-hero-btn.primary:hover { background: #f1f5f9 !important; color: #166534 !important; }
+  .page-hero-btn.has-badge {
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+  }
+  .page-hero-btn.has-badge:hover {
+    background: rgba(255,255,255,0.2) !important;
+  }
+  .page-hero-badge {
+    background: #dc2626 !important;
+    border: 1.5px solid #fff !important;
+  }
+
+  /* Toolbar Inputs */
+  .eq-toolbar .eq-search,
+  .eq-toolbar .eq-cat {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    color: #0f172a !important;
+    font-size: 0.9rem !important;
+    padding: 0.55rem 0.75rem !important;
+  }
+  .eq-toolbar .eq-search:focus,
+  .eq-toolbar .eq-cat:focus {
+    border-color: #15803d !important;
+    box-shadow: 0 0 0 3px rgba(21,128,61,0.15) !important;
+  }
+  .eq-toolbar button,
+  .eq-toolbar a.eq-reset {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.86rem !important;
+    padding: 0.55rem 0.9rem !important;
+  }
+
+  /* Meta */
+  .eq-meta { color: #64748b !important; }
+  .eq-meta strong { color: #15803d !important; }
+
+  /* Stats-Karten */
+  .eq-stat {
+    border-radius: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s !important;
+  }
+  .eq-stat:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: #cbd5e1 !important;
+  }
+  .eq-stat::before {
+    background: #e2e8f0 !important;
+  }
+  .eq-stat[data-tone="primary"]::before { background: #15803d !important; }
+  .eq-stat[data-tone="warn"]::before    { background: #d97706 !important; }
+  .eq-stat[data-tone="ok"]::before      { background: #15803d !important; }
+  .eq-stat-label { color: #64748b !important; }
+  .eq-stat-val { color: #0f172a !important; }
+  .eq-stat-sub { color: #94a3b8 !important; }
+
+  /* Equipment-Karten */
+  .eq-card {
+    border-radius: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
+  }
+  .eq-card:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.06) !important;
+    transform: none !important;
+  }
+
+  /* Collapsibles */
+  .eq-collapse {
+    border-radius: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  .eq-collapse > summary {
+    border-radius: 10px 10px 0 0 !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  /* Section-Title */
+  .eq-section-title {
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: #64748b !important;
+  }
+
+  /* Empty-State */
+  .eq-empty {
+    border-radius: 10px !important;
+    border: 1px dashed #e2e8f0 !important;
+    background: #f8fafc !important;
+    color: #64748b !important;
+  }
+
+  /* Modale */
+  .eq-stats-modal,
+  .eq-inbox-modal {
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 20px 50px rgba(15,23,42,0.25) !important;
+  }
+  .eq-stats-modal-head,
+  .eq-inbox-head {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+  .eq-stats-modal-title,
+  .eq-inbox-title {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+  }
+  .eq-stats-modal-close,
+  .eq-inbox-close {
+    color: #64748b !important;
+    background: transparent !important;
+  }
+  .eq-stats-modal-close:hover,
+  .eq-inbox-close:hover {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+
+  /* Sheet */
+  .eq-sheet {
+    border-radius: 16px 16px 0 0 !important;
+    background: #fff !important;
+  }
+  .eq-sheet-title {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+  }
+  .eq-sheet-item {
+    border-radius: 10px !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    transition: background 0.14s !important;
+  }
+  .eq-sheet-item:hover {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+  }
+  .eq-sheet-badge {
+    background: #dc2626 !important;
+    color: #fff !important;
+  }
+</style>
