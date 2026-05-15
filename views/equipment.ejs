@@ -439,13 +439,13 @@
   }
   .eq-assignee-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.28rem;
+    flex-direction: column;
+    gap: 0.18rem;
     width: 100%;
   }
   .eq-card-assigned.is-collapsible .eq-assignee-list {
     position: relative;
-    max-height: 4.6rem; /* ~2 Reihen Chips */
+    max-height: 7.4rem; /* ~4 Zeilen */
     overflow: hidden;
     transition: max-height 0.25s ease;
   }
@@ -489,32 +489,46 @@
     gap: 0.3rem;
   }
   .eq-assignee {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.4rem;
     font-size: 0.72rem;
     font-weight: 600;
-    padding: 0.15rem 0.55rem;
-    border-radius: 999px;
-    background: #eef6f1;
-    border: 1px solid #cfe5d8;
+    padding: 0.22rem 0.55rem;
+    border-radius: 8px;
+    background: #f5faf7;
+    border: 1px solid #e2efe6;
     color: #1f4d33;
-    max-width: 100%;
+    width: 100%;
+    min-width: 0;
   }
-  .eq-assignee.is-holder { background: #f1ecfd; border-color: #d9ccfa; color: #4427a3; }
-  .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; }
-  .eq-assignee-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .eq-assignee-qty { opacity: 0.7; font-weight: 500; }
-  .eq-assignee-sn {
+  .eq-assignee.is-holder { background: #f6f2fe; border-color: #e4daf8; color: #4427a3; }
+  .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.75; }
+  .eq-assignee-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .eq-assignee-qty {
+    flex-shrink: 0;
+    font-size: 0.66rem;
     font-weight: 700;
-    color: #1a7a45;
-    background: #e6f4ec;
-    border: 1px solid #c5e8d2;
-    border-radius: 999px;
-    padding: 0 0.45rem;
-    font-size: 0.72rem;
-    letter-spacing: 0.02em;
+    color: #6b7280;
   }
+  .eq-assignee-sn {
+    flex-shrink: 0;
+    font-size: 0.62rem;
+    font-weight: 600;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color: #6b7280;
+    background: transparent;
+    border: none;
+    padding: 0;
+    letter-spacing: 0;
+  }
+  .eq-assignee.is-holder .eq-assignee-sn { color: #7c5cc9; }
 
   .eq-card-actions {
     display: flex;
