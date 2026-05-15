@@ -6,18 +6,27 @@ const path = require('path');
 const fs = require('fs');
 
 const KATALOG_PATH = path.join(__dirname, '../public/strafenkatalog.pdf');
+const KATALOG_KEY = 'strafenkatalog';
 
+// In-Memory Upload (Render: ephemerales Dateisystem -> Speicherung in DB)
 const pdfUpload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, path.join(__dirname, '../public')),
-    filename: (_req, _file, cb) => cb(null, 'strafenkatalog.pdf')
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype === 'application/pdf') return cb(null, true);
     cb(new Error('Nur PDF-Dateien erlaubt'));
   }
 }).single('katalog_pdf');
+
+async function strafenkatalogExists() {
+  try {
+    const result = await db.query('SELECT 1 FROM app_files WHERE key = $1 LIMIT 1', [KATALOG_KEY]);
+    if (result.rowCount > 0) return true;
+  } catch (err) {
+    console.error('Fehler beim Pruefen des Strafenkatalogs:', err);
+  }
+  return fs.existsSync(KATALOG_PATH);
+}
 
 function requireAdmin(req, res, next) {
   if (req.session.user && req.session.user.is_admin) return next();
@@ -81,7 +90,7 @@ router.get('/', requireAdmin, async (req, res) => {
       editCatalogItem,
       eventCatalog,
       editEventItem,
-      strafenkatalogExists: fs.existsSync(KATALOG_PATH),
+      strafenkatalogExists: await strafenkatalogExists(),
       saved: req.query.saved === '1',
       error: req.query.error || null
     });
@@ -246,22 +255,62 @@ router.post('/event-catalog/:id/delete', requireAdmin, async (req, res) => {
 });
 
 router.post('/strafenkatalog-upload', requireAdmin, (req, res) => {
-  pdfUpload(req, res, (err) => {
+  pdfUpload(req, res, async (err) => {
     if (err) {
       return res.redirect(`/spiess-board?error=${encodeURIComponent(err.message || 'Upload fehlgeschlagen')}`);
     }
     if (!req.file) {
       return res.redirect(`/spiess-board?error=${encodeURIComponent('Keine Datei ausgewählt')}`);
     }
-    res.redirect('/spiess-board?saved=1');
+    try {
+      await db.query(
+        `
+          INSERT INTO app_files (key, filename, mimetype, data, updated_at)
+          VALUES ($1, $2, $3, $4, NOW())
+          ON CONFLICT (key) DO UPDATE SET
+            filename = EXCLUDED.filename,
+            mimetype = EXCLUDED.mimetype,
+            data = EXCLUDED.data,
+            updated_at = NOW()
+        `,
+        [KATALOG_KEY, req.file.originalname || 'strafenkatalog.pdf', req.file.mimetype || 'application/pdf', req.file.buffer]
+      );
+      // Alte Disk-Datei (falls vorhanden) aufraeumen
+      try { if (fs.existsSync(KATALOG_PATH)) fs.unlinkSync(KATALOG_PATH); } catch (_) {}
+      res.redirect('/spiess-board?saved=1');
+    } catch (dbErr) {
+      console.error('Fehler beim Speichern des Strafenkatalogs (DB):', dbErr);
+      res.redirect(`/spiess-board?error=${encodeURIComponent('Speichern in der Datenbank fehlgeschlagen')}`);
+    }
   });
 });
 
-router.post('/strafenkatalog-delete', requireAdmin, (req, res) => {
+// Strafenkatalog ausliefern (DB bevorzugt, Disk als Fallback)
+router.get('/strafenkatalog.pdf', async (req, res) => {
   try {
-    if (fs.existsSync(KATALOG_PATH)) {
-      fs.unlinkSync(KATALOG_PATH);
+    const result = await db.query(
+      'SELECT filename, mimetype, data FROM app_files WHERE key = $1 LIMIT 1',
+      [KATALOG_KEY]
+    );
+    if (result.rowCount > 0) {
+      const row = result.rows[0];
+      res.setHeader('Content-Type', row.mimetype || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${row.filename || 'strafenkatalog.pdf'}"`);
+      return res.send(row.data);
     }
+  } catch (err) {
+    console.error('Fehler beim Laden des Strafenkatalogs:', err);
+  }
+  if (fs.existsSync(KATALOG_PATH)) {
+    return res.sendFile(KATALOG_PATH);
+  }
+  return res.status(404).send('Kein Strafenkatalog hinterlegt');
+});
+
+router.post('/strafenkatalog-delete', requireAdmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM app_files WHERE key = $1', [KATALOG_KEY]);
+    try { if (fs.existsSync(KATALOG_PATH)) fs.unlinkSync(KATALOG_PATH); } catch (_) {}
     res.redirect('/spiess-board?saved=1');
   } catch (err) {
     console.error('Fehler beim Löschen des Strafenkatalogs:', err);

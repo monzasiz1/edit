@@ -93,6 +93,16 @@ async function ensureDatabaseSchema() {
   `);
 
   await db.query(`
+    CREATE TABLE IF NOT EXISTS app_files (
+      key TEXT PRIMARY KEY,
+      filename TEXT,
+      mimetype TEXT,
+      data BYTEA NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await db.query(`
     INSERT INTO app_settings (key, value)
     VALUES ('ranking_visible', 'true')
     ON CONFLICT (key) DO NOTHING
