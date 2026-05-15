@@ -69,52 +69,68 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
        FROM penalties p
        LEFT JOIN users u ON p.user_id = u.id
        LEFT JOIN users a ON p.admin_id = a.id
-       ORDER BY p.date DESC`
+       ORDER BY LOWER(u.username) ASC, p.date DESC`
     );
 
-    const doc = new PDFDocument({ margin: 35, size: 'A4' });
+    const doc = createPdfDoc();
     res
       .setHeader('Content-Disposition', 'attachment; filename=Strafen_Gesamt.pdf')
       .type('application/pdf');
     doc.pipe(res);
 
-    // Logo oben links
-    const logoPath = path.join(__dirname, '..', 'public', 'logo.png');
-    doc.image(logoPath, doc.page.margins.left, doc.page.margins.top - 10, { width: 50 });
-    doc.moveDown(2);
-
-    // Titel
-    doc.fontSize(18).text('Alle Strafen aller Mitglieder', { align: 'center' });
-    doc.moveDown();
+    drawDocHeader(doc, 'Strafenübersicht – Gesamt', `Alle Mitglieder · ${rows.length} Eintrag${rows.length === 1 ? '' : 'e'}`);
 
     if (!rows.length) {
-      doc.fontSize(13).text('Keine Strafen vorhanden. 🎉');
-      return doc.end();
+      doc.font('Helvetica').fontSize(12).fillColor(COLORS.muted)
+         .text('Keine Strafen vorhanden.', { align: 'center' });
+      finalizeDoc(doc);
+      return;
     }
 
-    // Tabelle mit klar getrennten Spalten
-    await drawTable(doc, rows, [
-      { label: 'Datum',      prop: 'date',      width: 80 },
-      { label: 'Mitglied',   prop: 'mitglied',  width: 90 },
-      { label: 'Event',      prop: 'event',     width: 100 },
-      { label: 'Grund',      prop: 'type',      width: 95 },
-      { label: 'Betrag (€)', prop: 'amount',    width: 70, align: 'right' },
-      { label: 'Spieß',      prop: 'admin',     width: 80 }
+    // Gruppieren nach Mitglied (alphabetisch sortiert)
+    const groups = new Map();
+    rows.forEach(r => {
+      const key = r.mitglied || '— unbekannt —';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(r);
+    });
+    const memberNames = Array.from(groups.keys()).sort((a, b) => a.localeCompare(b, 'de'));
+
+    const grandTotal = rows.reduce((acc, r) => acc + Number(r.amount), 0);
+
+    // Zusammenfassung oben
+    drawSummaryBox(doc, [
+      { label: 'Mitglieder', value: String(memberNames.length) },
+      { label: 'Einträge', value: String(rows.length) },
+      { label: 'Gesamtsumme', value: formatEuro(grandTotal), highlight: true }
     ]);
 
-    // Summen‐Zeile direkt unterhalb der Tabelle
-    const sumAll = rows.reduce((acc, cur) => acc + Number(cur.amount), 0);
-    const sumTextAll = `Gesamtbetrag: ${sumAll.toFixed(2)} €`;
-    const m = doc.page.margins.left;
-    doc
-      .font('Helvetica-Bold')
-      .fontSize(13)
-      .text(sumTextAll, m, doc.y + 5, {
-        width: doc.page.width - m * 2,
-        align: 'right'
-      });
+    memberNames.forEach((name, idx) => {
+      const entries = groups.get(name);
+      const subtotal = entries.reduce((acc, r) => acc + Number(r.amount), 0);
 
-    doc.end();
+      ensureSpace(doc, 90);
+      drawMemberHeading(doc, name, entries.length, subtotal);
+
+      drawTable(doc, entries, [
+        { label: 'Datum',      prop: 'date',   width: 70 },
+        { label: 'Event',      prop: 'event',  width: 130 },
+        { label: 'Grund',      prop: 'type',   width: 150 },
+        { label: 'Betrag',     prop: 'amount', width: 70, align: 'right' },
+        { label: 'Spieß',      prop: 'admin',  width: 90 }
+      ]);
+
+      if (idx < memberNames.length - 1) {
+        doc.moveDown(0.6);
+      }
+    });
+
+    // Grand Total am Ende
+    doc.moveDown(0.8);
+    ensureSpace(doc, 50);
+    drawGrandTotal(doc, grandTotal);
+
+    finalizeDoc(doc);
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
     console.error(e);
@@ -203,52 +219,230 @@ async function userPenaltiesPDF(req, res, userId, userName) {
        ORDER BY p.date DESC`,
       [userId]
     );
-    const doc = new PDFDocument({ margin: 35, size: 'A4' });
+    const doc = createPdfDoc();
     res
       .setHeader('Content-Disposition', `attachment; filename=Strafen_${userName.replace(/\s/g, "_")}.pdf`)
       .type('application/pdf');
     doc.pipe(res);
 
-    // Logo oben links
-    const logoPath = path.join(__dirname, '..', 'public', 'logo.png');
-    doc.image(logoPath, doc.page.margins.left, doc.page.margins.top - 10, { width: 50 });
-    doc.moveDown(2);
-
-    // Titel
-    doc.fontSize(18).text(`Strafenübersicht für ${userName}`, { align: 'center' });
-    doc.moveDown();
+    drawDocHeader(doc, 'Strafenübersicht', userName);
 
     if (!penalties.length) {
-      doc.fontSize(13).text('Keine Strafen vorhanden. 🎉');
-      return doc.end();
+      doc.font('Helvetica').fontSize(12).fillColor(COLORS.muted)
+         .text('Keine Strafen vorhanden.', { align: 'center' });
+      finalizeDoc(doc);
+      return;
     }
 
-    // Tabelle mit klar getrennten Spalten
-    await drawTable(doc, penalties, [
-      { label: 'Datum',      prop: 'date',      width: 80 },
-      { label: 'Event',      prop: 'event',     width: 120 },
-      { label: 'Grund',      prop: 'type',      width: 120 },
-      { label: 'Betrag (€)', prop: 'amount',    width: 100, align: 'right' },
-      { label: 'Spieß',      prop: 'admin',     width: 80 }
+    const sumUser = penalties.reduce((acc, cur) => acc + Number(cur.amount), 0);
+
+    drawSummaryBox(doc, [
+      { label: 'Mitglied', value: userName },
+      { label: 'Einträge', value: String(penalties.length) },
+      { label: 'Gesamtsumme', value: formatEuro(sumUser), highlight: true }
     ]);
 
-    // Summen‐Zeile direkt unterhalb der Tabelle
-    const sumUser = penalties.reduce((acc, cur) => acc + Number(cur.amount), 0);
-    const sumTextUser = `Gesamtbetrag: ${sumUser.toFixed(2)} €`;
-    const m2 = doc.page.margins.left;
-    doc
-      .font('Helvetica-Bold')
-      .fontSize(13)
-      .text(sumTextUser, m2, doc.y + 5, {
-        width: doc.page.width - m2 * 2,
-        align: 'right'
-      });
+    drawTable(doc, penalties, [
+      { label: 'Datum',  prop: 'date',   width: 80 },
+      { label: 'Event',  prop: 'event',  width: 150 },
+      { label: 'Grund',  prop: 'type',   width: 160 },
+      { label: 'Betrag', prop: 'amount', width: 70, align: 'right' },
+      { label: 'Spieß',  prop: 'admin',  width: 90 }
+    ]);
 
-    doc.end();
+    doc.moveDown(0.8);
+    ensureSpace(doc, 50);
+    drawGrandTotal(doc, sumUser);
+
+    finalizeDoc(doc);
   } catch (e) {
     if (!res.headersSent) res.status(500).send('Fehler beim PDF-Export.');
     console.error(e);
   }
+}
+
+// ───── PDF-Designsystem ───────────────────────────────────────────────────
+const COLORS = {
+  text: '#0f172a',
+  muted: '#64748b',
+  border: '#e2e8f0',
+  subtleBg: '#f8fafc',
+  headerBg: '#15803d',
+  headerText: '#ffffff',
+  zebra: '#f1f5f9',
+  accent: '#15803d',
+  accentDark: '#166534',
+  totalBg: '#15803d',
+  totalText: '#ffffff'
+};
+
+const PAGE_MARGIN = 42;
+const LOGO_PATH = path.join(__dirname, '..', 'public', 'logo.png');
+
+function createPdfDoc() {
+  const doc = new PDFDocument({
+    size: 'A4',
+    margins: { top: 110, bottom: 60, left: PAGE_MARGIN, right: PAGE_MARGIN },
+    bufferPages: true,
+    info: { Title: 'Strafenübersicht', Author: 'Spießbuch' }
+  });
+
+  // Header auf jeder weiteren Seite zeichnen
+  doc.on('pageAdded', () => {
+    drawPageChrome(doc, { withFooter: false });
+    doc.y = doc.page.margins.top;
+  });
+
+  return doc;
+}
+
+function drawPageChrome(doc) {
+  const pageW = doc.page.width;
+
+  // Header-Streifen
+  doc.save();
+  doc.rect(0, 0, pageW, 78).fill(COLORS.headerBg);
+  doc.restore();
+
+  // Logo
+  try {
+    doc.image(LOGO_PATH, PAGE_MARGIN, 14, { width: 50, height: 50 });
+  } catch (_) { /* logo optional */ }
+
+  // App-Name rechts neben Logo
+  doc.fillColor(COLORS.headerText)
+     .font('Helvetica-Bold').fontSize(16)
+     .text('Spießbuch', PAGE_MARGIN + 64, 22, { lineBreak: false });
+  doc.font('Helvetica').fontSize(9).fillColor('#d1fae5')
+     .text('Strafenverwaltung', PAGE_MARGIN + 64, 44, { lineBreak: false });
+
+  // Datum rechts
+  const dateStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  doc.font('Helvetica').fontSize(9).fillColor('#d1fae5')
+     .text(`Erstellt am ${dateStr}`, 0, 32, { width: pageW - PAGE_MARGIN, align: 'right' });
+
+  // Reset
+  doc.fillColor(COLORS.text);
+}
+
+function drawDocHeader(doc, title, subtitle) {
+  drawPageChrome(doc);
+  doc.y = doc.page.margins.top;
+
+  doc.fillColor(COLORS.text).font('Helvetica-Bold').fontSize(22)
+     .text(title, PAGE_MARGIN, doc.y, { width: doc.page.width - PAGE_MARGIN * 2 });
+  if (subtitle) {
+    doc.moveDown(0.15);
+    doc.font('Helvetica').fontSize(11).fillColor(COLORS.muted)
+       .text(subtitle, { width: doc.page.width - PAGE_MARGIN * 2 });
+  }
+  doc.moveDown(0.7);
+}
+
+function drawSummaryBox(doc, cells) {
+  const x = PAGE_MARGIN;
+  const width = doc.page.width - PAGE_MARGIN * 2;
+  const height = 56;
+  const y = doc.y;
+
+  doc.save();
+  doc.roundedRect(x, y, width, height, 8).fillAndStroke(COLORS.subtleBg, COLORS.border);
+  doc.restore();
+
+  const cellW = width / cells.length;
+  cells.forEach((cell, i) => {
+    const cx = x + i * cellW;
+    doc.font('Helvetica').fontSize(9).fillColor(COLORS.muted)
+       .text(cell.label.toUpperCase(), cx + 12, y + 10, { width: cellW - 16, characterSpacing: 0.6 });
+    doc.font('Helvetica-Bold').fontSize(cell.highlight ? 16 : 13)
+       .fillColor(cell.highlight ? COLORS.accent : COLORS.text)
+       .text(String(cell.value || '—'), cx + 12, y + 24, { width: cellW - 16, lineBreak: false, ellipsis: true });
+
+    // Trenner zwischen Zellen
+    if (i > 0) {
+      doc.save();
+      doc.moveTo(cx, y + 10).lineTo(cx, y + height - 10)
+         .lineWidth(0.5).strokeColor(COLORS.border).stroke();
+      doc.restore();
+    }
+  });
+
+  doc.y = y + height + 14;
+  doc.fillColor(COLORS.text);
+}
+
+function drawMemberHeading(doc, name, count, subtotal) {
+  const x = PAGE_MARGIN;
+  const width = doc.page.width - PAGE_MARGIN * 2;
+  const y = doc.y;
+
+  doc.save();
+  doc.roundedRect(x, y, width, 26, 6).fill('#ecfdf5');
+  doc.restore();
+
+  doc.fillColor(COLORS.accentDark).font('Helvetica-Bold').fontSize(12)
+     .text(name, x + 12, y + 7, { width: width - 24, lineBreak: false, ellipsis: true });
+
+  const right = `${count} Eintrag${count === 1 ? '' : 'e'} · ${formatEuro(subtotal)}`;
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.accent)
+     .text(right, x, y + 8, { width: width - 12, align: 'right', lineBreak: false });
+
+  doc.y = y + 32;
+  doc.fillColor(COLORS.text);
+}
+
+function drawGrandTotal(doc, total) {
+  const x = PAGE_MARGIN;
+  const width = doc.page.width - PAGE_MARGIN * 2;
+  const y = doc.y;
+  const h = 38;
+
+  doc.save();
+  doc.roundedRect(x, y, width, h, 8).fill(COLORS.totalBg);
+  doc.restore();
+
+  doc.fillColor(COLORS.totalText).font('Helvetica-Bold').fontSize(12)
+     .text('Gesamtbetrag', x + 16, y + 13, { width: width / 2, lineBreak: false });
+  doc.font('Helvetica-Bold').fontSize(16)
+     .text(formatEuro(total), x, y + 10, { width: width - 16, align: 'right', lineBreak: false });
+
+  doc.y = y + h + 6;
+  doc.fillColor(COLORS.text);
+}
+
+function formatEuro(value) {
+  const n = Number(value) || 0;
+  return n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function ensureSpace(doc, needed) {
+  if (doc.y + needed > doc.page.height - doc.page.margins.bottom) {
+    doc.addPage();
+  }
+}
+
+function finalizeDoc(doc) {
+  // Footer mit Seitenzahl auf allen Seiten zeichnen
+  try {
+    const range = doc.bufferedPageRange();
+    const total = range.count;
+    for (let i = 0; i < total; i++) {
+      doc.switchToPage(range.start + i);
+      const pageW = doc.page.width;
+      const footerY = doc.page.height - 38;
+
+      doc.save();
+      doc.moveTo(PAGE_MARGIN, footerY).lineTo(pageW - PAGE_MARGIN, footerY)
+         .lineWidth(0.5).strokeColor(COLORS.border).stroke();
+      doc.restore();
+
+      doc.font('Helvetica').fontSize(8).fillColor(COLORS.muted)
+         .text('Spießbuch · Strafenexport', PAGE_MARGIN, footerY + 8, { lineBreak: false });
+      doc.font('Helvetica').fontSize(8).fillColor(COLORS.muted)
+         .text(`Seite ${i + 1} von ${total}`, 0, footerY + 8, { width: pageW - PAGE_MARGIN, align: 'right', lineBreak: false });
+    }
+  } catch (_) { /* ignore */ }
+  doc.end();
 }
 
 // ───── Tabellen‐Renderer ──────────────────────────────────────────────────
@@ -259,75 +453,89 @@ function getTextHeight(doc, text, width, options = {}) {
   return h;
 }
 
-async function drawTable(doc, rows, columns) {
-  const tableTop     = doc.y + 10;
-  const minRowHeight = 24;
-  const colSpacing   = 10; // Abstand zwischen den Spalten
-  const colX         = [doc.page.margins.left];
+function drawTable(doc, rows, columns) {
+  const cellPadX = 6;
+  const cellPadY = 5;
+  const minRowHeight = 22;
+  const tableX = PAGE_MARGIN;
+  const totalW = columns.reduce((a, c) => a + c.width, 0);
 
-  // Spalten-Startpositionen berechnen mit Abstand
-  columns.forEach(col => {
-    const lastX = colX[colX.length - 1];
-    colX.push(lastX + col.width + colSpacing);
-  });
+  // Spalten-Startpositionen
+  const colX = [tableX];
+  columns.forEach(col => colX.push(colX[colX.length - 1] + col.width));
 
-  // Kopfzeile
-  function header(y) {
-    doc.font('Helvetica-Bold').fontSize(12).fillColor('#111');
-    columns.forEach((col, i) =>
-      doc.text(col.label, colX[i], y, { width: col.width, align: col.align || 'left' })
-    );
-    doc.moveTo(colX[0], y + minRowHeight - 8)
-       .lineTo(colX[columns.length - 1] + columns[columns.length -1].width, y + minRowHeight - 8)
-       .stroke();
-    doc.font('Helvetica').fontSize(11);
+  function drawHeader(y) {
+    doc.save();
+    doc.rect(tableX, y, totalW, minRowHeight).fill(COLORS.accent);
+    doc.restore();
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#ffffff');
+    columns.forEach((col, i) => {
+      doc.text(col.label, colX[i] + cellPadX, y + cellPadY, {
+        width: col.width - cellPadX * 2,
+        align: col.align || 'left',
+        lineBreak: false
+      });
+    });
+    doc.fillColor(COLORS.text);
+    return y + minRowHeight;
   }
 
-  let y = tableTop;
-  header(y);
-  y += minRowHeight;
+  function formatCell(col, raw) {
+    if (raw === null || raw === undefined || raw === '') return '—';
+    if (col.prop === 'date')   return new Date(raw).toLocaleDateString('de-DE');
+    if (col.prop === 'amount') return formatEuro(raw);
+    return String(raw);
+  }
 
-  // Zeilen
+  let y = doc.y;
+  y = drawHeader(y);
+
+  doc.font('Helvetica').fontSize(10);
+
   rows.forEach((r, i) => {
-    const heights = columns.map(col => {
-      let val = r[col.prop];
-      if (col.prop === 'date')   val = new Date(val).toLocaleDateString('de-DE');
-      if (col.prop === 'amount') val = Number(val).toFixed(2);
-      return getTextHeight(doc, val || '-', col.width) + 8;
+    // Zeilenhöhe berechnen
+    const cellHeights = columns.map(col => {
+      const val = formatCell(col, r[col.prop]);
+      return getTextHeight(doc, val, col.width - cellPadX * 2) + cellPadY * 2;
     });
-    const rowHeight = Math.max(minRowHeight, ...heights);
+    const rowH = Math.max(minRowHeight, ...cellHeights);
 
     // Seitenumbruch?
-    if (y + rowHeight > doc.page.height - 60) {
+    if (y + rowH > doc.page.height - doc.page.margins.bottom - 10) {
       doc.addPage();
       y = doc.page.margins.top;
-      header(y);
-      y += minRowHeight;
+      y = drawHeader(y);
+      doc.font('Helvetica').fontSize(10);
     }
 
-    // Zebra-Striping
-    if (i % 2 === 1) {
-      doc.rect(colX[0], y - 3,
-               colX[columns.length - 1] + columns[columns.length -1].width - colX[0],
-               rowHeight)
-         .fill('#e7f3e6')
-         .fillColor('#111');
+    // Zebra
+    if (i % 2 === 0) {
+      doc.save();
+      doc.rect(tableX, y, totalW, rowH).fill(COLORS.zebra);
+      doc.restore();
     }
 
-    // Werte zeichnen
     columns.forEach((col, j) => {
-      let val = r[col.prop];
-      if (col.prop === 'date')   val = new Date(val).toLocaleDateString('de-DE');
-      if (col.prop === 'amount') val = Number(val).toFixed(2);
-      doc.fillColor('#111')
-         .text(val || '-', colX[j], y, { width: col.width, align: col.align || 'left' });
+      const val = formatCell(col, r[col.prop]);
+      const isAmount = col.prop === 'amount';
+      doc.font(isAmount ? 'Helvetica-Bold' : 'Helvetica').fontSize(10)
+         .fillColor(COLORS.text)
+         .text(val, colX[j] + cellPadX, y + cellPadY, {
+            width: col.width - cellPadX * 2,
+            align: col.align || 'left'
+         });
     });
 
-    y += rowHeight;
+    // dünne Trennlinie unten
+    doc.save();
+    doc.moveTo(tableX, y + rowH).lineTo(tableX + totalW, y + rowH)
+       .lineWidth(0.3).strokeColor(COLORS.border).stroke();
+    doc.restore();
+
+    y += rowH;
   });
 
-  // doc.y ans Ende der Tabelle setzen
-  doc.y = y;
+  doc.y = y + 4;
 }
 
 module.exports = router;
