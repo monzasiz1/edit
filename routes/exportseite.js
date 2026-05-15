@@ -109,7 +109,8 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
       const entries = groups.get(name);
       const subtotal = entries.reduce((acc, r) => acc + Number(r.amount), 0);
 
-      ensureSpace(doc, 90);
+      ensureSpace(doc, 110);
+      const groupStartY = doc.y;
       drawMemberHeading(doc, name, entries.length, subtotal);
 
       drawTable(doc, entries, [
@@ -120,8 +121,14 @@ router.get('/alle-pdf', requireLogin, requireAdmin, async (req, res) => {
         { label: 'Spieß',      prop: 'admin',  width: 90 }
       ]);
 
+      // Goldener Akzentstreifen links über Heading + Tabelle (Klammer)
+      doc.save();
+      doc.rect(PAGE_MARGIN, groupStartY, 4, doc.y - groupStartY - 4).fill('#fbbf24');
+      doc.restore();
+      doc.fillColor(COLORS.text);
+
       if (idx < memberNames.length - 1) {
-        doc.moveDown(0.6);
+        doc.moveDown(1.2);
       }
     });
 
@@ -419,19 +426,29 @@ function drawMemberHeading(doc, name, count, subtotal) {
   const x = PAGE_MARGIN;
   const width = doc.page.width - PAGE_MARGIN * 2;
   const y = doc.y;
+  const h = 30;
 
+  // Dunkelgruener Block (Farbe wie Tabellenkopf -> verschmilzt visuell zu einer Einheit)
   doc.save();
-  doc.roundedRect(x, y, width, 26, 6).fill('#ecfdf5');
+  doc.rect(x, y, width, h).fill(COLORS.accentDark);
   doc.restore();
 
-  doc.fillColor(COLORS.accentDark).font('Helvetica-Bold').fontSize(12)
-     .text(name, x + 12, y + 7, { width: width - 24, lineBreak: false, ellipsis: true });
+  // Goldener Akzentstreifen links als Klammer ueber Heading + Tabelle (Heading-Teil)
+  doc.save();
+  doc.rect(x, y, 4, h).fill('#fbbf24');
+  doc.restore();
 
-  const right = `${count} Eintrag${count === 1 ? '' : 'e'} · ${formatEuro(subtotal)}`;
-  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.accent)
-     .text(right, x, y + 8, { width: width - 12, align: 'right', lineBreak: false });
+  // Mitgliedsname links
+  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13)
+     .text(name, x + 14, y + 9, { width: width - 28 - 180, lineBreak: false, ellipsis: true });
 
-  doc.y = y + 32;
+  // Anzahl + Summe rechts
+  const right = `${count} Eintrag${count === 1 ? '' : 'e'}  ·  ${formatEuro(subtotal)}`;
+  doc.font('Helvetica-Bold').fontSize(11).fillColor('#d1fae5')
+     .text(right, x, y + 11, { width: width - 14, align: 'right', lineBreak: false });
+
+  // KEIN Abstand zur Tabelle - sie sitzt direkt darunter und gehoert sichtbar zusammen
+  doc.y = y + h;
   doc.fillColor(COLORS.text);
 }
 
