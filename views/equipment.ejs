@@ -441,13 +441,14 @@
   }
   .eq-assignee-list {
     display: flex;
-    flex-direction: column;
-    gap: 0.18rem;
+    flex-wrap: wrap;
+    gap: 0.28rem;
     width: 100%;
+    min-width: 0;
   }
   .eq-card-assigned.is-collapsible .eq-assignee-list {
     position: relative;
-    max-height: 7.4rem; /* ~4 Zeilen */
+    max-height: 4.6rem; /* ~2 Reihen Chips */
     overflow: hidden;
     transition: max-height 0.25s ease;
   }
@@ -491,53 +492,49 @@
     gap: 0.3rem;
   }
   .eq-assignee {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
     font-size: 0.72rem;
     font-weight: 600;
-    padding: 0.22rem 0.5rem;
-    border-radius: 8px;
-    background: #f5faf7;
-    border: 1px solid #e2efe6;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: #eef6f1;
+    border: 1px solid #cfe5d8;
     color: #1f4d33;
-    width: 100%;
     max-width: 100%;
     min-width: 0;
     overflow: hidden;
   }
-  .eq-assignee.is-holder { background: #f6f2fe; border-color: #e4daf8; color: #4427a3; }
-  .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.75; }
+  .eq-assignee.is-holder { background: #f1ecfd; border-color: #d9ccfa; color: #4427a3; }
+  .eq-assignee svg { width: 11px; height: 11px; flex-shrink: 0; }
   .eq-assignee-name {
-    flex: 1 1 0;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .eq-assignee-qty {
-    flex-shrink: 0;
-    font-size: 0.66rem;
-    font-weight: 700;
-    color: #6b7280;
-  }
+  .eq-assignee-qty { opacity: 0.7; font-weight: 500; flex-shrink: 0; }
   .eq-assignee-sn {
-    flex-shrink: 1;
-    min-width: 0;
-    max-width: 45%;
+    flex-shrink: 0;
+    max-width: 55%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.6rem;
-    font-weight: 600;
-    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    color: #94a3b8;
-    background: transparent;
-    border: none;
-    padding: 0;
-    letter-spacing: 0;
+    font-weight: 700;
+    color: #1a7a45;
+    background: #e6f4ec;
+    border: 1px solid #c5e8d2;
+    border-radius: 999px;
+    padding: 0 0.45rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.02em;
   }
-  .eq-assignee.is-holder .eq-assignee-sn { color: #a89bd1; }
+  .eq-assignee.is-holder .eq-assignee-sn {
+    color: #4427a3;
+    background: #ede4fc;
+    border-color: #d9ccfa;
+  }
 
   .eq-card-actions {
     display: flex;
