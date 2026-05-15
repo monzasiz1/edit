@@ -75,21 +75,22 @@
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.45rem 0.85rem;
-    border-radius: 0.55rem;
-    border: 1px solid #0e9f6e;
-    background: linear-gradient(135deg, #10b981 0%, #0e9f6e 100%);
-    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.14s;
+    transition: background 0.12s, border-color 0.12s;
   }
   .assign-return-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1a7a45;
   }
-  .assign-return-btn svg { width: 14px; height: 14px; }
+  .assign-return-btn svg { width: 13px; height: 13px; }
 
   /* Action-Row pro Zuweisung */
   .assign-item-actions {
@@ -103,9 +104,9 @@
   .assign-item-actions .assign-edit-btn {
     flex: 1 1 auto;
     width: 100%;
-    font-size: 0.85rem;
-    padding: 0.5rem 0.85rem;
-    border-radius: 0.55rem;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
   }
   @media (max-width: 480px) {
     .assign-item-actions > form,
@@ -231,18 +232,17 @@
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    background: #fff;
-    border: 1px solid #d6e3da;
-    color: #1a7a45;
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.45rem 0.85rem;
-    border-radius: 0.55rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
     cursor: pointer;
-    transition: background 0.12s, border-color 0.12s, transform 0.1s;
+    transition: background 0.12s, border-color 0.12s;
   }
-  .assign-edit-btn:hover { background: #e6f4ec; border-color: #b8d8c0; }
-  .assign-edit-btn:active { transform: scale(0.98); }
+  .assign-edit-btn:hover { background: #f1f5f9; border-color: #cbd5e1; color: #0f172a; }
   .assign-edit-btn svg { width: 13px; height: 13px; }
 
   .assign-edit-form {
