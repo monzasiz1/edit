@@ -283,13 +283,13 @@ const COLORS = {
   headerBg: '#15803d',          // Seitenkopf bleibt sattes Gruen
   headerText: '#ffffff',
   zebra: '#f8fafc',
-  // Dezente Gruentoene fuer Mitglied/Tabellenkopf/Gesamtbetrag
-  accent: '#ecfdf5',            // Tabellenkopf bg (sehr hell)
-  accentText: '#166534',        // Tabellenkopf text
-  accentDark: '#d1fae5',        // Mitglied bg
-  accentDarkText: '#166534',    // Mitglied text
-  totalBg: '#bbf7d0',           // Gesamtbetrag bg (etwas kraeftiger als Mitglied)
-  totalText: '#14532d'          // Gesamtbetrag text
+  // Dezente Grautoene fuer Mitglied/Tabellenkopf/Gesamtbetrag
+  accent: '#f1f5f9',            // Tabellenkopf bg (sehr hell)
+  accentText: '#334155',        // Tabellenkopf text
+  accentDark: '#e2e8f0',        // Mitglied bg
+  accentDarkText: '#1e293b',    // Mitglied text
+  totalBg: '#1e293b',           // Gesamtbetrag bg (dunkles Anthrazit)
+  totalText: '#ffffff'          // Gesamtbetrag text
 };
 
 const PAGE_MARGIN = 42;
@@ -463,9 +463,9 @@ function drawZugsauBox(doc, top) {
   const y = doc.y + 4;
   const h = 30;
 
-  // Kompakter dunkler Streifen
+  // Kompakter Streifen (etwas heller als Gesamtbetrag, damit unterscheidbar)
   doc.save();
-  doc.roundedRect(x, y, width, h, 6).fill('#1e293b');
+  doc.roundedRect(x, y, width, h, 6).fill('#475569');
   doc.restore();
 
   // Label links
