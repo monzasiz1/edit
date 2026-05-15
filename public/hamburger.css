@@ -36,7 +36,7 @@ nav.main-nav #hamburger-btn.hamburger-btn.active span:nth-child(3) {
   transform: translateY(-12.5px) rotate(-45deg) !important;
 }
 /* Hamburger auf Desktop ausblenden */
-@media (min-width: 920px) {
+@media (min-width: 1200px) {
   .hamburger-btn {
     display: none !important;
   }

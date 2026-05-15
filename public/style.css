@@ -151,7 +151,7 @@ nav.main-nav ul li button:focus {
   border-radius: 2px;
   transition: var(--transition);
 }
-@media (max-width: 900px) {
+@media (max-width: 1199px) {
   nav.main-nav {
     padding: 0 1rem;
   }
