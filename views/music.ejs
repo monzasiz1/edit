@@ -149,19 +149,22 @@
                       <% if (piece.part) { %><span class="music-chip music-chip--secondary"><%= piece.part %></span><% } %>
                     </div>
                   </div>
-                  <div class="music-action-group">
-                    <a class="music-download" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" download="<%= piece.original_name %>">Herunterladen</a>
+                </div>
+                <div class="music-item-description"><%= piece.description || 'Keine Beschreibung' %></div>
+                <div class="music-item-footer">
+                  <div class="music-item-meta">
+                    <span>von <strong><%= piece.uploaded_by_name || 'Unbekannt' %></strong></span>
+                  </div>
+                  <div class="music-item-actions">
+                    <a class="music-link" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" target="_blank" rel="noopener">Öffnen</a>
+                    <a class="music-link music-link--secondary" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" download="<%= piece.original_name %>">Download</a>
                     <% if (user && (user.is_admin || piece.uploaded_by === user.id)) { %>
-                      <a class="music-edit" href="/music/edit/<%= piece.id %>">Bearbeiten</a>
-                      <form action="/music/delete/<%= piece.id %>" method="POST" class="music-delete-form" onsubmit="return confirm('Stück wirklich löschen?');">
-                        <button type="submit" class="music-delete-btn">Löschen</button>
+                      <a class="music-link music-link--tertiary" href="/music/edit/<%= piece.id %>">Bearbeiten</a>
+                      <form action="/music/delete/<%= piece.id %>" method="POST" class="music-link-form" onsubmit="return confirm('Stück wirklich löschen?');">
+                        <button type="submit" class="music-link music-link--danger">Löschen</button>
                       </form>
                     <% } %>
                   </div>
-                </div>
-                <div class="music-item-meta">
-                  <span><%= piece.description || 'Keine Beschreibung' %></span>
-                  <span>von <strong><%= piece.uploaded_by_name || 'Unbekannt' %></strong></span>
                 </div>
               </article>
             <% }) %>
@@ -523,36 +526,39 @@
   }
 
   .music-item {
-    padding: 0.85rem;
+    padding: 0.95rem;
     border: 1px solid rgba(15, 77, 139, 0.08);
-    border-radius: 1rem;
-    background: #f8fbfb;
-    box-shadow: 0 8px 18px rgba(15, 35, 25, 0.04);
+    border-radius: 1.15rem;
+    background: #ffffff;
+    box-shadow: 0 14px 30px rgba(15, 35, 25, 0.04);
   }
   .music-item-main {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.7rem;
-    align-items: start;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: flex-start;
     margin-bottom: 0.55rem;
   }
   .music-item-title-group {
     display: grid;
     gap: 0.2rem;
+    min-width: 0;
   }
   .music-item-main strong {
     display: block;
     font-size: 0.98rem;
-    color: #14291f;
+    color: #121a1a;
     line-height: 1.2;
+    letter-spacing: -0.02em;
   }
   .music-item-subtitle {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
     align-items: center;
-    color: #4f6558;
-    font-size: 0.85rem;
+    color: #55696b;
+    font-size: 0.82rem;
   }
   .music-tag-row {
     display: flex;
@@ -579,20 +585,28 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.48rem 0.8rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 12px;
-    color: #0f4d8a;
-    font-weight: 700;
+    color: #1f3e34;
+    font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
     border: 1px solid rgba(15, 77, 139, 0.12);
-    background: #eef6ff;
+    background: #f5fbff;
     transition: background 0.12s ease, transform 0.12s ease;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
+    min-width: max-content;
   }
   .music-download:hover,
-  .music-edit:hover,
-  .music-delete-btn:hover { background: #d9e9ff; }
+  .music-edit:hover { background: #d7ebff; }
+
+  .music-delete-btn {
+    border-color: rgba(220, 38, 38, 0.18);
+    background: #fff2f2;
+    color: #991b1b;
+  }
+
+  .music-delete-btn:hover { background: #fee2e2; }
 
   .music-edit {
     margin-left: 0.5rem;
@@ -613,27 +627,103 @@
     background: #fee2e2;
   }
 
+  .music-item-description {
+    margin: 0.4rem 0 0.75rem;
+    color: #5c6f71;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    min-height: 2.2rem;
+  }
+
+  .music-item-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .music-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
   .music-item-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 0.65rem;
     color: #5f6d60;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     line-height: 1.3;
-  }
-
-  .music-action-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    justify-content: flex-end;
-    align-items: center;
   }
 
   .music-item-meta span {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
+  }
+
+  .music-link,
+  .music-link button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 77, 139, 0.12);
+    background: #f8fcf8;
+    color: #14523d;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.12s ease, transform 0.12s ease;
+    min-width: max-content;
+  }
+
+  .music-link:hover,
+  .music-link button:hover {
+    background: #e9f7e9;
+  }
+
+  .music-link--secondary,
+  .music-link--secondary button {
+    background: #eef4ff;
+    border-color: rgba(17, 56, 107, 0.14);
+    color: #144070;
+  }
+
+  .music-link--secondary:hover,
+  .music-link--secondary button:hover {
+    background: #dfe8ff;
+  }
+
+  .music-link--tertiary,
+  .music-link--tertiary button {
+    background: #f6f6fb;
+    border-color: rgba(71, 63, 255, 0.14);
+    color: #3b3eb2;
+  }
+
+  .music-link--tertiary:hover,
+  .music-link--tertiary button:hover {
+    background: #ebebff;
+  }
+
+  .music-link--danger,
+  .music-link--danger button {
+    background: #fff1f1;
+    border-color: rgba(220, 38, 38, 0.18);
+    color: #991b1b;
+  }
+
+  .music-link--danger:hover,
+  .music-link--danger button:hover {
+    background: #fee2e2;
+  }
+
+  .music-link-form {
+    display: inline-flex;
   }
 
   .music-empty {
@@ -673,6 +763,8 @@
     }
     .music-panel { border-radius: 18px; }
     .music-item-main { flex-direction: column; align-items: stretch; }
-    .music-download { width: 100%; justify-content: center; }
+    .music-download,
+    .music-edit,
+    .music-delete-btn { width: auto; }
   }
 </style>
