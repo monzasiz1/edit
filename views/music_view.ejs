@@ -23,8 +23,7 @@
     <% } %>
   </div>
 
-  <div class="music-view-hotspot top" aria-hidden="true"></div>
-  <div class="music-view-hotspot bottom" aria-hidden="true"></div>
+  <div class="music-view-catcher" aria-hidden="true"></div>
 
   <div class="music-view-frame">
     <iframe src="<%= contentUrl %>" class="music-view-iframe" allowfullscreen></iframe>
@@ -145,7 +144,7 @@
     inset: 0;
     background: #050608;
     overflow: auto;
-    touch-action: pan-y;
+    touch-action: pan-y pinch-zoom;
   }
 
   .music-view-iframe {
@@ -157,18 +156,16 @@
     display: block;
   }
 
-  .music-view-hotspot {
+  .music-view-catcher {
     position: absolute;
-    left: 0;
-    right: 0;
-    height: 20vmin;
-    z-index: 25;
+    inset: 0;
+    z-index: 20;
     pointer-events: auto;
-    cursor: pointer;
   }
 
-  .music-view-hotspot.top { top: 0; }
-  .music-view-hotspot.bottom { bottom: 0; }
+  .music-view-catcher.hidden {
+    pointer-events: none;
+  }
 
   .music-view-iframe {
     width: 100%;
@@ -271,29 +268,27 @@
     }
   }
 
-  @media (max-width: 900px) {
-    .music-view-header,
-    .music-view-actions {
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-  }
 </style>
 
 <script>
   (function() {
     const header = document.querySelector('.music-view-header');
     const actions = document.querySelector('.music-view-actions');
+    const catcher = document.querySelector('.music-view-catcher');
     let hideTimer = null;
+
+    function hideControls() {
+      header.classList.remove('visible');
+      actions.classList.remove('visible');
+      if (catcher) catcher.classList.remove('hidden');
+    }
 
     function showControls() {
       header.classList.add('visible');
       actions.classList.add('visible');
+      if (catcher) catcher.classList.add('hidden');
       if (hideTimer) clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => {
-        header.classList.remove('visible');
-        actions.classList.remove('visible');
-      }, 2500);
+      hideTimer = setTimeout(hideControls, 2500);
     }
 
     function init() {
@@ -301,9 +296,14 @@
       document.body.style.overflow = 'hidden';
       header.classList.remove('visible');
       actions.classList.remove('visible');
+      if (catcher) catcher.classList.remove('hidden');
 
-      document.addEventListener('touchend', showControls, { passive: true });
-      document.addEventListener('click', showControls);
+      if (catcher) {
+        catcher.addEventListener('pointerup', () => {
+          showControls();
+        });
+      }
+
       document.addEventListener('keydown', showControls);
       showControls();
     }
