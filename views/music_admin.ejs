@@ -29,6 +29,20 @@
       </form>
     </article>
 
+    <article class="music-panel">
+      <h2>Stimmen für Instrumente</h2>
+      <p>Bearbeite die festen Stimmen / Besetzungen für jedes Instrument. Eine Stimme pro Zeile eingeben.</p>
+      <form action="/music/admin/parts" method="POST" class="music-form">
+        <% Object.keys(instrumentPartsMap).forEach(instrument => { %>
+          <label>
+            <span><%= instrument %></span>
+            <textarea name="parts_<%= instrument.replace(/\s+/g, '_') %>" rows="4" placeholder="Eine Stimme pro Zeile"><%= (instrumentPartsMap[instrument] || []).filter(part => part && part.trim()).join('\n') %></textarea>
+          </label>
+        <% }) %>
+        <button type="submit" class="music-btn music-btn-primary">Stimmen speichern</button>
+      </form>
+    </article>
+
     <article class="music-panel music-panel--info">
       <h3>Hinweis</h3>
       <p>Nur Administratoren haben hier Zugriff. Nach dem Speichern kannst du direkt auf die Notenverwaltung zurückkehren.</p>

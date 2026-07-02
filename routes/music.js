@@ -19,12 +19,35 @@ function sanitizeHeaderFilename(filename) {
   return filename.replace(/["\\]/g, '_');
 }
 
-const instrumentPartsMap = {
+const defaultInstrumentPartsMap = {
   Flöten: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte'],
   Trommeln: [''],
   Lyra: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass'],
   Andere: ['']
 };
+
+async function loadInstrumentPartsMap() {
+  try {
+    const result = await db.query(`SELECT value FROM app_settings WHERE key = 'music_instrument_parts' LIMIT 1`);
+    if (!result.rows.length || !result.rows[0].value) {
+      return defaultInstrumentPartsMap;
+    }
+    const parsed = JSON.parse(result.rows[0].value);
+    return Object.assign({}, defaultInstrumentPartsMap, parsed);
+  } catch (err) {
+    console.error('Fehler beim Laden der Instrumentstimmen:', err);
+    return defaultInstrumentPartsMap;
+  }
+}
+
+function saveInstrumentPartsMap(partsMap) {
+  return db.query(
+    `INSERT INTO app_settings (key, value)
+     VALUES ('music_instrument_parts', $1)
+     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+    [JSON.stringify(partsMap)]
+  );
+}
 
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
@@ -68,12 +91,7 @@ router.get('/', requireLogin, async (req, res) => {
     const selectedPart = (req.query.part || '').trim();
     const selectedSearch = (req.query.search || '').trim();
 
-    const instrumentPartsMap = {
-      Flöten: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte'],
-      Trommeln: [''],
-      Lyra: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass'],
-      Andere: ['']
-    };
+    const instrumentPartsMap = await loadInstrumentPartsMap();
 
     const passwordSetting = await db.query(`
       SELECT value FROM app_settings WHERE key = 'music_password_hash' LIMIT 1
@@ -232,6 +250,65 @@ router.get('/file/:id', requireLogin, async (req, res) => {
   }
 });
 
+router.get('/view/:id', requireLogin, async (req, res) => {
+  const pieceId = parseInt(req.params.id, 10);
+  if (Number.isNaN(pieceId)) {
+    return res.status(400).send('Ungültige Stück-ID');
+  }
+
+  const selectedInstrument = (req.query.instrument || '').trim();
+  const selectedPart = (req.query.part || '').trim();
+
+  try {
+    const currentPieceResult = await db.query(`SELECT * FROM music_pieces WHERE id = $1 LIMIT 1`, [pieceId]);
+    if (!currentPieceResult.rows.length) {
+      return res.status(404).render('404', { title: 'Stück nicht gefunden', path: '/music' });
+    }
+
+    const piece = currentPieceResult.rows[0];
+    const instrument = selectedInstrument || piece.instrument || 'Andere';
+    const partFilter = selectedPart || piece.part || '';
+
+    const filters = [`instrument = $1`];
+    const params = [instrument];
+    if (partFilter) {
+      params.push(partFilter);
+      filters.push(`part = $${params.length}`);
+    }
+
+    const piecesResult = await db.query(`
+      SELECT id
+      FROM music_pieces
+      WHERE ${filters.join(' AND ')}
+      ORDER BY LOWER(part) ASC, LOWER(title) ASC, LOWER(composer) ASC
+    `, params);
+
+    const ids = piecesResult.rows.map(r => r.id);
+    const currentIndex = ids.indexOf(pieceId);
+
+    const prevId = currentIndex > 0 ? ids[currentIndex - 1] : null;
+    const nextId = currentIndex >= 0 && currentIndex < ids.length - 1 ? ids[currentIndex + 1] : null;
+
+    const querySuffix = `?instrument=${encodeURIComponent(instrument)}&part=${encodeURIComponent(partFilter)}`;
+    const prevUrl = prevId ? `/music/view/${prevId}${querySuffix}` : null;
+    const nextUrl = nextId ? `/music/view/${nextId}${querySuffix}` : null;
+
+    res.render('music_view', {
+      user: req.session.user,
+      title: piece.title,
+      path: '/music/view/' + pieceId,
+      piece,
+      contentUrl: `/music/file/${pieceId}`,
+      prevUrl,
+      nextUrl,
+      downloadUrl: `/music/file/${pieceId}`
+    });
+  } catch (err) {
+    console.error('Fehler beim Laden der Musik-Ansicht:', err);
+    return res.status(500).render('404', { title: 'Fehler', path: '/music' });
+  }
+});
+
 function userCanManagePiece(req, piece) {
   return req.session.user && (req.session.user.is_admin || piece.uploaded_by === req.session.user.id);
 }
@@ -359,6 +436,7 @@ router.post('/delete/:id', requireLogin, async (req, res) => {
 
 router.get('/admin', requireLogin, requireAdmin, async (req, res) => {
   try {
+    const instrumentPartsMap = await loadInstrumentPartsMap();
     const passwordSetting = await db.query(`
       SELECT value FROM app_settings WHERE key = 'music_password_hash' LIMIT 1
     `);
@@ -369,6 +447,7 @@ router.get('/admin', requireLogin, requireAdmin, async (req, res) => {
       title: 'Noten-Admin',
       path: '/music/admin',
       hasPassword,
+      instrumentPartsMap,
       messageSuccess: req.query.success || null,
       messageError: req.query.error || null
     });
@@ -379,9 +458,30 @@ router.get('/admin', requireLogin, requireAdmin, async (req, res) => {
       title: 'Noten-Admin',
       path: '/music/admin',
       hasPassword: false,
+      instrumentPartsMap: defaultInstrumentPartsMap,
       messageSuccess: null,
       messageError: 'Fehler beim Laden des Admin-Bereichs.'
     });
+  }
+});
+
+router.post('/admin/parts', requireLogin, requireAdmin, express.urlencoded({ extended: true }), async (req, res) => {
+  try {
+    const instrumentPartsMap = await loadInstrumentPartsMap();
+    const updatedParts = {};
+
+    Object.keys(instrumentPartsMap).forEach((instrument) => {
+      const fieldName = `parts_${instrument.replace(/\s+/g, '_')}`;
+      const rawValue = req.body[fieldName] || '';
+      const parts = rawValue.split('\n').map((part) => part.trim()).filter((part) => part);
+      updatedParts[instrument] = [''].concat(parts);
+    });
+
+    await saveInstrumentPartsMap(updatedParts);
+    res.redirect('/music/admin?success=' + encodeURIComponent('Stimmen erfolgreich gespeichert.'));
+  } catch (err) {
+    console.error('Fehler beim Speichern der Instrumentstimmen:', err);
+    res.redirect('/music/admin?error=' + encodeURIComponent('Stimmen konnten nicht gespeichert werden.'));
   }
 });
 

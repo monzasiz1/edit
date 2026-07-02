@@ -69,7 +69,17 @@
             </label>
             <label>
               <span>Stimme / Besetzung</span>
-              <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
+              <% const hasFixedParts = (availableParts || []).filter(part => part && part.trim()).length > 0; %>
+              <% if (hasFixedParts) { %>
+                <select name="part">
+                  <option value=""><%= 'Wähle eine Stimme oder Besetzung' %></option>
+                  <% availableParts.forEach(part => { if (part && part.trim()) { %>
+                    <option value="<%= part %>"><%= part %></option>
+                  <% } }); %>
+                </select>
+              <% } else { %>
+                <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
+              <% } %>
             </label>
             <label>
               <span>Komponist / Arrangeur</span>
@@ -155,7 +165,7 @@
                     <span>von <strong><%= piece.uploaded_by_name || 'Unbekannt' %></strong></span>
                   </div>
                   <div class="music-item-actions">
-                    <a class="music-link" href="/music/file/<%= piece.id %>" target="_blank" rel="noopener">Öffnen</a>
+                    <a class="music-link" href="/music/view/<%= piece.id %>?instrument=<%= encodeURIComponent(selectedInstrument) %>&part=<%= encodeURIComponent(selectedPart) %>" target="_blank" rel="noopener">Öffnen</a>
                     <a class="music-link music-link--secondary" href="/music/file/<%= piece.id %>" download="<%= piece.original_name %>">Download</a>
                     <% if (user && (user.is_admin || piece.uploaded_by === user.id)) { %>
                       <a class="music-link music-link--tertiary" href="/music/edit/<%= piece.id %>">Bearbeiten</a>

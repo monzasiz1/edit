@@ -23,7 +23,17 @@
     </label>
     <label>
       <span>Stimme / Besetzung</span>
-      <input type="text" name="part" value="<%= piece.part %>" />
+      <% const hasFixedEditParts = (availableParts || []).filter(part => part && part.trim()).length > 0; %>
+      <% if (hasFixedEditParts) { %>
+        <select name="part">
+          <option value=""><%= 'Stimme wählen' %></option>
+          <% availableParts.forEach(part => { if (part && part.trim()) { %>
+            <option value="<%= part %>" <%= piece.part === part ? 'selected' : '' %>><%= part %></option>
+          <% } }); %>
+        </select>
+      <% } else { %>
+        <input type="text" name="part" value="<%= piece.part %>" />
+      <% } %>
     </label>
     <label>
       <span>Komponist / Arrangeur</span>
