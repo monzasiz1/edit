@@ -47,6 +47,13 @@ const upload = multer({
   }
 });
 
+function requireAdmin(req, res, next) {
+  if (!req.session.user || !req.session.user.is_admin) {
+    return res.redirect('/music?error=' + encodeURIComponent('Zugriff verweigert.'));
+  }
+  next();
+}
+
 router.get('/', requireLogin, async (req, res) => {
   try {
     const selectedInstrument = (req.query.instrument || '').trim();
@@ -125,6 +132,7 @@ router.get('/', requireLogin, async (req, res) => {
       pieces: piecesResult.rows,
       selectedInstrument,
       selectedPart,
+      showInstrumentHome: false,
       hasPassword,
       messageSuccess: req.query.success || null,
       messageError: req.query.error || null
@@ -136,9 +144,37 @@ router.get('/', requireLogin, async (req, res) => {
       title: 'Notenverwaltung',
       path: '/music',
       pieces: [],
-      showInstrumentHome: !req.query.instrument,
+      showInstrumentHome: false,
       messageSuccess: null,
       messageError: 'Fehler beim Laden der Noten.'
+    });
+  }
+});
+
+router.get('/admin', requireLogin, requireAdmin, async (req, res) => {
+  try {
+    const passwordSetting = await db.query(`
+      SELECT value FROM app_settings WHERE key = 'music_password_hash' LIMIT 1
+    `);
+    const hasPassword = passwordSetting.rows.length > 0 && passwordSetting.rows[0].value;
+
+    res.render('music_admin', {
+      user: req.session.user,
+      title: 'Noten-Admin',
+      path: '/music/admin',
+      hasPassword,
+      messageSuccess: req.query.success || null,
+      messageError: req.query.error || null
+    });
+  } catch (err) {
+    console.error('Fehler beim Laden des Admin-Panels:', err);
+    res.render('music_admin', {
+      user: req.session.user,
+      title: 'Noten-Admin',
+      path: '/music/admin',
+      hasPassword: false,
+      messageSuccess: null,
+      messageError: 'Fehler beim Laden des Admin-Bereichs.'
     });
   }
 });
@@ -208,7 +244,8 @@ router.post('/password', requireLogin, async (req, res) => {
 
   const newPassword = (req.body.newPassword || '').trim();
   if (!newPassword) {
-    return res.redirect('/music?error=' + encodeURIComponent('Neues Passwort darf nicht leer sein.'));
+    const redirectTarget = req.query.from === 'admin' ? '/music/admin' : '/music';
+    return res.redirect(redirectTarget + '?error=' + encodeURIComponent('Neues Passwort darf nicht leer sein.'));
   }
 
   try {
@@ -221,10 +258,12 @@ router.post('/password', requireLogin, async (req, res) => {
 
     req.session.musicAccess = true;
     await new Promise((resolve) => req.session.save(resolve));
-    res.redirect('/music?success=' + encodeURIComponent('Passwort wurde gespeichert.'));
+    const redirectTarget = req.query.from === 'admin' ? '/music/admin' : '/music';
+    res.redirect(redirectTarget + '?success=' + encodeURIComponent('Passwort wurde gespeichert.'));
   } catch (err) {
     console.error('Fehler beim Speichern des Musik-Passworts:', err);
-    res.redirect('/music?error=' + encodeURIComponent('Passwort konnte nicht gespeichert werden.'));
+    const redirectTarget = req.query.from === 'admin' ? '/music/admin' : '/music';
+    res.redirect(redirectTarget + '?error=' + encodeURIComponent('Passwort konnte nicht gespeichert werden.'));
   }
 });
 
