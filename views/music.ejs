@@ -59,37 +59,39 @@
           <a href="/music" class="music-back-link">Zurück zur Instrumentenübersicht</a>
         </div>
 
-        <form action="/music/upload" method="POST" enctype="multipart/form-data" class="music-form">
-          <input type="hidden" name="instrument" value="<%= selectedInstrument %>" />
-          <label>
-            <span>Titel</span>
-            <input type="text" name="title" placeholder="Beispiel: Marsch der Kameradschaft" required />
-          </label>
-          <label>
-            <span>Stimme / Besetzung</span>
-            <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
-          </label>
-          <label>
-            <span>Komponist / Arrangeur</span>
-            <input type="text" name="composer" placeholder="Beispiel: Max Mustermann" />
-          </label>
-          <label>
-            <span>Beschreibung</span>
-            <textarea name="description" rows="3" placeholder="Kurzbeschreibung oder Besetzung"></textarea>
-          </label>
-          <label class="file-upload-label">
-            <span>Datei wählen</span>
-            <input type="file" name="scoreFile" accept=".pdf,image/*,audio/*" required />
-          </label>
-          <button type="submit" class="music-btn music-btn-primary">Hochladen</button>
-        </form>
+        <details class="music-upload-panel" open>
+          <summary>Upload-Formular anzeigen / verbergen</summary>
+          <form action="/music/upload" method="POST" enctype="multipart/form-data" class="music-form">
+            <input type="hidden" name="instrument" value="<%= selectedInstrument %>" />
+            <label>
+              <span>Titel</span>
+              <input type="text" name="title" placeholder="Beispiel: Marsch der Kameradschaft" required />
+            </label>
+            <label>
+              <span>Stimme / Besetzung</span>
+              <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
+            </label>
+            <label>
+              <span>Komponist / Arrangeur</span>
+              <input type="text" name="composer" placeholder="Beispiel: Max Mustermann" />
+            </label>
+            <label>
+              <span>Beschreibung</span>
+              <textarea name="description" rows="3" placeholder="Kurzbeschreibung oder Besetzung"></textarea>
+            </label>
+            <label class="file-upload-label">
+              <span>Datei wählen</span>
+              <input type="file" name="scoreFile" accept=".pdf,image/*,audio/*" required />
+            </label>
+            <button type="submit" class="music-btn music-btn-primary">Hochladen</button>
+          </form>
 
-        <% if (user.is_admin) { %>
-          <div class="music-admin-cta">
-            <a href="/music/admin" class="music-btn music-btn-secondary">Admin-Bereich öffnen</a>
-          </div>
-        <% } %>
-      </article>
+          <% if (user.is_admin) { %>
+            <div class="music-admin-cta">
+              <a href="/music/admin" class="music-btn music-btn-secondary">Admin-Bereich öffnen</a>
+            </div>
+          <% } %>
+        </details>
 
       <article class="music-panel music-panel--list">
         <div class="music-panel-head">
@@ -101,15 +103,31 @@
         </div>
 
         <div class="music-filters">
-          <div class="music-filter-tabs">
-            <% const parts = ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass']; %>
-            <% parts.forEach(part => { %>
-              <a href="/music?instrument=<%= encodeURIComponent(selectedInstrument) %>&part=<%= encodeURIComponent(part) %>"
-                 class="music-tab <%= selectedPart === part ? 'active' : '' %>">
-                <%= part === '' ? 'Alle Stimmen' : part %>
-              </a>
-            <% }); %>
-          </div>
+          <form action="/music" method="GET" class="music-search-form">
+            <input type="hidden" name="instrument" value="<%= selectedInstrument %>" />
+            <% if (selectedPart) { %>
+              <input type="hidden" name="part" value="<%= selectedPart %>" />
+            <% } %>
+            <label class="music-search-label">
+              <span>Stück suchen</span>
+              <input type="search" name="search" value="<%= selectedSearch || '' %>" placeholder="Suche nach Titel" />
+            </label>
+            <button type="submit" class="music-btn music-btn-outline">Suchen</button>
+          </form>
+
+          <% if (showPartTabs) { %>
+            <div class="music-filter-tabs">
+              <% const parts = availableParts || ['']; %>
+              <% parts.forEach(part => { %>
+                <a href="/music?instrument=<%= encodeURIComponent(selectedInstrument) %>&part=<%= encodeURIComponent(part) %>"
+                   class="music-tab <%= selectedPart === part ? 'active' : '' %>">
+                  <%= part === '' ? 'Alle Stimmen' : part %>
+                </a>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <div class="music-filter-note">Keine Stimmenfilter für dieses Instrument.</div>
+          <% } %>
         </div>
 
         <div class="music-list">
@@ -179,19 +197,19 @@
   .music-home-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
+    gap: 0.9rem;
   }
   .music-instrument-card {
     display: grid;
-    gap: 0.65rem;
-    padding: 1.45rem;
-    border-radius: 28px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.96), #f6fbff);
-    border: 1px solid rgba(41, 128, 185, 0.14);
-    box-shadow: 0 18px 45px rgba(46, 125, 170, 0.12);
+    gap: 0.5rem;
+    padding: 1.2rem;
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid rgba(53, 104, 137, 0.12);
+    box-shadow: 0 12px 28px rgba(50, 90, 110, 0.08);
     text-decoration: none;
-    color: #16354a;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    color: #13323f;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
   .music-instrument-card:hover {
     transform: translateY(-4px);
@@ -212,14 +230,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.65rem 1rem;
+    padding: 0.6rem 1rem;
     border-radius: 999px;
-    background: rgba(5, 106, 173, 0.12);
-    color: #065a9e;
-    font-size: 0.9rem;
+    background: rgba(15, 97, 160, 0.14);
+    color: #0f4c81;
+    font-size: 0.88rem;
     font-weight: 700;
-    margin-top: 0.4rem;
-    box-shadow: inset 0 1px 3px rgba(5, 106, 173, 0.08);
+    margin-top: 0.35rem;
+    box-shadow: inset 0 1px 3px rgba(15, 97, 160, 0.1);
   }
   .music-instrument-card::before {
     content: '';
@@ -285,6 +303,68 @@
     font-size: 0.92rem;
     color: #385147;
   }
+  .music-upload-panel {
+    display: grid;
+    gap: 1rem;
+    border-top: 1px solid rgba(20, 56, 35, 0.08);
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+  .music-upload-panel summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #1f3e34;
+    list-style: none;
+    margin-bottom: 0.35rem;
+  }
+  .music-upload-panel summary::-webkit-details-marker {
+    display: none;
+  }
+  .music-upload-panel summary::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 0.5rem;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+  }
+  .music-upload-panel[open] summary::before {
+    transform: rotate(90deg);
+  }
+  .music-search-form {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .music-search-label {
+    display: grid;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+    color: #385147;
+  }
+  .music-search-form input[type="search"] {
+    width: 100%;
+    border: 1px solid #dbe5db;
+    border-radius: 14px;
+    padding: 0.88rem 1rem;
+    font: inherit;
+    background: #f6faf6;
+    color: #1d342b;
+  }
+  .music-btn-outline {
+    width: fit-content;
+    padding: 0.85rem 1rem;
+    border: 1px solid #1f593f;
+    background: transparent;
+    color: #1f593f;
+  }
+  .music-filter-note {
+    color: #3b5f72;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    background: #f5f8f8;
+    border: 1px solid rgba(31, 89, 63, 0.08);
+  }
   .music-form select,
   .music-form input,
   .music-form textarea {
@@ -343,18 +423,19 @@
   .music-back-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.55rem 0.9rem;
+    justify-content: center;
+    padding: 0.5rem 0.9rem;
     border-radius: 999px;
     border: 1px solid rgba(34, 51, 47, 0.12);
-    background: #f5f8f4;
-    color: #234033;
+    background: #f6fbf7;
+    color: #203c33;
     text-decoration: none;
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 700;
+    min-width: 180px;
   }
   .music-back-link:hover {
-    background: #e8f1e9;
+    background: #e9f3ee;
   }
 
   .music-admin-password-panel {
@@ -379,7 +460,7 @@
   .music-filter-tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.4rem;
     overflow-x: auto;
     padding-bottom: 0.15rem;
   }
@@ -391,36 +472,39 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.62rem 0.95rem;
+    padding: 0.55rem 0.85rem;
     border-radius: 999px;
     text-decoration: none;
     font-weight: 700;
-    color: #324a3f;
-    background: #edf6ee;
-    border: 1px solid rgba(76, 122, 92, 0.14);
-    transition: background 0.16s, color 0.16s, transform 0.15s;
+    color: #344c41;
+    background: #f4fbf8;
+    border: 1px solid rgba(31, 89, 63, 0.16);
+    transition: background 0.18s, color 0.18s, transform 0.15s;
     white-space: nowrap;
+    font-size: 0.88rem;
   }
   .music-filter-pill:hover,
   .music-tab:hover { transform: translateY(-1px); }
   .music-filter-pill.active,
   .music-tab.active {
-    background: #1f593f;
+    background: #185540;
     color: #ffffff;
     border-color: transparent;
+    box-shadow: 0 6px 16px rgba(24, 85, 64, 0.14);
   }
 
   .music-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 3.4rem;
+    min-width: 3.2rem;
     padding: 0.45rem 0.75rem;
     border-radius: 999px;
-    background: #eaf4ff;
-    color: #0f4e7f;
-    font-size: 0.85rem;
+    background: #e4f0ff;
+    color: #0f4d8a;
+    font-size: 0.86rem;
     font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
   }
 
   .music-list {

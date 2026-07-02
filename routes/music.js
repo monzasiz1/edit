@@ -58,6 +58,14 @@ router.get('/', requireLogin, async (req, res) => {
   try {
     const selectedInstrument = (req.query.instrument || '').trim();
     const selectedPart = (req.query.part || '').trim();
+    const selectedSearch = (req.query.search || '').trim();
+
+    const instrumentPartsMap = {
+      Flöten: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte'],
+      Trommeln: [''],
+      Lyra: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass'],
+      Andere: ['']
+    };
 
     const passwordSetting = await db.query(`
       SELECT value FROM app_settings WHERE key = 'music_password_hash' LIMIT 1
@@ -101,6 +109,7 @@ router.get('/', requireLogin, async (req, res) => {
         showInstrumentHome: true,
         instrumentCounts,
         hasPassword,
+        selectedSearch: selectedSearch,
         messageSuccess: req.query.success || null,
         messageError: req.query.error || null
       });
@@ -115,6 +124,11 @@ router.get('/', requireLogin, async (req, res) => {
     if (selectedPart) {
       params.push(selectedPart);
       filters.push(`mp.part = $${params.length}`);
+    }
+
+    if (selectedSearch) {
+      params.push(`%${selectedSearch}%`);
+      filters.push(`LOWER(mp.title) LIKE LOWER($${params.length})`);
     }
 
     const piecesResult = await db.query(`
@@ -132,6 +146,9 @@ router.get('/', requireLogin, async (req, res) => {
       pieces: piecesResult.rows,
       selectedInstrument,
       selectedPart,
+      selectedSearch,
+      availableParts: instrumentPartsMap[selectedInstrument] || [''],
+      showPartTabs: (instrumentPartsMap[selectedInstrument] || []).length > 1,
       showInstrumentHome: false,
       hasPassword,
       messageSuccess: req.query.success || null,
@@ -145,6 +162,8 @@ router.get('/', requireLogin, async (req, res) => {
       path: '/music',
       pieces: [],
       showInstrumentHome: false,
+      selectedSearch: '',
+      showPartTabs: false,
       messageSuccess: null,
       messageError: 'Fehler beim Laden der Noten.'
     });
