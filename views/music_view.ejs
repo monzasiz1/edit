@@ -1,14 +1,15 @@
-<div class="music-view-page music-view-page--minimal">
-  <header class="music-view-header">
+<div class="music-view-page">
+  <div class="music-view-header">
     <a href="/music" class="music-back-link">Zurück</a>
     <div class="music-view-title-wrap">
       <h1><%= piece.title %></h1>
-      <% if (piece.composer) { %><p><%= piece.composer %></p><% } %>
+      <% if (piece.composer) { %>
+        <p><%= piece.composer %></p>
+      <% } %>
     </div>
     <a href="<%= downloadUrl %>" class="music-btn music-btn-secondary music-view-download" download="<%= piece.original_name %>">Download</a>
-  </header>
+  </div>
 
-  <div class="music-view-actions">
   <div class="music-view-actions">
     <% if (prevUrl) { %>
       <a href="<%= prevUrl %>" class="music-btn music-btn-outline">← Vorheriges</a>
@@ -23,135 +24,133 @@
   </div>
 
   <div class="music-view-frame">
-    <iframe src="<%= contentUrl %>" frameborder="0" class="music-view-iframe"></iframe>
+    <iframe src="<%= contentUrl %>" class="music-view-iframe"></iframe>
   </div>
 </div>
 
 <style>
   .music-view-page {
+    position: fixed;
+    inset: 0;
     width: 100%;
-    min-height: 100vh;
+    height: 100%;
     margin: 0;
     padding: 0;
     background: #0e1210;
     color: #fff;
+    overflow: hidden;
   }
-  .music-view-page--minimal {
-    padding-top: 0.5rem;
-  }
+
   .music-view-header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem 0.5rem;
-    background: rgba(0, 0, 0, 0.12);
-    backdrop-filter: blur(18px);
-    position: sticky;
+    position: absolute;
     top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(12px);
     z-index: 20;
   }
+
   .music-view-title-wrap h1 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 800;
     line-height: 1.2;
   }
+
   .music-view-title-wrap p {
     margin: 0.25rem 0 0;
     font-size: 0.88rem;
     color: rgba(255, 255, 255, 0.75);
   }
+
   .music-view-download {
-    display: inline-flex;
     white-space: nowrap;
   }
+
   .music-view-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.4rem;
-    padding: 0.5rem 1rem 0.5rem;
-    background: rgba(0, 0, 0, 0.08);
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 20;
   }
+
   .music-view-frame {
-    position: fixed;
-    inset: 5.2rem 0 0;
+    position: absolute;
+    top: 4.2rem;
+    bottom: 3.75rem;
+    left: 0;
+    right: 0;
     background: #111;
   }
+
   .music-view-iframe {
     width: 100%;
     height: 100%;
     border: none;
   }
+
   .music-btn {
-    padding: 0.75rem 0.95rem;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    min-width: 9rem;
+    white-space: nowrap;
   }
+
   .music-btn-outline {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
   }
+
   .music-btn-secondary {
-    background: rgba(255,255,255,0.16);
+    background: rgba(255, 255, 255, 0.14);
     color: #fff;
   }
+
   .music-btn-disabled {
     opacity: 0.35;
     pointer-events: none;
   }
+
+  .music-back-link {
+    color: #9ec1ff;
+    text-decoration: none;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
   @media (max-width: 900px) {
     .music-view-header {
-      grid-template-columns: 1fr auto;
-      padding: 0.75rem 0.85rem 0.35rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.65rem;
     }
     .music-view-actions {
-      grid-template-columns: 1fr 1fr;
-      padding: 0.45rem 0.85rem 0.45rem;
-    }
-    .music-view-frame {
-      inset: 5.15rem 0 0;
+      flex-wrap: wrap;
+      justify-content: stretch;
     }
   }
+
   @media (max-width: 640px) {
-    .music-view-header {
-      grid-template-columns: 1fr;
-      row-gap: 0.55rem;
-      padding: 0.65rem 0.75rem 0.35rem;
-    }
     .music-view-actions {
-      grid-template-columns: 1fr;
-      padding: 0.4rem 0.75rem 0.4rem;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     .music-view-frame {
-      inset: 5.35rem 0 0;
+      top: 4.8rem;
+      bottom: 5.6rem;
     }
-  }
-  .music-view-page {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0.85rem 0.85rem 1.5rem;
-  }
-  .music-view-actions {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.85rem;
-    margin-bottom: 1rem;
-  }
-  .music-view-frame {
-    position: relative;
-    min-height: 75vh;
-    background: #fff;
-    border: 1px solid rgba(20, 56, 35, 0.08);
-    border-radius: 22px;
-    overflow: hidden;
-  }
-  .music-view-iframe {
-    width: 100%;
-    height: 100%;
-    min-height: 70vh;
-  }
-  .music-btn-disabled {
-    opacity: 0.5;
-    pointer-events: none;
   }
 </style>
