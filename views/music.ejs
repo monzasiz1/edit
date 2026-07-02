@@ -16,120 +16,138 @@
     <div class="message error"><%= messageError %></div>
   <% } %>
 
-  <section class="music-grid">
-    <article class="music-panel music-panel--upload">
-      <h2>Stück hochladen</h2>
-      <p>Füge neue Noten oder Audio-Dateien hinzu. Titel ist Pflicht, der Rest optional.</p>
-      <form action="/music/upload" method="POST" enctype="multipart/form-data" class="music-form">
-        <label>
-          <span>Titel</span>
-          <input type="text" name="title" placeholder="Beispiel: Marsch der Kameradschaft" required />
-        </label>
-        <label>
-          <span>Instrument</span>
-          <select name="instrument" required>
-            <option value="">Instrument wählen</option>
-            <option value="Flöten">Flöten</option>
-            <option value="Trommeln">Trommeln</option>
-            <option value="Lyra">Lyra</option>
-            <option value="Andere">Andere</option>
-          </select>
-        </label>
-        <label>
-          <span>Stimme / Besetzung</span>
-          <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
-        </label>
-        <label>
-          <span>Komponist / Arrangeur</span>
-          <input type="text" name="composer" placeholder="Beispiel: Max Mustermann" />
-        </label>
-        <label>
-          <span>Beschreibung</span>
-          <textarea name="description" rows="3" placeholder="Kurzbeschreibung oder Besetzung"></textarea>
-        </label>
-        <label class="file-upload-label">
-          <span>Datei wählen</span>
-          <input type="file" name="scoreFile" accept=".pdf,image/*,audio/*" required />
-        </label>
-        <button type="submit" class="music-btn music-btn-primary">Stück hochladen</button>
-      </form>
+  <% if (showInstrumentHome) { %>
+    <section class="music-home">
+      <div class="music-home-intro">
+        <h2>Notenübersicht</h2>
+        <p>Wähle zuerst ein Instrument, dann kannst du Stimmen filtern und neue Stücke hochladen.</p>
+      </div>
+      <div class="music-home-grid">
+        <a href="/music?instrument=Flöten" class="music-instrument-card">
+          <span class="music-card-title">Flöten</span>
+          <span class="music-card-subtitle">Für alle Flöten-Stücke</span>
+          <span class="music-card-count"><%= instrumentCounts.Flöten || 0 %> Stücke</span>
+        </a>
+        <a href="/music?instrument=Trommeln" class="music-instrument-card">
+          <span class="music-card-title">Trommeln</span>
+          <span class="music-card-subtitle">Rhythmus und Schlagwerk</span>
+          <span class="music-card-count"><%= instrumentCounts.Trommeln || 0 %> Stücke</span>
+        </a>
+        <a href="/music?instrument=Lyra" class="music-instrument-card">
+          <span class="music-card-title">Lyra</span>
+          <span class="music-card-subtitle">Saiten und Melodie</span>
+          <span class="music-card-count"><%= instrumentCounts.Lyra || 0 %> Stücke</span>
+        </a>
+        <a href="/music?instrument=Andere" class="music-instrument-card">
+          <span class="music-card-title">Andere</span>
+          <span class="music-card-subtitle">Alle weiteren Instrumente</span>
+          <span class="music-card-count"><%= instrumentCounts.Andere || 0 %> Stücke</span>
+        </a>
+      </div>
+      <div class="music-home-summary">
+        <span class="music-badge"><%= instrumentCounts.all || 0 %> Stücke insgesamt</span>
+      </div>
+    </section>
+  <% } else { %>
+    <section class="music-grid">
+      <article class="music-panel music-panel--upload">
+        <div class="music-panel-head compact">
+          <div>
+            <h2>Stück hochladen</h2>
+            <p>Für <strong><%= selectedInstrument %></strong> hochladen und Stimmen ergänzen.</p>
+          </div>
+          <a href="/music" class="music-back-link">Zurück zur Instrumentenübersicht</a>
+        </div>
 
-      <% if (user.is_admin) { %>
-      <div class="music-admin-password-panel">
-        <h3>Passwort für Notenbereich setzen</h3>
-        <form action="/music/password" method="POST" class="music-form">
+        <form action="/music/upload" method="POST" enctype="multipart/form-data" class="music-form">
+          <input type="hidden" name="instrument" value="<%= selectedInstrument %>" />
           <label>
-            <span>Neues Passwort</span>
-            <input type="password" name="newPassword" placeholder="Neues Passwort eingeben" required />
+            <span>Titel</span>
+            <input type="text" name="title" placeholder="Beispiel: Marsch der Kameradschaft" required />
           </label>
-          <button type="submit" class="music-btn music-btn-secondary">Passwort speichern</button>
+          <label>
+            <span>Stimme / Besetzung</span>
+            <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
+          </label>
+          <label>
+            <span>Komponist / Arrangeur</span>
+            <input type="text" name="composer" placeholder="Beispiel: Max Mustermann" />
+          </label>
+          <label>
+            <span>Beschreibung</span>
+            <textarea name="description" rows="3" placeholder="Kurzbeschreibung oder Besetzung"></textarea>
+          </label>
+          <label class="file-upload-label">
+            <span>Datei wählen</span>
+            <input type="file" name="scoreFile" accept=".pdf,image/*,audio/*" required />
+          </label>
+          <button type="submit" class="music-btn music-btn-primary">Hochladen</button>
         </form>
-      </div>
-      <% } %>
-    </article>
 
-    <article class="music-panel music-panel--list">
-      <div class="music-panel-head">
-        <div>
-          <h2>Hochgeladene Stücke</h2>
-          <p>Nach Instrumenten und Stimmen filtern oder neue Stücke eintragen.</p>
-        </div>
-        <span class="music-badge"><%= pieces.length %> Stück<%= pieces.length === 1 ? '' : 'e' %></span>
-      </div>
+        <% if (user.is_admin) { %>
+          <div class="music-admin-password-panel">
+            <h3>Passwort für Notenbereich setzen</h3>
+            <form action="/music/password" method="POST" class="music-form">
+              <label>
+                <span>Neues Passwort</span>
+                <input type="password" name="newPassword" placeholder="Neues Passwort eingeben" required />
+              </label>
+              <button type="submit" class="music-btn music-btn-secondary">Passwort speichern</button>
+            </form>
+          </div>
+        <% } %>
+      </article>
 
-      <div class="music-filters">
-        <div class="music-filter-group">
-          <% const instruments = ['Alle Instrumente', 'Flöten', 'Trommeln', 'Lyra']; %>
-          <% instruments.forEach(inst => { %>
-            <% const value = inst === 'Alle Instrumente' ? '' : inst; %>
-            <a href="/music?<%= selectedPart ? 'part=' + encodeURIComponent(selectedPart) + '&' : '' %>instrument=<%= encodeURIComponent(value) %>"
-               class="music-filter-pill <%= selectedInstrument === value ? 'active' : '' %>">
-              <%= inst %>
-            </a>
-          <% }); %>
+      <article class="music-panel music-panel--list">
+        <div class="music-panel-head">
+          <div>
+            <h2><%= selectedInstrument %></h2>
+            <p>Wähle eine Stimme, um die Liste zu filtern. Klick auf den Titel zum Öffnen.</p>
+          </div>
+          <span class="music-badge"><%= pieces.length %> Stück<%= pieces.length === 1 ? '' : 'e' %></span>
         </div>
-        <div class="music-filter-tabs">
-          <% const parts = ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass']; %>
-          <% parts.forEach(part => { %>
-            <a href="/music?<%= selectedInstrument ? 'instrument=' + encodeURIComponent(selectedInstrument) + '&' : '' %>part=<%= encodeURIComponent(part) %>"
-               class="music-tab <%= selectedPart === part ? 'active' : '' %>">
-              <%= part === '' ? 'Alle Stimmen' : part %>
-            </a>
-          <% }); %>
-        </div>
-      </div>
 
-      <div class="music-list">
-        <% if (pieces.length === 0) { %>
-          <div class="music-empty">Noch keine Stücke vorhanden. Lade jetzt dein erstes Stück hoch.</div>
-        <% } else { %>
-          <% pieces.forEach(piece => { %>
-            <article class="music-item">
-              <div class="music-item-main">
-                <div class="music-item-title-group">
-                  <strong><%= piece.title %></strong>
-                  <div class="music-item-subtitle">
-                    <span><%= piece.composer || 'Unbekannt' %></span>
-                    <% if (piece.instrument || piece.part) { %>
-                      <span class="music-tag-row">
-                        <% if (piece.instrument) { %><span class="music-chip"><%= piece.instrument %></span><% } %>
-                        <% if (piece.part) { %><span class="music-chip music-chip--secondary"><%= piece.part %></span><% } %>
-                      </span>
-                    <% } %>
+        <div class="music-filters">
+          <div class="music-filter-tabs">
+            <% const parts = ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass']; %>
+            <% parts.forEach(part => { %>
+              <a href="/music?instrument=<%= encodeURIComponent(selectedInstrument) %>&part=<%= encodeURIComponent(part) %>"
+                 class="music-tab <%= selectedPart === part ? 'active' : '' %>">
+                <%= part === '' ? 'Alle Stimmen' : part %>
+              </a>
+            <% }); %>
+          </div>
+        </div>
+
+        <div class="music-list">
+          <% if (pieces.length === 0) { %>
+            <div class="music-empty">Für diese Auswahl sind noch keine Stücke eingetragen.</div>
+          <% } else { %>
+            <% pieces.forEach(piece => { %>
+              <article class="music-item">
+                <div class="music-item-main">
+                  <div class="music-item-title-group">
+                    <strong><a class="music-item-link" href="<%= piece.filename %>" target="_blank" rel="noopener"><%= piece.title %></a></strong>
+                    <div class="music-item-subtitle">
+                      <span><%= piece.composer || 'Unbekannt' %></span>
+                      <% if (piece.part) { %><span class="music-chip music-chip--secondary"><%= piece.part %></span><% } %>
+                    </div>
+                  </div>
+                  <div class="music-action-group">
+                    <a class="music-download" href="<%= piece.filename %>" download="<%= piece.original_name %>">Herunterladen</a>
                   </div>
                 </div>
-                <a class="music-download" href="<%= piece.filename %>" download="<%= piece.original_name %>">Download</a>
-              </div>
-              <div class="music-item-meta">
-                <span><%= piece.description || 'Keine Beschreibung' %></span>
-                <span>von <strong><%= piece.uploaded_by_name || 'Unbekannt' %></strong></span>
-              </div>
-            </article>
-          <% }) %>
-        <% } %>
-      </div>
-    </article>
-  </section>
+                <div class="music-item-meta">
+                  <span><%= piece.description || 'Keine Beschreibung' %></span>
+                  <span>von <strong><%= piece.uploaded_by_name || 'Unbekannt' %></strong></span>
+                </div>
+              </article>
+            <% }) %>
+          <% } %>
+        </div>
+      </article>
+    </section>
+  <% } %>
 </div>
 
 <style>
@@ -137,6 +155,77 @@
     padding: 0 0.85rem 2rem;
     max-width: 1080px;
     margin: 0 auto;
+  }
+
+  .music-home {
+    display: grid;
+    gap: 1rem;
+  }
+  .music-home-intro {
+    background: #ffffff;
+    border: 1px solid rgba(20, 56, 35, 0.08);
+    border-radius: 22px;
+    padding: 1.4rem 1.35rem;
+    box-shadow: 0 12px 24px rgba(15, 35, 25, 0.05);
+  }
+  .music-home-intro h2 {
+    margin: 0 0 0.45rem;
+    font-size: 1.35rem;
+    color: #1f3e34;
+  }
+  .music-home-intro p {
+    margin: 0;
+    color: #546d64;
+    line-height: 1.6;
+  }
+
+  .music-home-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .music-instrument-card {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.35rem;
+    border-radius: 22px;
+    background: #ffffff;
+    border: 1px solid rgba(20, 56, 35, 0.08);
+    box-shadow: 0 10px 22px rgba(15, 35, 25, 0.05);
+    text-decoration: none;
+    color: #1f3329;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .music-instrument-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(31, 89, 63, 0.2);
+    box-shadow: 0 14px 28px rgba(15, 35, 25, 0.08);
+  }
+  .music-card-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+  }
+  .music-card-subtitle {
+    color: #4f6558;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+  .music-card-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: #eaf4ff;
+    color: #0f4e7f;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 0.3rem;
+  }
+
+  .music-home-summary {
+    display: flex;
+    justify-content: flex-end;
   }
 
   .message {
@@ -238,6 +327,27 @@
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
+  }
+  .music-panel-head.compact {
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .music-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(34, 51, 47, 0.12);
+    background: #f5f8f4;
+    color: #234033;
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 700;
+  }
+  .music-back-link:hover {
+    background: #e8f1e9;
   }
 
   .music-admin-password-panel {
@@ -394,11 +504,13 @@
 
   @media (max-width: 940px) {
     .music-grid { grid-template-columns: 1fr; }
+    .music-home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
   @media (max-width: 780px) {
     .music-panel--upload,
     .music-panel--list { padding: 1.1rem; }
+    .music-home-grid { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 620px) {

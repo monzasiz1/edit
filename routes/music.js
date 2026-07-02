@@ -67,13 +67,44 @@ router.get('/', requireLogin, async (req, res) => {
       });
     }
 
+    if (!selectedInstrument) {
+      const countsResult = await db.query(`
+        SELECT COALESCE(instrument, 'Andere') AS instrument, COUNT(*) AS count
+        FROM music_pieces
+        GROUP BY COALESCE(instrument, 'Andere')
+      `);
+
+      const instrumentCounts = {
+        all: 0,
+        Flöten: 0,
+        Trommeln: 0,
+        Lyra: 0,
+        Andere: 0
+      };
+      countsResult.rows.forEach(row => {
+        const count = parseInt(row.count, 10);
+        instrumentCounts[row.instrument] = (instrumentCounts[row.instrument] || 0) + count;
+        instrumentCounts.all += count;
+      });
+
+      return res.render('music', {
+        user: req.session.user,
+        title: 'Notenverwaltung',
+        path: '/music',
+        showInstrumentHome: true,
+        instrumentCounts,
+        hasPassword,
+        messageSuccess: req.query.success || null,
+        messageError: req.query.error || null
+      });
+    }
+
     const filters = [];
     const params = [];
 
-    if (selectedInstrument) {
-      params.push(selectedInstrument);
-      filters.push(`mp.instrument = $${params.length}`);
-    }
+    params.push(selectedInstrument);
+    filters.push(`mp.instrument = $${params.length}`);
+
     if (selectedPart) {
       params.push(selectedPart);
       filters.push(`mp.part = $${params.length}`);
@@ -83,8 +114,8 @@ router.get('/', requireLogin, async (req, res) => {
       SELECT mp.*, u.username AS uploaded_by_name
       FROM music_pieces mp
       LEFT JOIN users u ON mp.uploaded_by = u.id
-      ${filters.length ? 'WHERE ' + filters.join(' AND ') : ''}
-      ORDER BY COALESCE(mp.instrument, 'ZZZ') ASC, LOWER(mp.title) ASC, LOWER(mp.composer) ASC
+      WHERE ${filters.join(' AND ')}
+      ORDER BY LOWER(mp.part) ASC, LOWER(mp.title) ASC, LOWER(mp.composer) ASC
     `, params);
 
     res.render('music', {
@@ -105,6 +136,7 @@ router.get('/', requireLogin, async (req, res) => {
       title: 'Notenverwaltung',
       path: '/music',
       pieces: [],
+      showInstrumentHome: !req.query.instrument,
       messageSuccess: null,
       messageError: 'Fehler beim Laden der Noten.'
     });
