@@ -608,7 +608,12 @@
   }
 
   @media (max-width: 620px) {
-    .music-page { padding: 0 0.75rem 1.6rem; }
+    .music-page {
+      padding: 0 0.75rem 1.6rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
     .music-panel { border-radius: 18px; }
     .music-item-main { flex-direction: column; align-items: stretch; }
     .music-download { width: 100%; justify-content: center; }
