@@ -299,7 +299,7 @@ router.get('/view/:id', requireLogin, async (req, res) => {
       path: '/music/view/' + pieceId,
       noContainer: true,
       piece,
-      contentUrl: `/music/file/${pieceId}`,
+      contentUrl: `/music/file/${pieceId}#page=1&view=FitH&zoom=page-width&toolbar=0&navpanes=0&statusbar=0`,
       prevUrl,
       nextUrl,
       downloadUrl: `/music/file/${pieceId}`
