@@ -927,6 +927,10 @@
               <span class="nav-d-ic" style="background:#fef4e2;color:#c9920a;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
               <span><strong>Ranking</strong><small>Top-Platzierungen</small></span>
             </a>
+            <a href="/music" class="nav-d-item">
+              <span class="nav-d-ic" style="background:#e8f7ff;color:#0f4d8b;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v13"/><circle cx="19" cy="17" r="3"/></svg></span>
+              <span><strong>Noten</strong><small>Stücke hochladen</small></span>
+            </a>
             <a href="/suggestions" class="nav-d-item">
               <span class="nav-d-ic" style="background:#fef4e2;color:#d97b0a;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><path d="M12 6a6 6 0 0 1 6 6c0 3-1.5 5-3 6H9c-1.5-1-3-3-3-6a6 6 0 0 1 6-6z"/></svg></span>
               <span><strong>Ideen</strong><small>Vorschläge einreichen</small></span>
@@ -1042,6 +1046,13 @@
           tabindex="-1">
           <span class="nav-item-icon" style="background:#fef4e2;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9920a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
           Ranking
+        </a></li>
+
+        <li role="none"><a role="menuitem" href="/music"
+          <% if (typeof path !== 'undefined' && path === '/music') { %>class="active" aria-current="page"<% } %>
+          tabindex="-1">
+          <span class="nav-item-icon" style="background:#e8f7ff;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f4d8b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l10-2v13"/><circle cx="19" cy="17" r="3"/></svg></span>
+          Noten
         </a></li>
 
         <li role="none"><a role="menuitem" href="/export"

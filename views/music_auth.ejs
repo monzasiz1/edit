@@ -1,0 +1,106 @@
+<%- include('partials/page_hero', {
+      kicker: 'Musikverein',
+      title: 'Notenbereich gesperrt',
+      subtitle: 'Gib das gemeinsame Noten-Passwort ein, um Zugriff zu erhalten.',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M5 11V9a7 7 0 0 1 14 0v2"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>'
+    }) %>
+
+<div class="music-lock-page">
+  <% if (messageError) { %>
+    <div class="message error"><%= messageError %></div>
+  <% } %>
+
+  <div class="music-lock-card">
+    <p>Der Bereich für Noten ist geschützt. Bitte gib das Passwort ein, um zur Notenverwaltung zu gelangen.</p>
+    <form action="/music/unlock" method="POST" class="music-form">
+      <label>
+        <span>Passwort</span>
+        <input type="password" name="password" placeholder="Passwort für Notenbereich" required />
+      </label>
+      <button type="submit" class="music-btn music-btn-primary">Freischalten</button>
+    </form>
+
+    <% if (user.is_admin) { %>
+      <div class="music-admin-password">
+        <h2>Admin: Passwort setzen oder ändern</h2>
+        <form action="/music/password" method="POST" class="music-form">
+          <label>
+            <span>Neues Passwort</span>
+            <input type="password" name="newPassword" placeholder="Neues Passwort eingeben" required />
+          </label>
+          <button type="submit" class="music-btn music-btn-secondary">Passwort speichern</button>
+        </form>
+      </div>
+    <% } else if (!hasPassword) { %>
+      <div class="music-lock-note">
+        <p>Der Administrator muss das Passwort zuerst setzen. Bitte wende dich an einen Verantwortlichen.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<style>
+  .music-lock-page {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+  }
+  .music-lock-card {
+    background: #ffffff;
+    border: 1px solid rgba(43,65,48,0.12);
+    border-radius: 24px;
+    box-shadow: 0 22px 60px rgba(43,65,48,0.06);
+    padding: 2rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .music-lock-card p {
+    margin: 0;
+    color: #435742;
+    line-height: 1.75;
+  }
+  .music-form {
+    display: grid;
+    gap: 1rem;
+  }
+  .music-form label {
+    display: grid;
+    gap: 0.5rem;
+    color: #3d4f43;
+  }
+  .music-form input {
+    width: 100%;
+    border: 1px solid #d8dfd7;
+    border-radius: 16px;
+    padding: 0.95rem 1rem;
+    background: #fafcf9;
+    color: #1f342a;
+    font: inherit;
+  }
+  .music-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .music-btn.music-btn-primary { background: #105a4c; color: #fff; }
+  .music-btn.music-btn-secondary { background: #f5f7fb; color: #0f4d8b; border: 1px solid #cfd8e8; }
+  .message.error { margin-bottom: 0; }
+  .music-admin-password h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.03rem;
+    color: #243a2c;
+  }
+  .music-lock-note {
+    padding: 1rem;
+    border-radius: 16px;
+    background: #f5f9f2;
+    color: #3d4f43;
+    border: 1px solid rgba(49,105,77,0.14);
+  }
+</style>

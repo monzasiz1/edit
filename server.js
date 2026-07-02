@@ -103,6 +103,28 @@ async function ensureDatabaseSchema() {
   `);
 
   await db.query(`
+    CREATE TABLE IF NOT EXISTS music_pieces (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      composer TEXT,
+      description TEXT,
+      instrument TEXT,
+      part TEXT,
+      filename TEXT NOT NULL,
+      original_name TEXT NOT NULL,
+      uploaded_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      uploaded_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await db.query(`
+    ALTER TABLE IF EXISTS music_pieces ADD COLUMN IF NOT EXISTS instrument TEXT;
+  `);
+  await db.query(`
+    ALTER TABLE IF EXISTS music_pieces ADD COLUMN IF NOT EXISTS part TEXT;
+  `);
+
+  await db.query(`
     INSERT INTO app_settings (key, value)
     VALUES ('ranking_visible', 'true')
     ON CONFLICT (key) DO NOTHING
@@ -552,6 +574,7 @@ app.use('/spiess-board', require('./routes/spiessBoard'));
 app.use('/export', require('./routes/exportseite'));
 app.use('/logout', require('./routes/logout'));
 app.use('/profil', require('./routes/profile'));
+app.use('/music', require('./routes/music'));
 app.use('/suggestions', require('./routes/suggestions'));
 app.use('/equipment', require('./routes/equipment'));
 app.use('/roles', require('./routes/roles'));
