@@ -134,13 +134,12 @@
           <% if (pieces.length === 0) { %>
             <div class="music-empty">Für diese Auswahl sind noch keine Stücke eingetragen.</div>
           <% } else { %>
-            <% pieces.forEach(piece => { 
-               const pieceFilename = piece.filename ? piece.filename.split('/').pop().split('\\').pop() : ''; %>
+            <% pieces.forEach(piece => { %>
               <article class="music-item">
                 <div class="music-item-main">
                   <div class="music-item-title-group">
                     <strong>
-                      <a class="music-item-link" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" target="_blank" rel="noopener">
+                      <a class="music-item-link" href="/music/file/<%= piece.id %>" target="_blank" rel="noopener">
                         <%= piece.title %>
                       </a>
                     </strong>
@@ -156,8 +155,8 @@
                     <span>von <strong><%= piece.uploaded_by_name || 'Unbekannt' %></strong></span>
                   </div>
                   <div class="music-item-actions">
-                    <a class="music-link" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" target="_blank" rel="noopener">Öffnen</a>
-                    <a class="music-link music-link--secondary" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" download="<%= piece.original_name %>">Download</a>
+                    <a class="music-link" href="/music/file/<%= piece.id %>" target="_blank" rel="noopener">Öffnen</a>
+                    <a class="music-link music-link--secondary" href="/music/file/<%= piece.id %>" download="<%= piece.original_name %>">Download</a>
                     <% if (user && (user.is_admin || piece.uploaded_by === user.id)) { %>
                       <a class="music-link music-link--tertiary" href="/music/edit/<%= piece.id %>">Bearbeiten</a>
                       <form action="/music/delete/<%= piece.id %>" method="POST" class="music-link-form" onsubmit="return confirm('Stück wirklich löschen?');">
