@@ -112,6 +112,8 @@ async function ensureDatabaseSchema() {
       part TEXT,
       filename TEXT NOT NULL,
       original_name TEXT NOT NULL,
+      mimetype TEXT,
+      file_data BYTEA,
       uploaded_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
       uploaded_at TIMESTAMP DEFAULT NOW()
     )
@@ -122,6 +124,12 @@ async function ensureDatabaseSchema() {
   `);
   await db.query(`
     ALTER TABLE IF EXISTS music_pieces ADD COLUMN IF NOT EXISTS part TEXT;
+  `);
+  await db.query(`
+    ALTER TABLE IF EXISTS music_pieces ADD COLUMN IF NOT EXISTS mimetype TEXT;
+  `);
+  await db.query(`
+    ALTER TABLE IF EXISTS music_pieces ADD COLUMN IF NOT EXISTS file_data BYTEA;
   `);
 
   await db.query(`

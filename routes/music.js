@@ -187,22 +187,36 @@ router.get('/file/:filename', requireLogin, async (req, res) => {
     return res.status(400).send('Ungültiger Dateiname');
   }
 
-  fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
-      console.error('Musikdatei nicht gefunden:', filePath, err && err.code);
-      return res.status(404).render('404', { title: 'Datei nicht gefunden', path: '/music' });
+  try {
+    const stats = await fs.promises.stat(filePath);
+    if (stats.isFile()) {
+      res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+      return res.sendFile(filePath, (sendErr) => {
+        if (sendErr) {
+          console.error('Fehler beim Senden der Musikdatei:', sendErr);
+          if (!res.headersSent) {
+            res.status(500).render('404', { title: 'Datei nicht gefunden', path: '/music' });
+          }
+        }
+      });
+    }
+  } catch (err) {
+    const dbFilename = `/uploads/music/${filename}`;
+    try {
+      const result = await db.query(`SELECT file_data, mimetype, original_name FROM music_pieces WHERE filename = $1 LIMIT 1`, [dbFilename]);
+      if (result.rows.length && result.rows[0].file_data) {
+        const row = result.rows[0];
+        res.setHeader('Content-Type', row.mimetype || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `inline; filename="${row.original_name || filename}"`);
+        return res.send(row.file_data);
+      }
+    } catch (dbErr) {
+      console.error('Fehler beim Abrufen der Musikdatei aus der Datenbank:', dbErr);
     }
 
-    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-    res.sendFile(filePath, (sendErr) => {
-      if (sendErr) {
-        console.error('Fehler beim Senden der Musikdatei:', sendErr);
-        if (!res.headersSent) {
-          res.status(500).render('404', { title: 'Datei nicht gefunden', path: '/music' });
-        }
-      }
-    });
-  });
+    console.error('Musikdatei nicht gefunden:', filePath, err && err.code);
+    return res.status(404).render('404', { title: 'Datei nicht gefunden', path: '/music' });
+  }
 });
 
 function userCanManagePiece(req, piece) {
@@ -375,10 +389,11 @@ router.post('/upload', requireLogin, upload.single('scoreFile'), async (req, res
 
   try {
     const dbPath = `/uploads/music/${req.file.filename}`;
+    const fileData = await fs.promises.readFile(path.join(musicUploadDir, req.file.filename));
     await db.query(
-      `INSERT INTO music_pieces (title, composer, description, instrument, part, filename, original_name, uploaded_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [title, composer || null, description || null, instrument || null, part || null, dbPath, req.file.originalname, req.session.user.id]
+      `INSERT INTO music_pieces (title, composer, description, instrument, part, filename, original_name, mimetype, file_data, uploaded_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [title, composer || null, description || null, instrument || null, part || null, dbPath, req.file.originalname, req.file.mimetype, fileData, req.session.user.id]
     );
 
     res.redirect('/music?success=' + encodeURIComponent('Stück erfolgreich hochgeladen.'));
