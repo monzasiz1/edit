@@ -6,6 +6,11 @@ const path = require('path');
 const fs = require('fs');
 const db = require('../db');
 
+const musicUploadDir = path.resolve(__dirname, '../public/uploads/music');
+if (!fs.existsSync(musicUploadDir)) {
+  fs.mkdirSync(musicUploadDir, { recursive: true });
+}
+
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
@@ -13,11 +18,7 @@ function requireLogin(req, res, next) {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../public/uploads/music');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
+    cb(null, musicUploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
