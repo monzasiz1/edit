@@ -134,12 +134,13 @@
           <% if (pieces.length === 0) { %>
             <div class="music-empty">Für diese Auswahl sind noch keine Stücke eingetragen.</div>
           <% } else { %>
-            <% pieces.forEach(piece => { %>
+            <% pieces.forEach(piece => { 
+               const pieceFilename = piece.filename ? piece.filename.split('/').pop().split('\\').pop() : ''; %>
               <article class="music-item">
                 <div class="music-item-main">
                   <div class="music-item-title-group">
                     <strong>
-                      <a class="music-item-link" href="/music/file/<%= encodeURIComponent(piece.filename.split('/').pop()) %>" target="_blank" rel="noopener">
+                      <a class="music-item-link" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" target="_blank" rel="noopener">
                         <%= piece.title %>
                       </a>
                     </strong>
@@ -149,7 +150,7 @@
                     </div>
                   </div>
                   <div class="music-action-group">
-                    <a class="music-download" href="/music/file/<%= encodeURIComponent(piece.filename.split('/').pop()) %>" download="<%= piece.original_name %>">Herunterladen</a>
+                    <a class="music-download" href="/music/file/<%= encodeURIComponent(pieceFilename) %>" download="<%= piece.original_name %>">Herunterladen</a>
                     <% if (user && (user.is_admin || piece.uploaded_by === user.id)) { %>
                       <a class="music-edit" href="/music/edit/<%= piece.id %>">Bearbeiten</a>
                       <form action="/music/delete/<%= piece.id %>" method="POST" class="music-delete-form" onsubmit="return confirm('Stück wirklich löschen?');">
@@ -518,38 +519,40 @@
 
   .music-list {
     display: grid;
-    gap: 0.95rem;
+    gap: 0.7rem;
   }
 
   .music-item {
-    padding: 0.95rem 0.95rem 0.85rem;
-    border: 1px solid #dfe7e1;
-    border-radius: 18px;
-    background: #fbfcfb;
+    padding: 0.85rem;
+    border: 1px solid rgba(15, 77, 139, 0.08);
+    border-radius: 1rem;
+    background: #f8fbfb;
+    box-shadow: 0 8px 18px rgba(15, 35, 25, 0.04);
   }
   .music-item-main {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.95rem;
-    margin-bottom: 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.7rem;
+    align-items: start;
+    margin-bottom: 0.55rem;
   }
   .music-item-title-group {
     display: grid;
-    gap: 0.3rem;
+    gap: 0.2rem;
   }
   .music-item-main strong {
     display: block;
-    font-size: 1rem;
+    font-size: 0.98rem;
     color: #14291f;
+    line-height: 1.2;
   }
   .music-item-subtitle {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.35rem;
     align-items: center;
     color: #4f6558;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
   }
   .music-tag-row {
     display: flex;
@@ -576,15 +579,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.55rem 0.9rem;
-    border-radius: 14px;
+    padding: 0.48rem 0.8rem;
+    border-radius: 12px;
     color: #0f4d8a;
     font-weight: 700;
     text-decoration: none;
     white-space: nowrap;
-    border: 1px solid rgba(15, 77, 139, 0.16);
+    border: 1px solid rgba(15, 77, 139, 0.12);
     background: #eef6ff;
-    transition: background 0.15s ease, transform 0.15s ease;
+    transition: background 0.12s ease, transform 0.12s ease;
+    font-size: 0.88rem;
   }
   .music-download:hover,
   .music-edit:hover,
@@ -612,9 +616,24 @@
   .music-item-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.85rem;
+    gap: 0.65rem;
     color: #5f6d60;
-    font-size: 0.88rem;
+    font-size: 0.84rem;
+    line-height: 1.3;
+  }
+
+  .music-action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .music-item-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   .music-empty {

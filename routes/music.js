@@ -179,21 +179,22 @@ router.get('/', requireLogin, async (req, res) => {
 });
 
 router.get('/file/:filename', requireLogin, async (req, res) => {
-  const filename = path.basename(req.params.filename);
-  const filePath = path.join(musicUploadDir, filename);
+  const filename = path.basename(req.params.filename || '');
+  const filePath = path.resolve(musicUploadDir, filename);
+  const relative = path.relative(musicUploadDir, filePath);
 
-  if (filename.includes('..') || path.basename(filename) !== filename || !filePath.startsWith(musicUploadDir + path.sep)) {
+  if (!filename || filename.includes('..') || relative.startsWith('..') || path.basename(filename) !== filename) {
     return res.status(400).send('Ungültiger Dateiname');
   }
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      console.error('Musikdatei nicht gefunden:', filePath, err);
+      console.error('Musikdatei nicht gefunden:', filePath, err && err.code);
       return res.status(404).render('404', { title: 'Datei nicht gefunden', path: '/music' });
     }
 
     res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-    res.sendFile(filename, { root: musicUploadDir }, (sendErr) => {
+    res.sendFile(filePath, (sendErr) => {
       if (sendErr) {
         console.error('Fehler beim Senden der Musikdatei:', sendErr);
         if (!res.headersSent) {
