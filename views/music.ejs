@@ -308,6 +308,10 @@
     display: grid;
     gap: 0.95rem;
   }
+  .music-form,
+  .music-form * {
+    box-sizing: border-box;
+  }
   .music-form label {
     display: grid;
     gap: 0.4rem;
@@ -408,6 +412,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+    max-width: 100%;
     padding: 0.92rem 1rem;
     border-radius: 14px;
     border: none;
@@ -661,6 +666,18 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
+  }
+
+  .music-item-link {
+    color: #0f3e34;
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+
+  .music-item-link:hover {
+    color: #14523d;
+    transform: translateX(2px);
+    text-decoration: none;
   }
 
   .music-link,
