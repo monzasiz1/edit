@@ -23,12 +23,40 @@
     <% } %>
   </div>
 
+  <div class="music-view-hotspot top" aria-hidden="true"></div>
+  <div class="music-view-hotspot bottom" aria-hidden="true"></div>
+
   <div class="music-view-frame">
     <iframe src="<%= contentUrl %>" class="music-view-iframe"></iframe>
   </div>
 </div>
 
 <style>
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #000;
+    touch-action: none;
+  }
+
+  body {
+    position: fixed;
+    inset: 0;
+  }
+
+  .main-nav,
+  .page-hero,
+  .footer,
+  .nav-menu,
+  .nav-sheet,
+  .nav-sheet-handle,
+  .page-hero-clip {
+    display: none !important;
+  }
+
   .music-view-page {
     position: fixed;
     inset: 0;
@@ -36,24 +64,47 @@
     height: 100%;
     margin: 0;
     padding: 0;
-    background: #0e1210;
+    background: #000;
     color: #fff;
     overflow: hidden;
   }
 
-  .music-view-header {
+  .music-view-header,
+  .music-view-actions {
     position: absolute;
-    top: 0;
     left: 0;
     right: 0;
+    z-index: 30;
     display: flex;
     align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(14px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .music-view-header.visible,
+  .music-view-actions.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .music-view-header {
+    top: 0;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(12px);
-    z-index: 20;
+  }
+
+  .music-view-actions {
+    bottom: 0;
+    justify-content: space-between;
+  }
+
+  .music-view-title-wrap {
+    flex: 1;
+    min-width: 0;
   }
 
   .music-view-title-wrap h1 {
@@ -61,38 +112,38 @@
     font-size: 1.1rem;
     font-weight: 800;
     line-height: 1.2;
+    overflow-wrap: anywhere;
   }
 
   .music-view-title-wrap p {
     margin: 0.25rem 0 0;
-    font-size: 0.88rem;
-    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.86rem;
+    color: rgba(255, 255, 255, 0.72);
   }
 
-  .music-view-download {
+  .music-view-download,
+  .music-view-actions .music-btn,
+  .music-view-header a {
     white-space: nowrap;
-  }
-
-  .music-view-actions {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    gap: 0.6rem;
-    padding: 0.75rem 1rem;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: 20;
   }
 
   .music-view-frame {
     position: absolute;
-    top: 4.2rem;
-    bottom: 3.75rem;
+    inset: 0;
+    background: #000;
+  }
+
+  .music-view-hotspot {
+    position: absolute;
     left: 0;
     right: 0;
-    background: #111;
+    height: 20vmin;
+    z-index: 25;
+    pointer-events: none;
   }
+
+  .music-view-hotspot.top { top: 0; }
+  .music-view-hotspot.bottom { bottom: 0; }
 
   .music-view-iframe {
     width: 100%;
@@ -101,11 +152,11 @@
   }
 
   .music-btn {
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 1rem;
     border-radius: 14px;
     border: none;
     cursor: pointer;
-    min-width: 9rem;
+    min-width: 7rem;
     white-space: nowrap;
   }
 
@@ -132,14 +183,12 @@
   }
 
   @media (max-width: 900px) {
-    .music-view-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.65rem;
-    }
+    .music-view-header,
     .music-view-actions {
-      flex-wrap: wrap;
-      justify-content: stretch;
+      padding: 0.75rem 0.9rem;
+    }
+    .music-view-title-wrap h1 {
+      font-size: 1rem;
     }
   }
 
@@ -148,9 +197,39 @@
       flex-direction: column;
       gap: 0.5rem;
     }
-    .music-view-frame {
-      top: 4.8rem;
-      bottom: 5.6rem;
+    .music-btn {
+      width: 100%;
     }
   }
 </style>
+
+<script>
+  (function() {
+    const header = document.querySelector('.music-view-header');
+    const actions = document.querySelector('.music-view-actions');
+    let hideTimer = null;
+
+    function showControls() {
+      header.classList.add('visible');
+      actions.classList.add('visible');
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        header.classList.remove('visible');
+        actions.classList.remove('visible');
+      }, 2500);
+    }
+
+    function init() {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      header.classList.remove('visible');
+      actions.classList.remove('visible');
+      document.addEventListener('touchstart', showControls, { passive: true });
+      document.addEventListener('mousemove', showControls);
+      document.addEventListener('keydown', showControls);
+      showControls();
+    }
+
+    window.addEventListener('load', init);
+  })();
+</script>

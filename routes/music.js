@@ -297,6 +297,7 @@ router.get('/view/:id', requireLogin, async (req, res) => {
       user: req.session.user,
       title: piece.title,
       path: '/music/view/' + pieceId,
+      noContainer: true,
       piece,
       contentUrl: `/music/file/${pieceId}`,
       prevUrl,
