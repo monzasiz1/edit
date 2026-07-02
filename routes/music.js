@@ -11,6 +11,13 @@ if (!fs.existsSync(musicUploadDir)) {
   fs.mkdirSync(musicUploadDir, { recursive: true });
 }
 
+const instrumentPartsMap = {
+  Flöten: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte'],
+  Trommeln: [''],
+  Lyra: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte', 'Tenor', 'Bass'],
+  Andere: ['']
+};
+
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
@@ -195,6 +202,131 @@ router.get('/file/:filename', requireLogin, async (req, res) => {
       }
     });
   });
+});
+
+function userCanManagePiece(req, piece) {
+  return req.session.user && (req.session.user.is_admin || piece.uploaded_by === req.session.user.id);
+}
+
+router.get('/edit/:id', requireLogin, async (req, res) => {
+  const pieceId = parseInt(req.params.id, 10);
+  if (Number.isNaN(pieceId)) {
+    return res.redirect('/music?error=' + encodeURIComponent('Ungültige Stück-ID.'));
+  }
+
+  try {
+    const pieceResult = await db.query(`
+      SELECT mp.*, u.username AS uploaded_by_name
+      FROM music_pieces mp
+      LEFT JOIN users u ON mp.uploaded_by = u.id
+      WHERE mp.id = $1
+    `, [pieceId]);
+
+    if (!pieceResult.rows.length) {
+      return res.redirect('/music?error=' + encodeURIComponent('Stück nicht gefunden.'));
+    }
+
+    const piece = pieceResult.rows[0];
+    if (!userCanManagePiece(req, piece)) {
+      return res.redirect('/music?error=' + encodeURIComponent('Zugriff verweigert.'));
+    }
+
+    const hasPassword = (await db.query(`SELECT value FROM app_settings WHERE key = 'music_password_hash' LIMIT 1`)).rows.length > 0;
+    if (!req.session.user.is_admin && !req.session.musicAccess) {
+      return res.render('music_auth', {
+        user: req.session.user,
+        title: 'Notenbereich gesperrt',
+        path: '/music',
+        messageError: req.query.error || null,
+        hasPassword
+      });
+    }
+
+    res.render('music_edit', {
+      user: req.session.user,
+      title: 'Stück bearbeiten',
+      path: '/music/edit/' + piece.id,
+      piece,
+      availableParts: instrumentPartsMap[piece.instrument] || [''],
+      messageSuccess: req.query.success || null,
+      messageError: req.query.error || null
+    });
+  } catch (err) {
+    console.error('Fehler beim Laden der Stück-Bearbeitung:', err);
+    res.redirect('/music?error=' + encodeURIComponent('Fehler beim Laden des Stücks.'));
+  }
+});
+
+router.post('/edit/:id', requireLogin, upload.none(), async (req, res) => {
+  const pieceId = parseInt(req.params.id, 10);
+  if (Number.isNaN(pieceId)) {
+    return res.redirect('/music?error=' + encodeURIComponent('Ungültige Stück-ID.'));
+  }
+
+  const title = (req.body.title || '').trim();
+  const composer = (req.body.composer || '').trim();
+  const description = (req.body.description || '').trim();
+  const part = (req.body.part || '').trim();
+
+  if (!title) {
+    return res.redirect('/music/edit/' + pieceId + '?error=' + encodeURIComponent('Titel darf nicht leer sein.'));
+  }
+
+  try {
+    const pieceResult = await db.query(`SELECT uploaded_by, instrument FROM music_pieces WHERE id = $1`, [pieceId]);
+    if (!pieceResult.rows.length) {
+      return res.redirect('/music?error=' + encodeURIComponent('Stück nicht gefunden.'));
+    }
+
+    const piece = pieceResult.rows[0];
+    if (!userCanManagePiece(req, piece)) {
+      return res.redirect('/music?error=' + encodeURIComponent('Zugriff verweigert.'));
+    }
+
+    await db.query(`
+      UPDATE music_pieces
+      SET title = $1, composer = $2, description = $3, part = $4
+      WHERE id = $5
+    `, [title, composer || null, description || null, part || null, pieceId]);
+
+    res.redirect('/music?success=' + encodeURIComponent('Stück erfolgreich aktualisiert.'));
+  } catch (err) {
+    console.error('Fehler beim Bearbeiten der Stück:', err);
+    res.redirect('/music/edit/' + pieceId + '?error=' + encodeURIComponent('Fehler beim Speichern der Änderungen.'));
+  }
+});
+
+router.post('/delete/:id', requireLogin, async (req, res) => {
+  const pieceId = parseInt(req.params.id, 10);
+  if (Number.isNaN(pieceId)) {
+    return res.redirect('/music?error=' + encodeURIComponent('Ungültige Stück-ID.'));
+  }
+
+  try {
+    const pieceResult = await db.query(`SELECT filename, uploaded_by FROM music_pieces WHERE id = $1`, [pieceId]);
+    if (!pieceResult.rows.length) {
+      return res.redirect('/music?error=' + encodeURIComponent('Stück nicht gefunden.'));
+    }
+
+    const piece = pieceResult.rows[0];
+    if (!userCanManagePiece(req, piece)) {
+      return res.redirect('/music?error=' + encodeURIComponent('Zugriff verweigert.'));
+    }
+
+    const filename = path.basename(piece.filename);
+    const filePath = path.join(musicUploadDir, filename);
+    fs.unlink(filePath, (unlinkErr) => {
+      if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+        console.error('Fehler beim Löschen der Musikdatei:', filePath, unlinkErr);
+      }
+    });
+
+    await db.query(`DELETE FROM music_pieces WHERE id = $1`, [pieceId]);
+    res.redirect('/music?success=' + encodeURIComponent('Stück erfolgreich gelöscht.'));
+  } catch (err) {
+    console.error('Fehler beim Löschen der Stück:', err);
+    res.redirect('/music?error=' + encodeURIComponent('Fehler beim Löschen des Stücks.'));
+  }
 });
 
 router.get('/admin', requireLogin, requireAdmin, async (req, res) => {

@@ -150,6 +150,12 @@
                   </div>
                   <div class="music-action-group">
                     <a class="music-download" href="/music/file/<%= encodeURIComponent(piece.filename.split('/').pop()) %>" download="<%= piece.original_name %>">Herunterladen</a>
+                    <% if (user && (user.is_admin || piece.uploaded_by === user.id)) { %>
+                      <a class="music-edit" href="/music/edit/<%= piece.id %>">Bearbeiten</a>
+                      <form action="/music/delete/<%= piece.id %>" method="POST" class="music-delete-form" onsubmit="return confirm('Stück wirklich löschen?');">
+                        <button type="submit" class="music-delete-btn">Löschen</button>
+                      </form>
+                    <% } %>
                   </div>
                 </div>
                 <div class="music-item-meta">
@@ -564,20 +570,44 @@
     background: #eef3fc;
     color: #26405a;
   }
-  .music-download {
+  .music-download,
+  .music-edit,
+  .music-delete-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0.55rem 0.9rem;
     border-radius: 14px;
-    background: #eef6ff;
     color: #0f4d8a;
-    text-decoration: none;
     font-weight: 700;
-    border: 1px solid rgba(15, 77, 139, 0.16);
+    text-decoration: none;
     white-space: nowrap;
+    border: 1px solid rgba(15, 77, 139, 0.16);
+    background: #eef6ff;
+    transition: background 0.15s ease, transform 0.15s ease;
   }
-  .music-download:hover { background: #d9e9ff; }
+  .music-download:hover,
+  .music-edit:hover,
+  .music-delete-btn:hover { background: #d9e9ff; }
+
+  .music-edit {
+    margin-left: 0.5rem;
+  }
+
+  .music-delete-form {
+    display: inline-block;
+    margin-left: 0.5rem;
+  }
+
+  .music-delete-btn {
+    border-color: rgba(220, 38, 38, 0.22);
+    background: #fff1f1;
+    color: #b91c1c;
+  }
+
+  .music-delete-btn:hover {
+    background: #fee2e2;
+  }
 
   .music-item-meta {
     display: flex;

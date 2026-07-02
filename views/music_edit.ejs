@@ -1,0 +1,52 @@
+<%- include('partials/page_hero', {
+      kicker: 'Musik',
+      title: 'Stück bearbeiten',
+      subtitle: 'Bereits hochgeladene Noten ändern oder korrigieren.',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-4.8a4 4 0 0 1 4-4h2"/><path d="M9 7l10-4v14l-6 3l-4-2V7z"/></svg>',
+      actions: [
+        { href: '/music', label: 'Zurück', variant: 'ghost', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' }
+      ]
+    }) %>
+
+<div class="music-page">
+  <% if (messageError) { %>
+    <div class="message error"><%= messageError %></div>
+  <% } %>
+  <% if (messageSuccess) { %>
+    <div class="message success"><%= messageSuccess %></div>
+  <% } %>
+
+  <form action="/music/edit/<%= piece.id %>" method="POST" class="music-form">
+    <label>
+      <span>Titel</span>
+      <input type="text" name="title" value="<%= piece.title %>" required />
+    </label>
+    <label>
+      <span>Stimme / Besetzung</span>
+      <input type="text" name="part" value="<%= piece.part %>" />
+    </label>
+    <label>
+      <span>Komponist / Arrangeur</span>
+      <input type="text" name="composer" value="<%= piece.composer %>" />
+    </label>
+    <label>
+      <span>Beschreibung</span>
+      <textarea name="description" rows="4"><%= piece.description %></textarea>
+    </label>
+
+    <div class="music-action-row">
+      <button type="submit" class="music-btn music-btn-primary">Änderungen speichern</button>
+      <a href="/music" class="music-btn music-btn-secondary">Abbrechen</a>
+    </div>
+  </form>
+</div>
+
+<style>
+  .music-page { max-width: 680px; margin: 0 auto; padding: 1rem; }
+  .music-form { display: grid; gap: 1rem; }
+  .music-form label { display: grid; gap: 0.45rem; }
+  .music-form input,
+  .music-form textarea { width: 100%; border: 1px solid #dbe5db; border-radius: 14px; padding: 0.9rem 1rem; font: inherit; background: #f6faf6; color: #1d342b; }
+  .music-action-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+  .music-btn-secondary { width: auto; padding: 0.9rem 1rem; background: #f6fbf7; color: #203c33; border: 1px solid rgba(34, 51, 47, 0.12); }
+</style>
