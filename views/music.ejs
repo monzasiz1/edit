@@ -59,7 +59,7 @@
           <a href="/music" class="music-back-link">Zurück zur Instrumentenübersicht</a>
         </div>
 
-        <details class="music-upload-panel" open>
+        <details class="music-upload-panel">
           <summary>Upload-Formular anzeigen / verbergen</summary>
           <form action="/music/upload" method="POST" enctype="multipart/form-data" class="music-form">
             <input type="hidden" name="instrument" value="<%= selectedInstrument %>" />
@@ -499,13 +499,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 3.2rem;
-    padding: 0.45rem 0.75rem;
+    padding: 0.45rem 0.9rem;
     border-radius: 999px;
     background: #e4f0ff;
     color: #0f4d8a;
     font-size: 0.86rem;
     font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
   }
 
