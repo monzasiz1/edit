@@ -609,7 +609,15 @@
 
   @media (max-width: 620px) {
     .music-page {
-      padding: 0 0.75rem 1.6rem;
+      box-sizing: border-box;
+      width: 100vw;
+      max-width: 100vw;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      padding: 1rem 0.75rem 1.6rem;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
