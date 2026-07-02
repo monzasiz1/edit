@@ -85,15 +85,8 @@
         </form>
 
         <% if (user.is_admin) { %>
-          <div class="music-admin-password-panel">
-            <h3>Passwort für Notenbereich setzen</h3>
-            <form action="/music/password" method="POST" class="music-form">
-              <label>
-                <span>Neues Passwort</span>
-                <input type="password" name="newPassword" placeholder="Neues Passwort eingeben" required />
-              </label>
-              <button type="submit" class="music-btn music-btn-secondary">Passwort speichern</button>
-            </form>
+          <div class="music-admin-cta">
+            <a href="/music/admin" class="music-btn music-btn-secondary">Admin-Bereich öffnen</a>
           </div>
         <% } %>
       </article>
@@ -127,14 +120,18 @@
               <article class="music-item">
                 <div class="music-item-main">
                   <div class="music-item-title-group">
-                    <strong><a class="music-item-link" href="<%= piece.filename %>" target="_blank" rel="noopener"><%= piece.title %></a></strong>
+                    <strong>
+                      <a class="music-item-link" href="/music/file/<%= encodeURIComponent(piece.filename.split('/').pop()) %>" target="_blank" rel="noopener">
+                        <%= piece.title %>
+                      </a>
+                    </strong>
                     <div class="music-item-subtitle">
                       <span><%= piece.composer || 'Unbekannt' %></span>
                       <% if (piece.part) { %><span class="music-chip music-chip--secondary"><%= piece.part %></span><% } %>
                     </div>
                   </div>
                   <div class="music-action-group">
-                    <a class="music-download" href="<%= piece.filename %>" download="<%= piece.original_name %>">Herunterladen</a>
+                    <a class="music-download" href="/music/file/<%= encodeURIComponent(piece.filename.split('/').pop()) %>" download="<%= piece.original_name %>">Herunterladen</a>
                   </div>
                 </div>
                 <div class="music-item-meta">
@@ -186,41 +183,51 @@
   }
   .music-instrument-card {
     display: grid;
-    gap: 0.5rem;
-    padding: 1.35rem;
-    border-radius: 22px;
-    background: #ffffff;
-    border: 1px solid rgba(20, 56, 35, 0.08);
-    box-shadow: 0 10px 22px rgba(15, 35, 25, 0.05);
+    gap: 0.65rem;
+    padding: 1.45rem;
+    border-radius: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), #f6fbff);
+    border: 1px solid rgba(41, 128, 185, 0.14);
+    box-shadow: 0 18px 45px rgba(46, 125, 170, 0.12);
     text-decoration: none;
-    color: #1f3329;
+    color: #16354a;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .music-instrument-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(31, 89, 63, 0.2);
-    box-shadow: 0 14px 28px rgba(15, 35, 25, 0.08);
+    transform: translateY(-4px);
+    border-color: rgba(41, 128, 185, 0.28);
+    box-shadow: 0 20px 54px rgba(46, 125, 170, 0.17);
   }
   .music-card-title {
-    font-size: 1.08rem;
-    font-weight: 700;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #102a3d;
   }
   .music-card-subtitle {
-    color: #4f6558;
-    font-size: 0.92rem;
-    line-height: 1.45;
+    color: #3b5f72;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
   .music-card-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.55rem 0.9rem;
+    padding: 0.65rem 1rem;
     border-radius: 999px;
-    background: #eaf4ff;
-    color: #0f4e7f;
+    background: rgba(5, 106, 173, 0.12);
+    color: #065a9e;
     font-size: 0.9rem;
     font-weight: 700;
-    margin-top: 0.3rem;
+    margin-top: 0.4rem;
+    box-shadow: inset 0 1px 3px rgba(5, 106, 173, 0.08);
+  }
+  .music-instrument-card::before {
+    content: '';
+    display: block;
+    height: 6px;
+    width: 52px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1b7ebf, #5fd1ff);
   }
 
   .music-home-summary {

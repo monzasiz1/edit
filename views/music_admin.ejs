@@ -1,0 +1,101 @@
+<%- include('partials/page_hero', {
+      kicker: 'Musikverein',
+      title: 'Noten-Admin',
+      subtitle: 'Nur für Administratoren: Passwort setzen oder ändern.',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v4"/><path d="M5 5.2l2.8 2.8"/><path d="M1 12h4"/><path d="M5.2 18.8l2.8-2.8"/><path d="M12 19v4"/><path d="M18.8 18.8l-2.8-2.8"/><path d="M19 12h4"/><path d="M18.8 5.2l-2.8 2.8"/></svg>',
+      actions: [
+        { href: '/music', label: 'Zurück', variant: 'ghost', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' }
+      ]
+    }) %>
+
+<div class="music-page">
+  <% if (messageSuccess) { %>
+    <div class="message success"><%= messageSuccess %></div>
+  <% } %>
+  <% if (messageError) { %>
+    <div class="message error"><%= messageError %></div>
+  <% } %>
+
+  <section class="music-admin-panel">
+    <article class="music-panel">
+      <h2>Passwort für den Notenbereich</h2>
+      <p>Setze oder ändere das gemeinsame Passwort, das alle Nutzer für den Zugang benötigen.</p>
+      <form action="/music/password?from=admin" method="POST" class="music-form">
+        <label>
+          <span>Neues Passwort</span>
+          <input type="password" name="newPassword" placeholder="Neues Passwort eingeben" required />
+        </label>
+        <button type="submit" class="music-btn music-btn-primary">Passwort speichern</button>
+      </form>
+    </article>
+
+    <article class="music-panel music-panel--info">
+      <h3>Hinweis</h3>
+      <p>Nur Administratoren haben hier Zugriff. Nach dem Speichern kannst du direkt auf die Notenverwaltung zurückkehren.</p>
+    </article>
+  </section>
+</div>
+
+<style>
+  .music-admin-panel {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 0.85rem 2rem;
+  }
+  .music-panel {
+    background: #ffffff;
+    border: 1px solid rgba(20, 56, 35, 0.1);
+    border-radius: 22px;
+    box-shadow: 0 16px 38px rgba(15, 35, 25, 0.08);
+    padding: 1.45rem;
+  }
+  .music-panel h2,
+  .music-panel h3 {
+    margin: 0 0 0.65rem;
+    color: #1f3e34;
+  }
+  .music-panel p {
+    margin: 0 0 1.15rem;
+    color: #546d64;
+    line-height: 1.7;
+  }
+  .music-form {
+    display: grid;
+    gap: 0.95rem;
+  }
+  .music-form label {
+    display: grid;
+    gap: 0.4rem;
+    color: #385147;
+  }
+  .music-form input {
+    width: 100%;
+    border: 1px solid #dbe5db;
+    border-radius: 14px;
+    padding: 0.88rem 1rem;
+    font: inherit;
+    background: #f6faf6;
+    color: #1d342b;
+  }
+  .music-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.92rem 1rem;
+    border-radius: 14px;
+    border: none;
+    background: #1f593f;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.16s ease, background 0.16s ease;
+  }
+  .music-btn:hover { background: #184c36; transform: translateY(-1px); }
+  .music-panel--info {
+    border-color: rgba(34, 71, 54, 0.1);
+    background: #f8fbf8;
+  }
+</style>

@@ -151,6 +151,21 @@ router.get('/', requireLogin, async (req, res) => {
   }
 });
 
+router.get('/file/:filename', requireLogin, async (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '../public/uploads/music', filename);
+  if (!filePath.startsWith(path.join(__dirname, '../public/uploads/music'))) {
+    return res.status(400).send('Ungültiger Dateiname');
+  }
+
+  fs.access(filePath, fs.constants.R_OK, (err) => {
+    if (err) {
+      return res.status(404).render('404', { title: 'Datei nicht gefunden', path: '/music' });
+    }
+    res.sendFile(filePath);
+  });
+});
+
 router.get('/admin', requireLogin, requireAdmin, async (req, res) => {
   try {
     const passwordSetting = await db.query(`

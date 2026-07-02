@@ -22,14 +22,8 @@
 
     <% if (user.is_admin) { %>
       <div class="music-admin-password">
-        <h2>Admin: Passwort setzen oder ändern</h2>
-        <form action="/music/password" method="POST" class="music-form">
-          <label>
-            <span>Neues Passwort</span>
-            <input type="password" name="newPassword" placeholder="Neues Passwort eingeben" required />
-          </label>
-          <button type="submit" class="music-btn music-btn-secondary">Passwort speichern</button>
-        </form>
+        <p>Als Admin kannst du das Passwort auf der separaten Admin-Seite verwalten.</p>
+        <a href="/music/admin" class="music-btn music-btn-secondary">Zum Admin-Bereich</a>
       </div>
     <% } else if (!hasPassword) { %>
       <div class="music-lock-note">
