@@ -830,18 +830,18 @@
 <body>
   <nav class="main-nav<% if (user) { %> has-user<% } %>" role="navigation" aria-label="Hauptnavigation">
     <% if (user) { %>
-      <div class="logo" aria-label="Spießbuch">
+      <div class="logo" aria-label="Wir sind">
+        <span class="logo-wordmark">Wir sind</span>
         <span class="logo-img-wrap">
           <img src="/logo.png" alt="Logo Wir sind" />
         </span>
-        <span class="logo-wordmark">Wir sind</span>
       </div>
     <% } else { %>
       <a href="/" class="logo" tabindex="0" aria-label="Wir sind Startseite">
+        <span class="logo-wordmark">Wir sind</span>
         <span class="logo-img-wrap">
           <img src="/logo.png" alt="Logo Wir sind" />
         </span>
-        <span class="logo-wordmark">Wir sind</span>
       </a>
     <% } %>
     <% if (user) { %>
