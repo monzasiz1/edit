@@ -171,17 +171,26 @@ router.get('/', requireLogin, async (req, res) => {
 });
 
 router.get('/file/:filename', requireLogin, async (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(__dirname, '../public/uploads/music', filename);
-  if (!filePath.startsWith(path.join(__dirname, '../public/uploads/music'))) {
+  const filename = path.basename(req.params.filename);
+  const uploadDir = path.resolve(__dirname, '../public/uploads/music');
+  const filePath = path.join(uploadDir, filename);
+
+  if (!filePath.startsWith(uploadDir + path.sep) && filePath !== uploadDir) {
     return res.status(400).send('Ungültiger Dateiname');
   }
 
-  fs.access(filePath, fs.constants.R_OK, (err) => {
-    if (err) {
+  fs.stat(filePath, (err, stats) => {
+    if (err || !stats.isFile()) {
       return res.status(404).render('404', { title: 'Datei nicht gefunden', path: '/music' });
     }
-    res.sendFile(filePath);
+    res.sendFile(filename, { root: uploadDir }, (sendErr) => {
+      if (sendErr) {
+        console.error('Fehler beim Senden der Musikdatei:', sendErr);
+        if (!res.headersSent) {
+          res.status(500).render('404', { title: 'Datei nicht gefunden', path: '/music' });
+        }
+      }
+    });
   });
 });
 
