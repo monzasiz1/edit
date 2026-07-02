@@ -27,7 +27,7 @@
   <div class="music-view-hotspot bottom" aria-hidden="true"></div>
 
   <div class="music-view-frame">
-    <iframe src="<%= contentUrl %>" class="music-view-iframe" scrolling="no" allowfullscreen></iframe>
+    <iframe src="<%= contentUrl %>" class="music-view-iframe" allowfullscreen></iframe>
   </div>
 </div>
 
@@ -144,8 +144,8 @@
     position: absolute;
     inset: 0;
     background: #050608;
-    overflow: hidden;
-    touch-action: none;
+    overflow: auto;
+    touch-action: pan-y;
   }
 
   .music-view-iframe {
@@ -155,7 +155,6 @@
     max-width: 100%;
     border: none;
     display: block;
-    overflow: hidden;
   }
 
   .music-view-hotspot {
@@ -271,6 +270,14 @@
       width: 100%;
     }
   }
+
+  @media (max-width: 900px) {
+    .music-view-header,
+    .music-view-actions {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  }
 </style>
 
 <script>
@@ -295,15 +302,8 @@
       header.classList.remove('visible');
       actions.classList.remove('visible');
 
-      const hotspots = document.querySelectorAll('.music-view-hotspot');
-      hotspots.forEach((hotspot) => {
-        hotspot.addEventListener('touchstart', (event) => {
-          event.preventDefault();
-          showControls();
-        }, { passive: false });
-        hotspot.addEventListener('click', showControls);
-      });
-
+      document.addEventListener('touchend', showControls, { passive: true });
+      document.addEventListener('click', showControls);
       document.addEventListener('keydown', showControls);
       showControls();
     }
