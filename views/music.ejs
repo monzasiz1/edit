@@ -789,6 +789,24 @@
       flex-direction: column;
     }
     .music-panel { border-radius: 18px; }
+    .music-panel-head {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.65rem;
+    }
+    .music-panel-head > div {
+      min-width: 0;
+    }
+    .music-back-link {
+      width: auto;
+      align-self: flex-start;
+      white-space: nowrap;
+    }
+    .music-upload-panel summary,
+    .music-panel-head h2,
+    .music-panel-head p {
+      white-space: normal;
+    }
     .music-item-main { flex-direction: column; align-items: stretch; }
     .music-download,
     .music-edit,

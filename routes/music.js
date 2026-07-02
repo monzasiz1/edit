@@ -336,6 +336,7 @@ router.get('/edit/:id', requireLogin, async (req, res) => {
       return res.redirect('/music?error=' + encodeURIComponent('Zugriff verweigert.'));
     }
 
+    const instrumentPartsMap = await loadInstrumentPartsMap();
     const hasPassword = (await db.query(`SELECT value FROM app_settings WHERE key = 'music_password_hash' LIMIT 1`)).rows.length > 0;
     if (!req.session.user.is_admin && !req.session.musicAccess) {
       return res.render('music_auth', {
