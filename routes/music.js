@@ -85,6 +85,21 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// Temporary debug route: show session info for logged-in admins only
+// Remove this in production after debugging
+router.get('/debug-session', requireLogin, requireAdmin, (req, res) => {
+  try {
+    // Only return non-sensitive session fields
+    const safeUser = Object.assign({}, req.session.user || {});
+    // avoid leaking password hash if present
+    if (safeUser.password) delete safeUser.password;
+    return res.json({ ok: true, session: { musicAccess: req.session.musicAccess || false }, user: safeUser });
+  } catch (err) {
+    console.error('Debug route failed', err);
+    return res.status(500).json({ ok: false });
+  }
+});
+
 router.get('/', requireLogin, async (req, res) => {
   try {
     const selectedInstrument = (req.query.instrument || '').trim();
