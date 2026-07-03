@@ -313,6 +313,7 @@ router.get('/view/:id', requireLogin, async (req, res) => {
       title: piece.title,
       path: '/music/view/' + pieceId,
       noContainer: true,
+      allowUserZoom: true,
       piece,
       contentUrl: `/music/file/${pieceId}`,
       prevUrl,
