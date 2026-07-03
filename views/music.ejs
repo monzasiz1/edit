@@ -108,7 +108,13 @@
         <div class="music-panel-head">
           <div>
             <h2><%= selectedInstrument %></h2>
-            <p>Wähle eine Stimme, um die Liste zu filtern. Klick auf den Titel zum Öffnen.</p>
+            <p>
+              <% if (showPartTabs) { %>
+                Wähle eine Stimme, um die Liste zu filtern. Klick auf den Titel zum Öffnen.
+              <% } else { %>
+                Alle Stücke für dieses Instrument. Klick auf den Titel zum Öffnen.
+              <% } %>
+            </p>
           </div>
           <% if (showPartTabs) { %>
             <span class="music-badge"><%= pieces.length %> Stück<%= pieces.length === 1 ? '' : 'e' %></span>
@@ -143,11 +149,7 @@
               <div class="music-no-parts-pill">
                   <div class="music-no-parts-count"><%= pieces.length %> Stücke</div>
                   <div class="music-no-parts-sub">
-                    <% if ((selectedInstrument || '').toLowerCase() === 'trommeln') { %>
-                      Wähle eine Stimme
-                    <% } else { %>
-                      Keine festen Stimmen für dieses Instrument — alle Stücke anzeigen
-                    <% } %>
+                    Keine separaten Stimmen für dieses Instrument
                   </div>
                 </div>
             </div>

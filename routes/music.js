@@ -556,8 +556,13 @@ router.post('/unlock', requireLogin, async (req, res) => {
     }
 
     req.session.musicAccess = true;
-    await new Promise((resolve) => req.session.save(resolve));
-    res.redirect('/music');
+    return req.session.save((err) => {
+      if (err) {
+        console.error('Fehler beim Speichern der Musik-Session:', err);
+        return res.redirect('/music?error=' + encodeURIComponent('Session konnte nicht gespeichert werden.'));
+      }
+      res.redirect('/music');
+    });
   } catch (err) {
     console.error('Fehler beim Prüfen des Musik-Passworts:', err);
     res.redirect('/music?error=' + encodeURIComponent('Fehler beim Prüfen des Passworts.'));
@@ -584,9 +589,15 @@ router.post('/password', requireLogin, async (req, res) => {
     `, [hash]);
 
     req.session.musicAccess = true;
-    await new Promise((resolve) => req.session.save(resolve));
     const redirectTarget = req.query.from === 'admin' ? '/music/admin' : '/music';
-    res.redirect(redirectTarget + '?success=' + encodeURIComponent('Passwort wurde gespeichert.'));
+    
+    return req.session.save((err) => {
+      if (err) {
+        console.error('Fehler beim Speichern der Musik-Session:', err);
+        return res.redirect(redirectTarget + '?error=' + encodeURIComponent('Session konnte nicht gespeichert werden.'));
+      }
+      res.redirect(redirectTarget + '?success=' + encodeURIComponent('Passwort wurde gespeichert.'));
+    });
   } catch (err) {
     console.error('Fehler beim Speichern des Musik-Passworts:', err);
     const redirectTarget = req.query.from === 'admin' ? '/music/admin' : '/music';
