@@ -74,17 +74,17 @@
             </label>
             <label>
               <span>Stimme / Besetzung</span>
-              <% const hasFixedParts = (availableParts || []).filter(part => part && part.trim()).length > 0; %>
-              <% if (hasFixedParts) { %>
-                <select name="part">
+              <% const partsList = (availableParts || []).map(p => (p || '').trim()).filter(p => p); %>
+              <select name="part" <% if (partsList.length === 0) { %>disabled<% } %>>
+                <% if (partsList.length > 0) { %>
                   <option value=""><%= 'Wähle eine Stimme oder Besetzung' %></option>
-                  <% availableParts.forEach(part => { if (part && part.trim()) { %>
+                  <% partsList.forEach(part => { %>
                     <option value="<%= part %>"><%= part %></option>
-                  <% } }); %>
-                </select>
-              <% } else { %>
-                <input type="text" name="part" placeholder="Beispiel: Sopran 1, Altflöte, Bass" />
-              <% } %>
+                  <% }); %>
+                <% } else { %>
+                  <option value=""><%= 'Keine festen Stimmen definiert — Admin kann Stimmen anlegen' %></option>
+                <% } %>
+              </select>
             </label>
             <label>
               <span>Komponist / Arrangeur</span>
@@ -101,11 +101,7 @@
             <button type="submit" class="music-btn music-btn-primary">Hochladen</button>
           </form>
 
-          <% if (user.is_admin) { %>
-            <div class="music-admin-cta">
-              <a href="/music/admin" class="music-btn music-btn-secondary">Admin-Bereich öffnen</a>
-            </div>
-          <% } %>
+          <!-- Admin-Bereich Link im Upload-Form entfernt per Wunsch -->
         </details>
 
       <article class="music-panel music-panel--list">
@@ -114,7 +110,9 @@
             <h2><%= selectedInstrument %></h2>
             <p>Wähle eine Stimme, um die Liste zu filtern. Klick auf den Titel zum Öffnen.</p>
           </div>
-          <span class="music-badge"><%= pieces.length %> Stück<%= pieces.length === 1 ? '' : 'e' %></span>
+          <% if (showPartTabs) { %>
+            <span class="music-badge"><%= pieces.length %> Stück<%= pieces.length === 1 ? '' : 'e' %></span>
+          <% } %>
         </div>
 
         <div class="music-filters">
@@ -143,9 +141,15 @@
           <% } else { %>
             <div class="music-filter-no-parts">
               <div class="music-no-parts-pill">
-                <div class="music-no-parts-count"><%= pieces.length %> Stücke</div>
-                <div class="music-no-parts-sub">Keine festen Stimmen für dieses Instrument — alle Stücke anzeigen</div>
-              </div>
+                  <div class="music-no-parts-count"><%= pieces.length %> Stücke</div>
+                  <div class="music-no-parts-sub">
+                    <% if ((selectedInstrument || '').toLowerCase() === 'trommeln') { %>
+                      Wähle eine Stimme
+                    <% } else { %>
+                      Keine festen Stimmen für dieses Instrument — alle Stücke anzeigen
+                    <% } %>
+                  </div>
+                </div>
             </div>
           <% } %>
         </div>
