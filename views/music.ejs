@@ -47,6 +47,11 @@
       <div class="music-home-summary">
         <span class="music-badge"><%= instrumentCounts.all || 0 %> Stücke insgesamt</span>
       </div>
+        <% if (user && user.is_admin) { %>
+          <div class="music-home-admin" style="margin-top:0.9rem; text-align:center;">
+            <a href="/music/admin" class="music-btn" style="max-width:240px; display:inline-block;">Admincenter</a>
+          </div>
+        <% } %>
     </section>
   <% } else { %>
     <section class="music-grid">
@@ -136,7 +141,12 @@
               <% }); %>
             </div>
           <% } else { %>
-            <div class="music-filter-note">Keine Stimmenfilter für dieses Instrument.</div>
+            <div class="music-filter-no-parts">
+              <div class="music-no-parts-pill">
+                <div class="music-no-parts-count"><%= pieces.length %> Stücke</div>
+                <div class="music-no-parts-sub">Keine festen Stimmen für dieses Instrument — alle Stücke anzeigen</div>
+              </div>
+            </div>
           <% } %>
         </div>
 
@@ -389,6 +399,30 @@
     border-radius: 16px;
     background: #f5f8f8;
     border: 1px solid rgba(31, 89, 63, 0.08);
+  }
+  .music-filter-no-parts {
+    display: flex;
+    justify-content: center;
+    margin: 0.6rem 0 0.6rem;
+  }
+  .music-no-parts-pill {
+    background: linear-gradient(180deg, #e9f6ff 0%, #e7f3ff 100%);
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(14, 64, 120, 0.08);
+    border: 1px solid rgba(28, 116, 197, 0.12);
+    min-width: 220px;
+  }
+  .music-no-parts-count {
+    font-weight: 800;
+    color: #0f5f9a;
+    font-size: 1rem;
+  }
+  .music-no-parts-sub {
+    font-size: 0.82rem;
+    color: #2d5266;
+    margin-top: 0.25rem;
   }
   .music-form select,
   .music-form input,
