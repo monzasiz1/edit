@@ -29,6 +29,27 @@ await pool.query(`
     
   `);
 
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS drinks (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+`);
+
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS drink_rounds (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    drink_id INTEGER REFERENCES drinks(id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL,
+    round_date DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+`);
+
   // Optional: Standard-Admin einfügen (wenn nicht vorhanden)
   const adminName = 'admin';
   const adminPass = 'admin123'; // Bitte nach erstem Login ändern!
