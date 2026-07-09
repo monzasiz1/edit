@@ -586,6 +586,7 @@ app.use('/music', require('./routes/music'));
 app.use('/suggestions', require('./routes/suggestions'));
 app.use('/equipment', require('./routes/equipment'));
 app.use('/roles', require('./routes/roles'));
+app.use('/drinkrounds', require('./routes/drinkRounds'));
 
 app.post('/subscribe', (req, res) => {
   const subscription = req.body;
