@@ -1,0 +1,422 @@
+<style>
+  .dr-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.8rem;
+    align-items: start;
+  }
+  @media (max-width: 680px) {
+    .dr-wrap { grid-template-columns: 1fr; }
+  }
+  .dr-left, .dr-right {
+    background: #fafcf9;
+    border: 1.4px solid #dbe6d2;
+    border-radius: 1.4rem;
+    padding: 1.3rem 1.2rem;
+  }
+  .dr-left h2, .dr-right h2 {
+    margin: 0 0 0.8rem;
+    font-size: 1.15rem;
+    color: #1f4a30;
+  }
+  .dr-drink-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+  }
+  .dr-drink-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #1f4a30;
+    background: #fff;
+    border: 1.6px solid #cfe0c4;
+    border-radius: 0.9em;
+    padding: 0.5em 0.9em;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .dr-drink-btn .dr-price {
+    font-weight: 500;
+    color: #6f8678;
+    font-size: 0.82em;
+  }
+  .dr-drink-btn:hover {
+    background: #eef6ea;
+    border-color: #a0bb8c;
+  }
+  .dr-drink-btn.active {
+    background: #3da973;
+    border-color: #2d8f55;
+    color: #fff;
+  }
+  .dr-drink-btn.active .dr-price { color: rgba(255,255,255,0.85); }
+  .dr-hint {
+    font-size: 0.82rem;
+    color: #6f8678;
+    margin: 0 0 0.8rem;
+  }
+  #dr-canvas {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 1 / 1;
+    background: #fffef8;
+    border: 2px dashed #cfe0c4;
+    border-radius: 50%;
+    touch-action: none;
+    cursor: crosshair;
+    margin: 0 auto;
+  }
+  #dr-canvas.dr-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .dr-selected-info {
+    text-align: center;
+    margin-top: 0.8rem;
+    font-size: 0.92rem;
+    color: #2a3e32;
+  }
+  .dr-summary-list {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-height: 2.4rem;
+  }
+  .dr-summary-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2ebd9;
+    border-radius: 0.8em;
+    padding: 0.55em 0.85em;
+    font-size: 0.92rem;
+  }
+  .dr-summary-list li.dr-empty {
+    justify-content: center;
+    color: #8a9485;
+    font-style: italic;
+    border-style: dashed;
+  }
+  .dr-summary-name { font-weight: 700; color: #1f4a30; }
+  .dr-summary-meta { color: #6f8678; font-size: 0.85em; }
+  .dr-summary-sub { font-weight: 700; color: #2d8f55; }
+  .dr-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1f4a30;
+    padding: 0.7em 0.2em;
+    border-top: 1.4px solid #e2ebd9;
+    margin-bottom: 1rem;
+  }
+  .dr-submit-btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    background: #3da973;
+    border: none;
+    border-radius: 1em;
+    padding: 0.8em;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .dr-submit-btn:hover:not(:disabled) { background: #2d8f55; }
+  .dr-submit-btn:active:not(:disabled) { transform: scale(0.98); }
+  .dr-submit-btn:disabled {
+    background: #c7d6bf;
+    cursor: not-allowed;
+  }
+  #dr-msg {
+    margin-top: 0.7rem;
+    font-size: 0.88rem;
+    text-align: center;
+  }
+  #dr-msg.dr-ok { color: #2d8f55; }
+  #dr-msg.dr-err { color: #c0282a; }
+</style>
+
+<div class="dr-wrap">
+  <!-- Linke Spalte: Getränkeauswahl + Bierdeckel-Canvas -->
+  <div class="dr-left">
+    <h2>🍺 Bierdeckel</h2>
+
+    <div class="dr-drink-buttons" id="dr-drink-buttons">
+      <% drinks.forEach(function(d) { %>
+        <button
+          type="button"
+          class="dr-drink-btn"
+          data-id="<%= d.id %>"
+          data-name="<%= d.name %>"
+          data-price="<%= d.price %>"
+        ><%= d.name %> <span class="dr-price">€<%= parseFloat(d.price).toFixed(2) %></span></button>
+      <% }); %>
+    </div>
+
+    <p class="dr-hint">Getränk auswählen, dann über den Deckel wischen – jeder Wisch macht einen Strich.</p>
+
+    <canvas id="dr-canvas" width="340" height="340" class="dr-disabled"></canvas>
+
+    <div class="dr-selected-info">
+      Ausgewählt: <strong id="dr-selected-name">–</strong>
+      &middot; Striche: <strong id="dr-selected-count">0</strong>
+    </div>
+  </div>
+
+  <!-- Rechte Spalte: Live-Zusammenfassung der Runde -->
+  <div class="dr-right">
+    <h2>📋 Aktuelle Runde</h2>
+
+    <ul class="dr-summary-list" id="dr-summary-list">
+      <li class="dr-empty">Noch nichts gezählt</li>
+    </ul>
+
+    <div class="dr-total">
+      <span>Gesamt</span>
+      <span id="dr-total">€0.00</span>
+    </div>
+
+    <button type="button" class="dr-submit-btn" id="dr-submit-btn" disabled>
+      Runde abschicken
+    </button>
+
+    <div id="dr-msg"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Getränke-Stammdaten vom Server (id, name, price)
+  var DRINKS = <%- JSON.stringify(drinks) %>;
+  var drinkById = {};
+  DRINKS.forEach(function (d) { drinkById[d.id] = d; });
+
+  // Zähler pro Getränk: { drinkId: anzahl }
+  var counts = {};
+  var selectedId = null;
+
+  var canvas = document.getElementById('dr-canvas');
+  var ctx = canvas.getContext('2d');
+  var buttonsWrap = document.getElementById('dr-drink-buttons');
+  var selectedNameEl = document.getElementById('dr-selected-name');
+  var selectedCountEl = document.getElementById('dr-selected-count');
+  var summaryListEl = document.getElementById('dr-summary-list');
+  var totalEl = document.getElementById('dr-total');
+  var submitBtn = document.getElementById('dr-submit-btn');
+  var msgEl = document.getElementById('dr-msg');
+
+  // ---------- Getränk auswählen ----------
+  buttonsWrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dr-drink-btn');
+    if (!btn) return;
+    selectedId = parseInt(btn.dataset.id, 10);
+
+    buttonsWrap.querySelectorAll('.dr-drink-btn').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+
+    canvas.classList.remove('dr-disabled');
+    selectedNameEl.textContent = btn.dataset.name;
+    redrawCanvas();
+  });
+
+  // ---------- Canvas: Bierdeckel-Wisch-Geste ----------
+  var dragging = false;
+  var countedThisGesture = false;
+  var startX = 0, startY = 0;
+  var SWIPE_THRESHOLD = 28; // px, ab hier zählt der Wisch als "ein Strich"
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
+  }
+
+  function onPointerDown(e) {
+    if (!selectedId) return;
+    e.preventDefault();
+    dragging = true;
+    countedThisGesture = false;
+    var p = getPos(e);
+    startX = p.x;
+    startY = p.y;
+    canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e) {
+    if (!dragging || !selectedId) return;
+    e.preventDefault();
+    var p = getPos(e);
+    var dist = Math.hypot(p.x - startX, p.y - startY);
+
+    // Live-Feedback: Bereits gezählte Striche + aktuelle Wisch-Linie
+    redrawCanvas({ x0: startX, y0: startY, x1: p.x, y1: p.y });
+
+    if (!countedThisGesture && dist > SWIPE_THRESHOLD) {
+      countedThisGesture = true;
+      counts[selectedId] = (counts[selectedId] || 0) + 1;
+      updateSelectedInfo();
+      updateSummary();
+      redrawCanvas({ x0: startX, y0: startY, x1: p.x, y1: p.y });
+    }
+  }
+
+  function onPointerUp(e) {
+    if (!dragging) return;
+    dragging = false;
+    countedThisGesture = false;
+    redrawCanvas();
+  }
+
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerUp);
+  canvas.addEventListener('pointerleave', onPointerUp);
+
+  // Zusätzliche Absicherung für ältere mobile Browser ohne verlässliche Pointer Events
+  canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  // ---------- Tally-Marks zeichnen (klassische Strichliste: 4 Striche + 1 Diagonale) ----------
+  function drawTally(count) {
+    var groupW = 60, groupH = 76, cols = Math.floor((canvas.width - 20) / groupW) || 1;
+    ctx.strokeStyle = '#2b5f3b';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+
+    for (var i = 0; i < count; i++) {
+      var groupIndex = Math.floor(i / 5);
+      var posInGroup = i % 5;
+      var col = groupIndex % cols;
+      var row = Math.floor(groupIndex / cols);
+      var gx = 26 + col * groupW;
+      var gy = 34 + row * groupH;
+
+      if (posInGroup < 4) {
+        var x = gx + posInGroup * 11;
+        ctx.beginPath();
+        ctx.moveTo(x, gy);
+        ctx.lineTo(x, gy + 42);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(gx - 6, gy + 42);
+        ctx.lineTo(gx + 39, gy - 6);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function redrawCanvas(tempLine) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawTally(selectedId ? (counts[selectedId] || 0) : 0);
+
+    if (tempLine) {
+      ctx.strokeStyle = 'rgba(61,169,115,0.45)';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(tempLine.x0, tempLine.y0);
+      ctx.lineTo(tempLine.x1, tempLine.y1);
+      ctx.stroke();
+    }
+  }
+
+  // ---------- UI-Updates ----------
+  function updateSelectedInfo() {
+    selectedCountEl.textContent = selectedId ? (counts[selectedId] || 0) : 0;
+  }
+
+  function updateSummary() {
+    var entries = Object.keys(counts)
+      .map(function (id) { return { id: parseInt(id, 10), qty: counts[id] }; })
+      .filter(function (e) { return e.qty > 0; });
+
+    if (entries.length === 0) {
+      summaryListEl.innerHTML = '<li class="dr-empty">Noch nichts gezählt</li>';
+      totalEl.textContent = '€0.00';
+      submitBtn.disabled = true;
+      return;
+    }
+
+    var total = 0;
+    summaryListEl.innerHTML = entries.map(function (e) {
+      var drink = drinkById[e.id];
+      var price = parseFloat(drink.price);
+      var sub = price * e.qty;
+      total += sub;
+      return '<li>' +
+        '<span class="dr-summary-name">' + drink.name + '</span>' +
+        '<span class="dr-summary-meta">' + e.qty + ' &times; €' + price.toFixed(2) + '</span>' +
+        '<span class="dr-summary-sub">€' + sub.toFixed(2) + '</span>' +
+        '</li>';
+    }).join('');
+
+    totalEl.textContent = '€' + total.toFixed(2);
+    submitBtn.disabled = false;
+  }
+
+  // ---------- Runde abschicken ----------
+  submitBtn.addEventListener('click', function () {
+    var items = Object.keys(counts)
+      .map(function (id) { return { drinkId: parseInt(id, 10), quantity: counts[id] }; })
+      .filter(function (i) { return i.quantity > 0; });
+
+    if (items.length === 0) return;
+
+    submitBtn.disabled = true;
+    msgEl.textContent = '';
+    msgEl.className = '';
+
+    fetch('/drinkrounds', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: items })
+    })
+      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (result) {
+        if (result.ok) {
+          msgEl.textContent = 'Runde gespeichert. Prost! 🍻';
+          msgEl.className = 'dr-ok';
+          counts = {};
+          selectedId = null;
+          selectedNameEl.textContent = '–';
+          selectedCountEl.textContent = '0';
+          buttonsWrap.querySelectorAll('.dr-drink-btn').forEach(function (b) { b.classList.remove('active'); });
+          canvas.classList.add('dr-disabled');
+          redrawCanvas();
+          updateSummary();
+        } else {
+          msgEl.textContent = result.data.error || 'Fehler beim Speichern.';
+          msgEl.className = 'dr-err';
+          submitBtn.disabled = false;
+        }
+      })
+      .catch(function () {
+        msgEl.textContent = 'Netzwerkfehler beim Speichern.';
+        msgEl.className = 'dr-err';
+        submitBtn.disabled = false;
+      });
+  });
+
+  redrawCanvas();
+  updateSummary();
+})();
+</script>
