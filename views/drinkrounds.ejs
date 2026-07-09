@@ -146,6 +146,110 @@
   }
   #dr-msg.dr-ok { color: #2d8f55; }
   #dr-msg.dr-err { color: #c0282a; }
+
+  /* --- Admin: Getränke verwalten --- */
+  .dr-admin {
+    background: #fffaf0;
+    border: 1.4px solid #f0e0b8;
+    border-radius: 1.4rem;
+    padding: 1.3rem 1.2rem;
+    margin-top: 1.6rem;
+  }
+  .dr-admin h2 {
+    margin: 0 0 0.8rem;
+    font-size: 1.15rem;
+    color: #7a5a10;
+  }
+  .dr-admin-list {
+    list-style: none;
+    margin: 0 0 1.1rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .dr-admin-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #fff;
+    border: 1px solid #f0e0b8;
+    border-radius: 0.8em;
+    padding: 0.5em 0.75em;
+    flex-wrap: wrap;
+  }
+  .dr-admin-name {
+    font-weight: 700;
+    color: #1f4a30;
+    flex: 1 1 auto;
+    min-width: 80px;
+  }
+  .dr-admin-price-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+    font-weight: 600;
+    color: #6f8678;
+  }
+  .dr-admin-price-input {
+    width: 5.4em;
+    font-family: inherit;
+    font-size: 0.92rem;
+    padding: 0.35em 0.5em;
+    border: 1.4px solid #dbe6d2;
+    border-radius: 0.6em;
+  }
+  .dr-admin-save-btn {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: #3da973;
+    border: none;
+    border-radius: 0.7em;
+    padding: 0.5em 0.9em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dr-admin-save-btn:hover:not(:disabled) { background: #2d8f55; }
+  .dr-admin-save-btn:disabled { background: #c7d6bf; cursor: not-allowed; }
+  .dr-admin-add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    padding-top: 0.9rem;
+    border-top: 1.4px solid #f0e0b8;
+  }
+  .dr-admin-add-form input[type="text"],
+  .dr-admin-add-form input[type="number"] {
+    font-family: inherit;
+    font-size: 0.92rem;
+    padding: 0.55em 0.75em;
+    border: 1.4px solid #dbe6d2;
+    border-radius: 0.7em;
+    flex: 1 1 140px;
+  }
+  .dr-admin-add-form button {
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fff;
+    background: #3da973;
+    border: none;
+    border-radius: 0.7em;
+    padding: 0.6em 1.1em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dr-admin-add-form button:hover { background: #2d8f55; }
+  #dr-admin-msg {
+    margin-top: 0.7rem;
+    font-size: 0.88rem;
+    text-align: center;
+  }
+  #dr-admin-msg.dr-ok { color: #2d8f55; }
+  #dr-admin-msg.dr-err { color: #c0282a; }
 </style>
 
 <div class="dr-wrap">
@@ -195,6 +299,32 @@
     <div id="dr-msg"></div>
   </div>
 </div>
+
+<% if (typeof user !== 'undefined' && user && user.is_admin) { %>
+<div class="dr-admin">
+  <h2>🛠️ Getränke verwalten</h2>
+
+  <ul class="dr-admin-list" id="dr-admin-list">
+    <% drinks.forEach(function(d) { %>
+      <li class="dr-admin-row" data-id="<%= d.id %>">
+        <span class="dr-admin-name"><%= d.name %></span>
+        <span class="dr-admin-price-wrap">
+          €<input type="number" step="0.10" min="0" class="dr-admin-price-input" value="<%= parseFloat(d.price).toFixed(2) %>">
+        </span>
+        <button type="button" class="dr-admin-save-btn">Speichern</button>
+      </li>
+    <% }); %>
+  </ul>
+
+  <form class="dr-admin-add-form" id="dr-admin-add-form">
+    <input type="text" id="dr-new-drink-name" placeholder="Name (z. B. Radler)" required>
+    <input type="number" id="dr-new-drink-price" step="0.10" min="0" placeholder="Preis in €" required>
+    <button type="submit">Hinzufügen</button>
+  </form>
+
+  <div id="dr-admin-msg"></div>
+</div>
+<% } %>
 
 <script>
 (function () {
@@ -295,19 +425,33 @@
   canvas.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
   // ---------- Tally-Marks zeichnen (klassische Strichliste: 4 Striche + 1 Diagonale) ----------
+  // Die Gruppen werden als Block berechnet und mittig auf dem runden Deckel platziert.
   function drawTally(count) {
-    var groupW = 60, groupH = 76, cols = Math.floor((canvas.width - 20) / groupW) || 1;
+    if (count <= 0) return;
+
+    var groupW = 60, groupH = 76;
+    var groupInnerW = 45, groupInnerH = 48; // tatsächlich gezeichnete Fläche innerhalb einer Gruppe
     ctx.strokeStyle = '#2b5f3b';
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
+
+    var totalGroups = Math.ceil(count / 5);
+    var maxCols = 3; // begrenzt die Breite, damit der Block im Kreis bleibt
+    var cols = Math.min(totalGroups, maxCols);
+    var rows = Math.ceil(totalGroups / cols);
+
+    var blockW = cols * groupW;
+    var blockH = rows * groupH;
+    var offsetX = (canvas.width - blockW) / 2 + (groupW - groupInnerW) / 2;
+    var offsetY = (canvas.height - blockH) / 2 + (groupH - groupInnerH) / 2;
 
     for (var i = 0; i < count; i++) {
       var groupIndex = Math.floor(i / 5);
       var posInGroup = i % 5;
       var col = groupIndex % cols;
       var row = Math.floor(groupIndex / cols);
-      var gx = 26 + col * groupW;
-      var gy = 34 + row * groupH;
+      var gx = offsetX + col * groupW;
+      var gy = offsetY + row * groupH;
 
       if (posInGroup < 4) {
         var x = gx + posInGroup * 11;
@@ -418,5 +562,144 @@
 
   redrawCanvas();
   updateSummary();
+
+  // ---------- Admin: Preise bearbeiten & Getränke hinzufügen ----------
+  var adminList = document.getElementById('dr-admin-list');
+  var adminAddForm = document.getElementById('dr-admin-add-form');
+  var adminMsg = document.getElementById('dr-admin-msg');
+
+  function updateDrinkButtonPrice(id, price) {
+    var btn = buttonsWrap.querySelector('.dr-drink-btn[data-id="' + id + '"]');
+    if (btn) {
+      btn.dataset.price = price;
+      var priceEl = btn.querySelector('.dr-price');
+      if (priceEl) priceEl.textContent = '€' + parseFloat(price).toFixed(2);
+    }
+  }
+
+  function addDrinkButton(drink) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dr-drink-btn';
+    btn.dataset.id = drink.id;
+    btn.dataset.name = drink.name;
+    btn.dataset.price = drink.price;
+    btn.innerHTML = drink.name + ' <span class="dr-price">€' + parseFloat(drink.price).toFixed(2) + '</span>';
+    buttonsWrap.appendChild(btn);
+  }
+
+  if (adminList) {
+    adminList.addEventListener('click', function (e) {
+      var saveBtn = e.target.closest('.dr-admin-save-btn');
+      if (!saveBtn) return;
+      var row = saveBtn.closest('.dr-admin-row');
+      var id = parseInt(row.dataset.id, 10);
+      var input = row.querySelector('.dr-admin-price-input');
+      var price = parseFloat(input.value);
+
+      adminMsg.textContent = '';
+      adminMsg.className = '';
+
+      if (!Number.isFinite(price) || price < 0) {
+        adminMsg.textContent = 'Ungültiger Preis.';
+        adminMsg.className = 'dr-err';
+        return;
+      }
+
+      saveBtn.disabled = true;
+      fetch('/drinkrounds/drinks/' + id + '/price', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ price: price })
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          saveBtn.disabled = false;
+          if (result.ok) {
+            var d = result.data.drink;
+            if (drinkById[d.id]) drinkById[d.id].price = d.price;
+            updateDrinkButtonPrice(d.id, d.price);
+            input.value = parseFloat(d.price).toFixed(2);
+            updateSummary();
+            adminMsg.textContent = 'Preis für "' + d.name + '" gespeichert.';
+            adminMsg.className = 'dr-ok';
+          } else {
+            adminMsg.textContent = result.data.error || 'Fehler beim Speichern.';
+            adminMsg.className = 'dr-err';
+          }
+        })
+        .catch(function () {
+          saveBtn.disabled = false;
+          adminMsg.textContent = 'Netzwerkfehler beim Speichern.';
+          adminMsg.className = 'dr-err';
+        });
+    });
+  }
+
+  if (adminAddForm) {
+    adminAddForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nameInput = document.getElementById('dr-new-drink-name');
+      var priceInput = document.getElementById('dr-new-drink-price');
+      var name = nameInput.value.trim();
+      var price = parseFloat(priceInput.value);
+
+      adminMsg.textContent = '';
+      adminMsg.className = '';
+
+      if (!name) {
+        adminMsg.textContent = 'Bitte einen Namen eingeben.';
+        adminMsg.className = 'dr-err';
+        return;
+      }
+      if (!Number.isFinite(price) || price < 0) {
+        adminMsg.textContent = 'Ungültiger Preis.';
+        adminMsg.className = 'dr-err';
+        return;
+      }
+
+      fetch('/drinkrounds/drinks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, price: price })
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          if (result.ok) {
+            var d = result.data.drink;
+            if (!drinkById[d.id]) {
+              DRINKS.push(d);
+              addDrinkButton(d);
+
+              var li = document.createElement('li');
+              li.className = 'dr-admin-row';
+              li.dataset.id = d.id;
+              li.innerHTML =
+                '<span class="dr-admin-name">' + d.name + '</span>' +
+                '<span class="dr-admin-price-wrap">€<input type="number" step="0.10" min="0" class="dr-admin-price-input" value="' + parseFloat(d.price).toFixed(2) + '"></span>' +
+                '<button type="button" class="dr-admin-save-btn">Speichern</button>';
+              adminList.appendChild(li);
+            } else {
+              updateDrinkButtonPrice(d.id, d.price);
+              var existingRow = adminList.querySelector('.dr-admin-row[data-id="' + d.id + '"] .dr-admin-price-input');
+              if (existingRow) existingRow.value = parseFloat(d.price).toFixed(2);
+            }
+            drinkById[d.id] = d;
+
+            nameInput.value = '';
+            priceInput.value = '';
+            adminMsg.textContent = 'Getränk "' + d.name + '" gespeichert.';
+            adminMsg.className = 'dr-ok';
+          } else {
+            adminMsg.textContent = result.data.error || 'Fehler beim Hinzufügen.';
+            adminMsg.className = 'dr-err';
+          }
+        })
+        .catch(function () {
+          adminMsg.textContent = 'Netzwerkfehler beim Hinzufügen.';
+          adminMsg.className = 'dr-err';
+        });
+    });
+  }
 })();
 </script>

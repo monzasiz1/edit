@@ -14,6 +14,16 @@ function requireLogin(req, res, next) {
 }
 
 // ---------------------------------------------------------------------
+// Routenschutz: nur Admins dürfen Getränke verwalten (Preise/Neuanlage)
+// ---------------------------------------------------------------------
+function requireAdmin(req, res, next) {
+  if (!req.session.user || !req.session.user.is_admin) {
+    return res.status(403).json({ error: 'Keine Berechtigung.' });
+  }
+  next();
+}
+
+// ---------------------------------------------------------------------
 // Automatische Befüllung: Wenn die Getränke-Tabelle leer ist,
 // werden beim Start drei Standard-Getränke angelegt.
 // (Läuft einmal beim Laden dieses Moduls, also beim Serverstart.)
@@ -99,6 +109,68 @@ router.post('/', requireLogin, async (req, res) => {
     res.status(500).json({ error: 'Fehler beim Speichern der Runde.' });
   } finally {
     client.release();
+  }
+});
+
+// ---------------------------------------------------------------------
+// POST /drinkrounds/drinks — Neues Getränk anlegen (nur Admins)
+// Erwartet JSON: { name, price }
+// Existiert der Name bereits (auch inaktiv), wird er reaktiviert.
+// ---------------------------------------------------------------------
+router.post('/drinks', requireLogin, requireAdmin, async (req, res) => {
+  const { name, price } = req.body;
+  const cleanName = typeof name === 'string' ? name.trim() : '';
+  const cleanPrice = parseFloat(price);
+
+  if (!cleanName) {
+    return res.status(400).json({ error: 'Bitte einen Namen angeben.' });
+  }
+  if (!Number.isFinite(cleanPrice) || cleanPrice < 0) {
+    return res.status(400).json({ error: 'Ungültiger Preis.' });
+  }
+
+  try {
+    const result = await db.query(
+      `INSERT INTO drinks (name, price, active)
+       VALUES ($1, $2, TRUE)
+       ON CONFLICT (name) DO UPDATE SET price = EXCLUDED.price, active = TRUE
+       RETURNING id, name, price`,
+      [cleanName, cleanPrice.toFixed(2)]
+    );
+    res.status(200).json({ success: true, drink: result.rows[0] });
+  } catch (err) {
+    console.error('Fehler beim Hinzufügen des Getränks:', err);
+    res.status(500).json({ error: 'Fehler beim Hinzufügen des Getränks.' });
+  }
+});
+
+// ---------------------------------------------------------------------
+// PATCH /drinkrounds/drinks/:id/price — Preis eines Getränks ändern (nur Admins)
+// Erwartet JSON: { price }
+// ---------------------------------------------------------------------
+router.patch('/drinks/:id/price', requireLogin, requireAdmin, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const price = parseFloat(req.body.price);
+
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ error: 'Ungültige Getränke-ID.' });
+  }
+  if (!Number.isFinite(price) || price < 0) {
+    return res.status(400).json({ error: 'Ungültiger Preis.' });
+  }
+
+  try {
+    const result = await db.query(
+      'UPDATE drinks SET price = $1 WHERE id = $2 RETURNING id, name, price',
+      [price.toFixed(2), id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Getränk nicht gefunden.' });
+    }
+    res.status(200).json({ success: true, drink: result.rows[0] });
+  } catch (err) {
+    console.error('Fehler beim Aktualisieren des Preises:', err);
+    res.status(500).json({ error: 'Fehler beim Aktualisieren des Preises.' });
   }
 });
 
