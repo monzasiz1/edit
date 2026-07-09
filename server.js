@@ -327,7 +327,6 @@ async function ensureDatabaseSchema() {
     )
   `);
 
-
   await db.query(`
     CREATE TABLE IF NOT EXISTS equipment (
       id SERIAL PRIMARY KEY,
@@ -483,6 +482,37 @@ async function ensureDatabaseSchema() {
     WHERE u.is_board = TRUE
     ON CONFLICT (user_id, role_id) DO NOTHING
   `);
+
+  // ===== NEU: Getränkerunden Tabellen =====
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS drinks (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL UNIQUE,
+      price NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+      active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS drink_rounds (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      drink_id INTEGER REFERENCES drinks(id) ON DELETE CASCADE,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  // Standard Getränke initial anlegen
+  await db.query(`
+    INSERT INTO drinks (name, price) VALUES
+      ('Bier', 2.50),
+      ('Cola', 2.00),
+      ('Wasser', 1.50),
+      ('Fanta', 2.00)
+    ON CONFLICT (name) DO NOTHING
+  `);
 }
 
 const vapidKeys = {
@@ -584,9 +614,9 @@ app.use('/logout', require('./routes/logout'));
 app.use('/profil', require('./routes/profile'));
 app.use('/music', require('./routes/music'));
 app.use('/suggestions', require('./routes/suggestions'));
+app.use('/drinkrounds', require('./routes/drinkRounds'));
 app.use('/equipment', require('./routes/equipment'));
 app.use('/roles', require('./routes/roles'));
-app.use('/drinkrounds', require('./routes/drinkRounds'));
 
 app.post('/subscribe', (req, res) => {
   const subscription = req.body;

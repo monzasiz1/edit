@@ -2,37 +2,25 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
-// Middleware to check if user is authenticated
+// Middleware angepasst an deine native Session-Logik aus server.js
 function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.session && req.session.user) {
         return next();
     }
     res.redirect('/login');
 }
 
-// Route to display drink rounds
+// Route: Getränkerunden Bierdeckel anzeigen
 router.get('/', isAuthenticated, async (req, res) => {
     try {
-        // Get active drinks for selection
+        // Aktive Getränke aus der DB holen
         const drinksResult = await pool.query('SELECT * FROM drinks WHERE active = TRUE ORDER BY name');
         let drinks = drinksResult.rows;
-
-        // If no drinks exist, insert some default ones for development
-        if (drinks.length === 0) {
-            console.log("No drinks found. Inserting default drinks...");
-            await pool.query(
-                "INSERT INTO drinks (name, price) VALUES ($1, $2), ($3, $4), ($5, $6) ON CONFLICT (name) DO NOTHING",
-                ['Bier', 2.50, 'Cola', 2.00, 'Wasser', 1.50]
-            );
-            // Refresh the drinks list
-            const drinksResult2 = await pool.query('SELECT * FROM drinks WHERE active = TRUE ORDER BY name');
-            drinks = drinksResult2.rows;
-        }
 
         res.render('drinkRounds', { 
             title: 'Getränkerunden', 
             path: '/drinkrounds', 
-            user: req.user,
+            user: req.session.user,
             drinks: drinks
         });
     } catch (err) {
@@ -41,10 +29,14 @@ router.get('/', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route to handle adding a new drink round
+// Route: Neue Getränkerunde in DB eintragen
 router.post('/add', isAuthenticated, async (req, res) => {
     const { rounds } = req.body;
-    const userId = req.user.id;
+    const userId = req.session.user.id;
+
+    if (!rounds || !Array.isArray(rounds)) {
+        return res.status(400).json({ error: 'Ungültige Rundendaten erhalten.' });
+    }
 
     try {
         for (const round of rounds) {
