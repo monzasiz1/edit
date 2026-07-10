@@ -799,3 +799,17 @@
                 existingRow.querySelector('.dr-admin-price-input').value = parseFloat(d.price).toFixed(2);
               }
             }
+ nameInput.value = '';
+            priceInput.value = '';
+            showAdminMsg('„' + d.name + '" gespeichert.', true);
+          } else {
+            showAdminMsg(result.data.error || 'Fehler beim Hinzufügen.', false);
+          }
+        })
+        .catch(function () {
+          showAdminMsg('Netzwerkfehler beim Hinzufügen.', false);
+        });
+    });
+  }
+})();
+</script>
