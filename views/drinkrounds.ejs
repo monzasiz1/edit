@@ -147,127 +147,140 @@
   #dr-msg.dr-ok { color: #2d8f55; }
   #dr-msg.dr-err { color: #c0282a; }
 
-  /* --- Getränke verwalten (für alle User) --- */
+  /* --- Getränke verwalten: kompakt, mobil-optimiert, einzeilig --- */
   .dr-admin {
     background: #fffaf0;
     border: 1.4px solid #f0e0b8;
-    border-radius: 1.4rem;
-    padding: 1.3rem 1.2rem;
+    border-radius: 1.2rem;
+    padding: 1rem 0.9rem;
     margin-top: 1.6rem;
   }
   .dr-admin h2 {
-    margin: 0 0 0.3rem;
-    font-size: 1.15rem;
+    margin: 0 0 0.2rem;
+    font-size: 1.05rem;
     color: #7a5a10;
   }
   .dr-admin-hint {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: #9a8555;
-    margin: 0 0 0.9rem;
+    margin: 0 0 0.7rem;
   }
   .dr-admin-list {
     list-style: none;
-    margin: 0 0 1.1rem;
+    margin: 0 0 0.9rem;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
   .dr-admin-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
     background: #fff;
     border: 1px solid #f0e0b8;
-    border-radius: 0.8em;
-    padding: 0.5em 0.6em;
-    flex-wrap: wrap;
+    border-radius: 0.7em;
+    padding: 0.3em 0.35em;
+    flex-wrap: nowrap;
   }
   .dr-admin-name-input {
-    flex: 1 1 100px;
-    min-width: 90px;
+    flex: 1 1 auto;
+    min-width: 0;
     font-family: inherit;
-    font-size: 0.92rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: #1f4a30;
-    padding: 0.4em 0.55em;
-    border: 1.4px solid #dbe6d2;
-    border-radius: 0.6em;
+    padding: 0.35em 0.4em;
+    border: 1.2px solid #dbe6d2;
+    border-radius: 0.55em;
   }
   .dr-admin-price-wrap {
     display: flex;
     align-items: center;
-    gap: 0.25em;
+    gap: 0.15em;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #6f8678;
-    flex-shrink: 0;
+    flex: 0 0 auto;
   }
   .dr-admin-price-input {
-    width: 5em;
-    font-family: inherit;
-    font-size: 0.92rem;
-    padding: 0.4em 0.5em;
-    border: 1.4px solid #dbe6d2;
-    border-radius: 0.6em;
-  }
-  .dr-admin-save-btn,
-  .dr-admin-delete-btn {
-    flex-shrink: 0;
+    width: 3.6em;
     font-family: inherit;
     font-size: 0.85rem;
-    font-weight: 700;
+    padding: 0.35em 0.3em;
+    border: 1.2px solid #dbe6d2;
+    border-radius: 0.55em;
+  }
+  .dr-admin-icon-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     border: none;
-    border-radius: 0.7em;
-    padding: 0.5em 0.8em;
+    border-radius: 0.6em;
     cursor: pointer;
-    transition: background 0.15s;
+    padding: 0;
+    transition: background 0.15s, opacity 0.15s;
   }
+  .dr-admin-icon-btn svg { width: 15px; height: 15px; }
   .dr-admin-save-btn {
-    color: #fff;
-    background: #3da973;
+    background: #e6f4ec;
+    color: #2d8f55;
   }
-  .dr-admin-save-btn:hover:not(:disabled) { background: #2d8f55; }
-  .dr-admin-save-btn:disabled { background: #c7d6bf; cursor: not-allowed; }
-  .dr-admin-delete-btn {
-    color: #c0282a;
+  .dr-admin-save-btn:hover:not(:disabled) { background: #cdeedb; }
+  .dr-admin-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .dr-admin-archive-btn {
     background: #fdecec;
-    padding: 0.5em 0.65em;
+    color: #c0282a;
   }
-  .dr-admin-delete-btn:hover:not(:disabled) { background: #fadbdb; }
-  .dr-admin-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .dr-admin-archive-btn:hover:not(:disabled) { background: #fadbdb; }
+  .dr-admin-archive-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .dr-admin-add-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
     align-items: center;
-    padding-top: 0.9rem;
-    border-top: 1.4px solid #f0e0b8;
+    padding-top: 0.7rem;
+    border-top: 1.2px solid #f0e0b8;
+  }
+  .dr-admin-add-form input[type="text"] {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .dr-admin-add-form input[type="number"] {
+    flex: 0 0 5.2em;
   }
   .dr-admin-add-form input[type="text"],
   .dr-admin-add-form input[type="number"] {
     font-family: inherit;
-    font-size: 0.92rem;
-    padding: 0.55em 0.75em;
-    border: 1.4px solid #dbe6d2;
-    border-radius: 0.7em;
-    flex: 1 1 140px;
+    font-size: 0.85rem;
+    padding: 0.5em 0.6em;
+    border: 1.2px solid #dbe6d2;
+    border-radius: 0.6em;
   }
   .dr-admin-add-form button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
     font-family: inherit;
-    font-size: 0.92rem;
-    font-weight: 700;
     color: #fff;
     background: #3da973;
     border: none;
-    border-radius: 0.7em;
-    padding: 0.6em 1.1em;
+    border-radius: 0.6em;
     cursor: pointer;
     transition: background 0.15s;
+    padding: 0;
   }
+  .dr-admin-add-form button svg { width: 16px; height: 16px; }
   .dr-admin-add-form button:hover { background: #2d8f55; }
   #dr-admin-msg {
-    margin-top: 0.7rem;
-    font-size: 0.88rem;
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
     text-align: center;
   }
   #dr-admin-msg.dr-ok { color: #2d8f55; }
@@ -315,7 +328,7 @@
     </div>
 
     <button type="button" class="dr-submit-btn" id="dr-submit-btn" disabled>
-      Runde abschicken
+      Runde speichern
     </button>
 
     <div id="dr-msg"></div>
@@ -324,7 +337,7 @@
 
 <div class="dr-admin">
   <h2>🛠️ Getränke verwalten</h2>
-  <p class="dr-admin-hint">Name/Preis ändern und mit „Speichern" bestätigen, oder mit 🗑️ entfernen.</p>
+  <p class="dr-admin-hint">Name/Preis ändern und mit ✓ bestätigen<% if (typeof user !== 'undefined' && user && user.is_admin) { %>, mit 🗄️ archivieren<% } %>.</p>
 
   <ul class="dr-admin-list" id="dr-admin-list">
     <% drinks.forEach(function(d) { %>
@@ -333,16 +346,24 @@
         <span class="dr-admin-price-wrap">
           €<input type="number" step="0.10" min="0" class="dr-admin-price-input" value="<%= parseFloat(d.price).toFixed(2) %>">
         </span>
-        <button type="button" class="dr-admin-save-btn">Speichern</button>
-        <button type="button" class="dr-admin-delete-btn" aria-label="Getränk löschen" title="Getränk löschen">🗑️</button>
+        <button type="button" class="dr-admin-icon-btn dr-admin-save-btn" aria-label="Speichern" title="Speichern">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <% if (typeof user !== 'undefined' && user && user.is_admin) { %>
+        <button type="button" class="dr-admin-icon-btn dr-admin-archive-btn" aria-label="Archivieren" title="Archivieren">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
+        </button>
+        <% } %>
       </li>
     <% }); %>
   </ul>
 
   <form class="dr-admin-add-form" id="dr-admin-add-form">
-    <input type="text" id="dr-new-drink-name" placeholder="Name (z. B. Radler)" required>
-    <input type="number" id="dr-new-drink-price" step="0.10" min="0" placeholder="Preis in €" required>
-    <button type="submit">Hinzufügen</button>
+    <input type="text" id="dr-new-drink-name" placeholder="Name" required>
+    <input type="number" id="dr-new-drink-price" step="0.10" min="0" placeholder="€" required>
+    <button type="submit" aria-label="Hinzufügen" title="Hinzufügen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
   </form>
 
   <div id="dr-admin-msg"></div>
@@ -354,6 +375,8 @@
   var DRINKS = <%- JSON.stringify(drinks) %>;
   var drinkById = {};
   DRINKS.forEach(function (d) { drinkById[d.id] = d; });
+
+  var IS_ADMIN = <%- (typeof user !== 'undefined' && user && user.is_admin) ? 'true' : 'false' %>;
 
   // Zähler pro Getränk: { drinkId: anzahl }
   var counts = {};
@@ -539,7 +562,7 @@
     submitBtn.disabled = false;
   }
 
-  // ---------- Runde abschicken ----------
+  // ---------- Runde speichern ----------
   submitBtn.addEventListener('click', function () {
     var items = Object.keys(counts)
       .map(function (id) { return { drinkId: parseInt(id, 10), quantity: counts[id] }; })
@@ -585,7 +608,7 @@
   redrawCanvas();
   updateSummary();
 
-  // ---------- Getränke verwalten: bearbeiten, hinzufügen, löschen ----------
+  // ---------- Getränke verwalten: bearbeiten, hinzufügen, archivieren ----------
   var adminList = document.getElementById('dr-admin-list');
   var adminAddForm = document.getElementById('dr-admin-add-form');
   var adminMsg = document.getElementById('dr-admin-msg');
@@ -630,6 +653,23 @@
     }
     delete counts[id];
     updateSummary();
+  }
+
+  function buildAdminRow(d) {
+    var li = document.createElement('li');
+    li.className = 'dr-admin-row';
+    li.dataset.id = d.id;
+    li.innerHTML =
+      '<input type="text" class="dr-admin-name-input" value="' + d.name + '">' +
+      '<span class="dr-admin-price-wrap">€<input type="number" step="0.10" min="0" class="dr-admin-price-input" value="' + parseFloat(d.price).toFixed(2) + '"></span>' +
+      '<button type="button" class="dr-admin-icon-btn dr-admin-save-btn" aria-label="Speichern" title="Speichern">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '</button>' +
+      (IS_ADMIN ?
+        '<button type="button" class="dr-admin-icon-btn dr-admin-archive-btn" aria-label="Archivieren" title="Archivieren">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><line x1="10" y1="13" x2="14" y2="13"/></svg>' +
+        '</button>' : '');
+    return li;
   }
 
   // Speichern (Name + Preis)
@@ -687,13 +727,13 @@
         return;
       }
 
-      // --- Löschen ---
-      if (e.target.closest('.dr-admin-delete-btn')) {
-        var delBtn = e.target.closest('.dr-admin-delete-btn');
+      // --- Archivieren (nur Admins, Button existiert nur dann im DOM) ---
+      if (e.target.closest('.dr-admin-archive-btn')) {
+        var archBtn = e.target.closest('.dr-admin-archive-btn');
         var drinkName = (drinkById[id] && drinkById[id].name) || 'dieses Getränk';
-        if (!confirm('„' + drinkName + '" wirklich löschen?')) return;
+        if (!confirm('„' + drinkName + '" wirklich archivieren? Es verschwindet aus der Auswahl, bleibt aber in der Historie.')) return;
 
-        delBtn.disabled = true;
+        archBtn.disabled = true;
         fetch('/drinkrounds/drinks/' + id, { method: 'DELETE' })
           .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
           .then(function (result) {
@@ -701,15 +741,15 @@
               row.remove();
               delete drinkById[id];
               removeDrinkButton(id);
-              showAdminMsg('„' + drinkName + '" gelöscht.', true);
+              showAdminMsg('„' + drinkName + '" archiviert.', true);
             } else {
-              delBtn.disabled = false;
-              showAdminMsg(result.data.error || 'Fehler beim Löschen.', false);
+              archBtn.disabled = false;
+              showAdminMsg(result.data.error || 'Fehler beim Archivieren.', false);
             }
           })
           .catch(function () {
-            delBtn.disabled = false;
-            showAdminMsg('Netzwerkfehler beim Löschen.', false);
+            archBtn.disabled = false;
+            showAdminMsg('Netzwerkfehler beim Archivieren.', false);
           });
       }
     });
@@ -750,16 +790,7 @@
 
             if (isNew) {
               addDrinkButton(d);
-
-              var li = document.createElement('li');
-              li.className = 'dr-admin-row';
-              li.dataset.id = d.id;
-              li.innerHTML =
-                '<input type="text" class="dr-admin-name-input" value="' + d.name + '">' +
-                '<span class="dr-admin-price-wrap">€<input type="number" step="0.10" min="0" class="dr-admin-price-input" value="' + parseFloat(d.price).toFixed(2) + '"></span>' +
-                '<button type="button" class="dr-admin-save-btn">Speichern</button>' +
-                '<button type="button" class="dr-admin-delete-btn" aria-label="Getränk löschen" title="Getränk löschen">🗑️</button>';
-              adminList.appendChild(li);
+              adminList.appendChild(buildAdminRow(d));
             } else {
               updateDrinkButton(d.id, d);
               var existingRow = adminList.querySelector('.dr-admin-row[data-id="' + d.id + '"]');
@@ -768,18 +799,3 @@
                 existingRow.querySelector('.dr-admin-price-input').value = parseFloat(d.price).toFixed(2);
               }
             }
-
-            nameInput.value = '';
-            priceInput.value = '';
-            showAdminMsg('„' + d.name + '" gespeichert.', true);
-          } else {
-            showAdminMsg(result.data.error || 'Fehler beim Hinzufügen.', false);
-          }
-        })
-        .catch(function () {
-          showAdminMsg('Netzwerkfehler beim Hinzufügen.', false);
-        });
-    });
-  }
-})();
-</script>

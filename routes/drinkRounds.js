@@ -14,6 +14,16 @@ function requireLogin(req, res, next) {
 }
 
 // ---------------------------------------------------------------------
+// Routenschutz: nur Admins dürfen Getränke archivieren
+// ---------------------------------------------------------------------
+function requireAdmin(req, res, next) {
+  if (!req.session.user || !req.session.user.is_admin) {
+    return res.status(403).json({ error: 'Nur Admins dürfen Getränke archivieren.' });
+  }
+  next();
+}
+
+// ---------------------------------------------------------------------
 // Automatische Befüllung: Wenn die Getränke-Tabelle leer ist,
 // werden beim Start drei Standard-Getränke angelegt.
 // (Läuft einmal beim Laden dieses Moduls, also beim Serverstart.)
@@ -106,7 +116,7 @@ router.post('/', requireLogin, async (req, res) => {
 // POST /drinkrounds/drinks — Neues Getränk anlegen
 // Erwartet JSON: { name, price }
 // Jeder eingeloggte User darf das. Existiert der Name bereits (auch
-// inaktiv/gelöscht), wird er reaktiviert und der Preis übernommen.
+// inaktiv/archiviert), wird er reaktiviert und der Preis übernommen.
 // ---------------------------------------------------------------------
 router.post('/drinks', requireLogin, async (req, res) => {
   const { name, price } = req.body;
@@ -185,11 +195,11 @@ router.patch('/drinks/:id', requireLogin, async (req, res) => {
 });
 
 // ---------------------------------------------------------------------
-// DELETE /drinkrounds/drinks/:id — Getränk entfernen
+// DELETE /drinkrounds/drinks/:id — Getränk archivieren (nur Admins)
 // Soft-Delete (active = FALSE), damit bereits gespeicherte Runden in
-// der Historie erhalten bleiben. Jeder eingeloggte User darf das.
+// der Historie erhalten bleiben.
 // ---------------------------------------------------------------------
-router.delete('/drinks/:id', requireLogin, async (req, res) => {
+router.delete('/drinks/:id', requireLogin, requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) {
     return res.status(400).json({ error: 'Ungültige Getränke-ID.' });
@@ -205,8 +215,8 @@ router.delete('/drinks/:id', requireLogin, async (req, res) => {
     }
     res.status(200).json({ success: true, id: result.rows[0].id });
   } catch (err) {
-    console.error('Fehler beim Löschen des Getränks:', err);
-    res.status(500).json({ error: 'Fehler beim Löschen des Getränks.' });
+    console.error('Fehler beim Archivieren des Getränks:', err);
+    res.status(500).json({ error: 'Fehler beim Archivieren des Getränks.' });
   }
 });
 
