@@ -14,16 +14,6 @@ function requireLogin(req, res, next) {
 }
 
 // ---------------------------------------------------------------------
-// Routenschutz: nur Admins dürfen Getränke verwalten (Preise/Neuanlage)
-// ---------------------------------------------------------------------
-function requireAdmin(req, res, next) {
-  if (!req.session.user || !req.session.user.is_admin) {
-    return res.status(403).json({ error: 'Keine Berechtigung.' });
-  }
-  next();
-}
-
-// ---------------------------------------------------------------------
 // Automatische Befüllung: Wenn die Getränke-Tabelle leer ist,
 // werden beim Start drei Standard-Getränke angelegt.
 // (Läuft einmal beim Laden dieses Moduls, also beim Serverstart.)
@@ -113,11 +103,12 @@ router.post('/', requireLogin, async (req, res) => {
 });
 
 // ---------------------------------------------------------------------
-// POST /drinkrounds/drinks — Neues Getränk anlegen (nur Admins)
+// POST /drinkrounds/drinks — Neues Getränk anlegen
 // Erwartet JSON: { name, price }
-// Existiert der Name bereits (auch inaktiv), wird er reaktiviert.
+// Jeder eingeloggte User darf das. Existiert der Name bereits (auch
+// inaktiv/gelöscht), wird er reaktiviert und der Preis übernommen.
 // ---------------------------------------------------------------------
-router.post('/drinks', requireLogin, requireAdmin, async (req, res) => {
+router.post('/drinks', requireLogin, async (req, res) => {
   const { name, price } = req.body;
   const cleanName = typeof name === 'string' ? name.trim() : '';
   const cleanPrice = parseFloat(price);
@@ -145,32 +136,77 @@ router.post('/drinks', requireLogin, requireAdmin, async (req, res) => {
 });
 
 // ---------------------------------------------------------------------
-// PATCH /drinkrounds/drinks/:id/price — Preis eines Getränks ändern (nur Admins)
-// Erwartet JSON: { price }
+// PATCH /drinkrounds/drinks/:id — Name und/oder Preis eines Getränks ändern
+// Erwartet JSON: { name?, price? } — mind. eins von beiden.
+// Jeder eingeloggte User darf das.
 // ---------------------------------------------------------------------
-router.patch('/drinks/:id/price', requireLogin, requireAdmin, async (req, res) => {
+router.patch('/drinks/:id', requireLogin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const price = parseFloat(req.body.price);
-
   if (!Number.isInteger(id)) {
     return res.status(400).json({ error: 'Ungültige Getränke-ID.' });
   }
-  if (!Number.isFinite(price) || price < 0) {
+
+  const hasName = typeof req.body.name === 'string';
+  const hasPrice = req.body.price !== undefined && req.body.price !== null && req.body.price !== '';
+
+  const cleanName = hasName ? req.body.name.trim() : null;
+  const cleanPrice = hasPrice ? parseFloat(req.body.price) : null;
+
+  if (!hasName && !hasPrice) {
+    return res.status(400).json({ error: 'Nichts zu ändern übermittelt.' });
+  }
+  if (hasName && !cleanName) {
+    return res.status(400).json({ error: 'Name darf nicht leer sein.' });
+  }
+  if (hasPrice && (!Number.isFinite(cleanPrice) || cleanPrice < 0)) {
     return res.status(400).json({ error: 'Ungültiger Preis.' });
   }
 
   try {
     const result = await db.query(
-      'UPDATE drinks SET price = $1 WHERE id = $2 RETURNING id, name, price',
-      [price.toFixed(2), id]
+      `UPDATE drinks
+       SET name = COALESCE($1, name),
+           price = COALESCE($2, price)
+       WHERE id = $3
+       RETURNING id, name, price`,
+      [cleanName, hasPrice ? cleanPrice.toFixed(2) : null, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Getränk nicht gefunden.' });
     }
     res.status(200).json({ success: true, drink: result.rows[0] });
   } catch (err) {
-    console.error('Fehler beim Aktualisieren des Preises:', err);
-    res.status(500).json({ error: 'Fehler beim Aktualisieren des Preises.' });
+    if (err.code === '23505') { // unique_violation auf name
+      return res.status(400).json({ error: 'Ein Getränk mit diesem Namen existiert bereits.' });
+    }
+    console.error('Fehler beim Aktualisieren des Getränks:', err);
+    res.status(500).json({ error: 'Fehler beim Aktualisieren des Getränks.' });
+  }
+});
+
+// ---------------------------------------------------------------------
+// DELETE /drinkrounds/drinks/:id — Getränk entfernen
+// Soft-Delete (active = FALSE), damit bereits gespeicherte Runden in
+// der Historie erhalten bleiben. Jeder eingeloggte User darf das.
+// ---------------------------------------------------------------------
+router.delete('/drinks/:id', requireLogin, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ error: 'Ungültige Getränke-ID.' });
+  }
+
+  try {
+    const result = await db.query(
+      'UPDATE drinks SET active = FALSE WHERE id = $1 RETURNING id',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Getränk nicht gefunden.' });
+    }
+    res.status(200).json({ success: true, id: result.rows[0].id });
+  } catch (err) {
+    console.error('Fehler beim Löschen des Getränks:', err);
+    res.status(500).json({ error: 'Fehler beim Löschen des Getränks.' });
   }
 });
 
