@@ -1,0 +1,130 @@
+<style>
+  .dra-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .dra-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .dra-head h1 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #1f4a30;
+  }
+  .dra-back {
+    font-size: 0.85rem;
+    color: #2d8f55;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .dra-back:hover { text-decoration: underline; }
+  .dra-summary {
+    background: #eef6ea;
+    border: 1.4px solid #cfe0c4;
+    border-radius: 1rem;
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.92rem;
+    color: #1f4a30;
+  }
+  .dra-summary strong { font-size: 1.05rem; }
+  .dra-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .dra-card {
+    background: #fafcf9;
+    border: 1.4px solid #dbe6d2;
+    border-radius: 1.1rem;
+    padding: 0.9rem 1.1rem;
+  }
+  .dra-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  .dra-user {
+    font-weight: 800;
+    color: #1f4a30;
+  }
+  .dra-date {
+    font-size: 0.8rem;
+    color: #6f8678;
+  }
+  .dra-total {
+    font-weight: 800;
+    color: #2d8f55;
+    margin-left: auto;
+  }
+  .dra-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .dra-item {
+    background: #fff;
+    border: 1px solid #e2ebd9;
+    border-radius: 0.7em;
+    padding: 0.3em 0.7em;
+    font-size: 0.85rem;
+    color: #2a3e32;
+  }
+  .dra-empty {
+    text-align: center;
+    color: #8a9485;
+    font-style: italic;
+    padding: 2rem 1rem;
+  }
+</style>
+
+<div class="dra-wrap">
+  <div class="dra-head">
+    <h1>📚 Bierdeckel-Archiv</h1>
+    <a class="dra-back" href="/drinkrounds">← Zurück zur Getränkerunde</a>
+  </div>
+
+  <%
+    var grandTotal = 0;
+    batches.forEach(function (b) { grandTotal += parseFloat(b.total); });
+  %>
+
+  <div class="dra-summary">
+    <div>Gespeicherte Runden: <strong><%= batches.length %></strong></div>
+    <div>Gesamtsumme: <strong>€<%= grandTotal.toFixed(2) %></strong></div>
+  </div>
+
+  <% if (batches.length === 0) { %>
+    <div class="dra-empty">Noch keine Runden gespeichert.</div>
+  <% } else { %>
+    <ul class="dra-list">
+      <% batches.forEach(function (b) { %>
+        <li class="dra-card">
+          <div class="dra-card-head">
+            <span class="dra-user"><%= b.full_name || b.username || 'Unbekannt' %></span>
+            <span class="dra-date"><%= new Date(b.created_at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+            <span class="dra-total">€<%= parseFloat(b.total).toFixed(2) %></span>
+          </div>
+          <div class="dra-items">
+            <% b.items.forEach(function (it) { %>
+              <span class="dra-item"><%= it.quantity %> &times; <%= it.name %></span>
+            <% }); %>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  <% } %>
+</div>

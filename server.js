@@ -494,6 +494,18 @@ async function ensureDatabaseSchema() {
     )
   `);
 
+  // Ein "Bierdeckel" = eine gespeicherte Runde. Fasst mehrere Getränke-Positionen
+  // (drink_rounds) zu einem archivierbaren Datensatz mit Nutzer, Zeitpunkt und
+  // Gesamtsumme zusammen, damit der Vorstand ein Archiv aller Runden sehen kann.
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS drink_round_batches (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      total NUMERIC(10,2) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
   await db.query(`
     CREATE TABLE IF NOT EXISTS drink_rounds (
       id SERIAL PRIMARY KEY,
@@ -502,6 +514,16 @@ async function ensureDatabaseSchema() {
       quantity INTEGER NOT NULL DEFAULT 1,
       created_at TIMESTAMP DEFAULT NOW()
     )
+  `);
+
+  await db.query(`
+    ALTER TABLE drink_rounds
+    ADD COLUMN IF NOT EXISTS batch_id INTEGER REFERENCES drink_round_batches(id) ON DELETE CASCADE
+  `);
+
+  await db.query(`
+    CREATE INDEX IF NOT EXISTS idx_drink_rounds_batch_id
+      ON drink_rounds(batch_id)
   `);
 
   // Standard Getränke initial anlegen

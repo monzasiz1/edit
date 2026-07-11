@@ -198,6 +198,30 @@
   #dr-msg.dr-ok { color: #2d8f55; }
   #dr-msg.dr-err { color: #c0282a; }
 
+  .dr-archive-banner {
+    margin-top: 1rem;
+    text-align: right;
+  }
+  .dr-archive-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1f4a30;
+    background: #eef6ea;
+    border: 1.4px solid #cfe0c4;
+    border-radius: 0.9em;
+    padding: 0.5em 0.9em;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .dr-archive-link:hover {
+    background: #dcefd3;
+    border-color: #a0bb8c;
+  }
+
   /* --- Getränke verwalten: kompakt, mobil-optimiert, einzeilig --- */
   .dr-admin {
     background: #fffaf0;
@@ -386,6 +410,12 @@
     <div id="dr-msg"></div>
   </div>
 </div>
+
+<% if (typeof user !== 'undefined' && user && (user.is_board || user.is_admin)) { %>
+<div class="dr-archive-banner">
+  <a href="/drinkrounds/archive" class="dr-archive-link">📚 Bierdeckel-Archiv ansehen</a>
+</div>
+<% } %>
 
 <div class="dr-admin">
   <h2>🛠️ Getränke verwalten</h2>

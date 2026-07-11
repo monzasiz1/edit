@@ -24,6 +24,17 @@ function requireAdmin(req, res, next) {
 }
 
 // ---------------------------------------------------------------------
+// Routenschutz: nur Vorstand/Admin dürfen das Bierdeckel-Archiv einsehen
+// ---------------------------------------------------------------------
+function requireBoard(req, res, next) {
+  const u = req.session.user;
+  if (!u || !(u.is_board || u.is_admin)) {
+    return res.status(403).send('Nur für den Vorstand.');
+  }
+  next();
+}
+
+// ---------------------------------------------------------------------
 // Automatische Befüllung: Wenn die Getränke-Tabelle leer ist,
 // werden beim Start drei Standard-Getränke angelegt.
 // (Läuft einmal beim Laden dieses Moduls, also beim Serverstart.)
@@ -95,20 +106,89 @@ router.post('/', requireLogin, async (req, res) => {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
+
+    // Aktuelle Preise serverseitig nachschlagen (nicht den Werten des Clients
+    // vertrauen), um die Gesamtsumme des Bierdeckels korrekt zu berechnen.
+    const drinkIds = cleanItems.map(i => i.drinkId);
+    const priceResult = await client.query(
+      'SELECT id, price FROM drinks WHERE id = ANY($1::int[])',
+      [drinkIds]
+    );
+    const priceById = {};
+    priceResult.rows.forEach(r => { priceById[r.id] = parseFloat(r.price); });
+
+    let total = 0;
+    for (const item of cleanItems) {
+      const price = priceById[item.drinkId];
+      if (price === undefined) continue;
+      total += price * item.quantity;
+    }
+
+    // Batch anlegen: Ein Bierdeckel = eine gespeicherte Runde,
+    // damit sie später im Archiv als ein Eintrag erscheint.
+    const batchResult = await client.query(
+      'INSERT INTO drink_round_batches (user_id, total) VALUES ($1, $2) RETURNING id',
+      [userId, total.toFixed(2)]
+    );
+    const batchId = batchResult.rows[0].id;
+
     for (const item of cleanItems) {
       await client.query(
-        'INSERT INTO drink_rounds (user_id, drink_id, quantity) VALUES ($1, $2, $3)',
-        [userId, item.drinkId, item.quantity]
+        'INSERT INTO drink_rounds (user_id, drink_id, quantity, batch_id) VALUES ($1, $2, $3, $4)',
+        [userId, item.drinkId, item.quantity, batchId]
       );
     }
+
     await client.query('COMMIT');
-    res.status(200).json({ success: true, saved: cleanItems.length });
+    res.status(200).json({ success: true, saved: cleanItems.length, batchId });
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('Fehler beim Speichern der Getränkerunde:', err);
     res.status(500).json({ error: 'Fehler beim Speichern der Runde.' });
   } finally {
     client.release();
+  }
+});
+
+// ---------------------------------------------------------------------
+// GET /drinkrounds/archive — Bierdeckel-Archiv für den Vorstand
+// Zeigt alle gespeicherten Runden (Batches) mit Nutzer, Zeitpunkt,
+// enthaltenen Getränken und Gesamtsumme, neueste zuerst.
+// ---------------------------------------------------------------------
+router.get('/archive', requireLogin, requireBoard, async (req, res) => {
+  try {
+    const batchesResult = await db.query(`
+      SELECT b.id, b.total, b.created_at, u.username, u.full_name
+      FROM drink_round_batches b
+      LEFT JOIN users u ON u.id = b.user_id
+      ORDER BY b.created_at DESC
+    `);
+    const batches = batchesResult.rows;
+
+    const itemsResult = await db.query(`
+      SELECT dr.batch_id, dr.quantity, d.name, d.price
+      FROM drink_rounds dr
+      JOIN drinks d ON d.id = dr.drink_id
+      WHERE dr.batch_id IS NOT NULL
+      ORDER BY d.name ASC
+    `);
+
+    const itemsByBatch = {};
+    itemsResult.rows.forEach(row => {
+      if (!itemsByBatch[row.batch_id]) itemsByBatch[row.batch_id] = [];
+      itemsByBatch[row.batch_id].push(row);
+    });
+
+    batches.forEach(b => { b.items = itemsByBatch[b.id] || []; });
+
+    res.render('drinkroundsArchive', {
+      title: 'Bierdeckel-Archiv',
+      batches,
+      path: '/drinkrounds/archive'
+    });
+  } catch (err) {
+    console.error('Fehler beim Laden des Archivs:', err);
+    res.status(500).send('Fehler beim Laden des Archivs');
   }
 });
 
