@@ -77,11 +77,30 @@
     cursor: not-allowed;
   }
   .dr-selected-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
     text-align: center;
     margin-top: 0.8rem;
     font-size: 0.92rem;
     color: #2a3e32;
   }
+  .dr-mini-btn {
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #c0282a;
+    background: #fdecec;
+    border: 1.4px solid #f3c7c7;
+    border-radius: 0.8em;
+    padding: 0.25em 0.7em;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .dr-mini-btn:hover:not(:disabled) { background: #fadbdb; }
+  .dr-mini-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .dr-summary-list {
     list-style: none;
     margin: 0 0 1rem;
@@ -93,6 +112,7 @@
   }
   .dr-summary-list li {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     background: #fff;
@@ -110,6 +130,37 @@
   .dr-summary-name { font-weight: 700; color: #1f4a30; }
   .dr-summary-meta { color: #6f8678; font-size: 0.85em; }
   .dr-summary-sub { font-weight: 700; color: #2d8f55; }
+  .dr-summary-actions {
+    display: flex;
+    gap: 0.3em;
+    margin-left: 0.5em;
+  }
+  .dr-summary-minus, .dr-summary-remove {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 0.55em;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+  }
+  .dr-summary-minus {
+    background: #eef6ea;
+    color: #2d8f55;
+  }
+  .dr-summary-minus:hover { background: #d9ecd0; }
+  .dr-summary-remove {
+    background: #fdecec;
+    color: #c0282a;
+  }
+  .dr-summary-remove:hover { background: #fadbdb; }
   .dr-total {
     display: flex;
     justify-content: space-between;
@@ -311,6 +362,7 @@
     <div class="dr-selected-info">
       Ausgewählt: <strong id="dr-selected-name">–</strong>
       &middot; Striche: <strong id="dr-selected-count">0</strong>
+      <button type="button" id="dr-remove-stroke-btn" class="dr-mini-btn" title="Letzten Strich entfernen" disabled>−1</button>
     </div>
   </div>
 
@@ -387,6 +439,7 @@
   var buttonsWrap = document.getElementById('dr-drink-buttons');
   var selectedNameEl = document.getElementById('dr-selected-name');
   var selectedCountEl = document.getElementById('dr-selected-count');
+  var removeStrokeBtn = document.getElementById('dr-remove-stroke-btn');
   var summaryListEl = document.getElementById('dr-summary-list');
   var totalEl = document.getElementById('dr-total');
   var submitBtn = document.getElementById('dr-submit-btn');
@@ -404,6 +457,7 @@
 
     canvas.classList.remove('dr-disabled');
     selectedNameEl.textContent = btn.dataset.name;
+    updateSelectedInfo();
     redrawCanvas();
   });
 
@@ -469,6 +523,16 @@
   canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
   canvas.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
+  // ---------- Strich manuell entfernen (z.B. bei Verwischen/Versehen) ----------
+  removeStrokeBtn.addEventListener('click', function () {
+    if (!selectedId || !counts[selectedId]) return;
+    counts[selectedId] = Math.max(0, counts[selectedId] - 1);
+    if (counts[selectedId] === 0) delete counts[selectedId];
+    updateSelectedInfo();
+    updateSummary();
+    redrawCanvas();
+  });
+
   // ---------- Tally-Marks zeichnen (klassische Strichliste: 4 Striche + 1 Diagonale) ----------
   // Die Gruppen werden als Block berechnet und mittig auf dem runden Deckel platziert.
   function drawTally(count) {
@@ -530,7 +594,9 @@
 
   // ---------- UI-Updates ----------
   function updateSelectedInfo() {
-    selectedCountEl.textContent = selectedId ? (counts[selectedId] || 0) : 0;
+    var count = selectedId ? (counts[selectedId] || 0) : 0;
+    selectedCountEl.textContent = count;
+    removeStrokeBtn.disabled = !selectedId || count === 0;
   }
 
   function updateSummary() {
@@ -551,16 +617,43 @@
       var price = parseFloat(drink.price);
       var sub = price * e.qty;
       total += sub;
-      return '<li>' +
+      return '<li data-id="' + e.id + '">' +
         '<span class="dr-summary-name">' + drink.name + '</span>' +
         '<span class="dr-summary-meta">' + e.qty + ' &times; €' + price.toFixed(2) + '</span>' +
         '<span class="dr-summary-sub">€' + sub.toFixed(2) + '</span>' +
+        '<span class="dr-summary-actions">' +
+          '<button type="button" class="dr-summary-minus" data-id="' + e.id + '" title="Eins entfernen">−</button>' +
+          '<button type="button" class="dr-summary-remove" data-id="' + e.id + '" title="Position komplett entfernen">✕</button>' +
+        '</span>' +
         '</li>';
     }).join('');
 
     totalEl.textContent = '€' + total.toFixed(2);
     submitBtn.disabled = false;
   }
+
+  // Klicks auf die Minus-/Entfernen-Buttons in der Zusammenfassung
+  summaryListEl.addEventListener('click', function (e) {
+    var minusBtn = e.target.closest('.dr-summary-minus');
+    var removeBtn = e.target.closest('.dr-summary-remove');
+    if (!minusBtn && !removeBtn) return;
+
+    var id = parseInt((minusBtn || removeBtn).dataset.id, 10);
+    if (!id || !counts[id]) return;
+
+    if (minusBtn) {
+      counts[id] = Math.max(0, counts[id] - 1);
+    } else {
+      counts[id] = 0;
+    }
+    if (counts[id] === 0) delete counts[id];
+
+    if (selectedId === id) {
+      updateSelectedInfo();
+      redrawCanvas();
+    }
+    updateSummary();
+  });
 
   // ---------- Runde speichern ----------
   submitBtn.addEventListener('click', function () {
@@ -587,7 +680,7 @@
           counts = {};
           selectedId = null;
           selectedNameEl.textContent = '–';
-          selectedCountEl.textContent = '0';
+          updateSelectedInfo();
           buttonsWrap.querySelectorAll('.dr-drink-btn').forEach(function (b) { b.classList.remove('active'); });
           canvas.classList.add('dr-disabled');
           redrawCanvas();
@@ -607,6 +700,7 @@
 
   redrawCanvas();
   updateSummary();
+  updateSelectedInfo();
 
   // ---------- Getränke verwalten: bearbeiten, hinzufügen, archivieren ----------
   var adminList = document.getElementById('dr-admin-list');
@@ -647,11 +741,11 @@
     if (selectedId === id) {
       selectedId = null;
       selectedNameEl.textContent = '–';
-      selectedCountEl.textContent = '0';
       canvas.classList.add('dr-disabled');
       redrawCanvas();
     }
     delete counts[id];
+    updateSelectedInfo();
     updateSummary();
   }
 
@@ -799,7 +893,8 @@
                 existingRow.querySelector('.dr-admin-price-input').value = parseFloat(d.price).toFixed(2);
               }
             }
- nameInput.value = '';
+
+            nameInput.value = '';
             priceInput.value = '';
             showAdminMsg('„' + d.name + '" gespeichert.', true);
           } else {
