@@ -300,4 +300,30 @@ router.delete('/drinks/:id', requireLogin, requireAdmin, async (req, res) => {
   }
 });
 
+// ---------------------------------------------------------------------
+// DELETE /drinkrounds/archive/:batchId — Archivierten Bierdeckel löschen
+// Löscht den Batch inkl. aller zugehörigen Positionen (CASCADE über
+// batch_id). Nur für Vorstand/Admin, wie auch die Archiv-Ansicht selbst.
+// ---------------------------------------------------------------------
+router.delete('/archive/:batchId', requireLogin, requireBoard, async (req, res) => {
+  const id = parseInt(req.params.batchId, 10);
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ error: 'Ungültige Runden-ID.' });
+  }
+
+  try {
+    const result = await db.query(
+      'DELETE FROM drink_round_batches WHERE id = $1 RETURNING id',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Runde nicht gefunden.' });
+    }
+    res.status(200).json({ success: true, id: result.rows[0].id });
+  } catch (err) {
+    console.error('Fehler beim Löschen des Bierdeckels:', err);
+    res.status(500).json({ error: 'Fehler beim Löschen der Runde.' });
+  }
+});
+
 module.exports = router;

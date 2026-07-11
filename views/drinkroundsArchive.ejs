@@ -52,10 +52,16 @@
   .dra-card-head {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: wrap;
     gap: 0.4rem 0.9rem;
     margin-bottom: 0.5rem;
+  }
+  .dra-card-meta {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
   }
   .dra-user {
     font-weight: 800;
@@ -68,8 +74,29 @@
   .dra-total {
     font-weight: 800;
     color: #2d8f55;
-    margin-left: auto;
   }
+  .dra-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .dra-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 0.6em;
+    background: #fdecec;
+    color: #c0282a;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .dra-delete-btn:hover:not(:disabled) { background: #fadbdb; }
+  .dra-delete-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .dra-delete-btn svg { width: 15px; height: 15px; }
   .dra-items {
     display: flex;
     flex-wrap: wrap;
@@ -89,6 +116,13 @@
     font-style: italic;
     padding: 2rem 1rem;
   }
+  #dra-msg {
+    margin-top: 0.2rem;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  #dra-msg.dr-ok { color: #2d8f55; }
+  #dra-msg.dr-err { color: #c0282a; }
 </style>
 
 <div class="dra-wrap">
@@ -103,20 +137,29 @@
   %>
 
   <div class="dra-summary">
-    <div>Gespeicherte Runden: <strong><%= batches.length %></strong></div>
-    <div>Gesamtsumme: <strong>€<%= grandTotal.toFixed(2) %></strong></div>
+    <div>Gespeicherte Runden: <strong id="dra-count"><%= batches.length %></strong></div>
+    <div>Gesamtsumme: <strong id="dra-grandtotal">€<%= grandTotal.toFixed(2) %></strong></div>
   </div>
 
-  <% if (batches.length === 0) { %>
-    <div class="dra-empty">Noch keine Runden gespeichert.</div>
-  <% } else { %>
-    <ul class="dra-list">
+  <div id="dra-msg"></div>
+
+  <ul class="dra-list" id="dra-list">
+    <% if (batches.length === 0) { %>
+      <li class="dra-empty" id="dra-empty-item">Noch keine Runden gespeichert.</li>
+    <% } else { %>
       <% batches.forEach(function (b) { %>
-        <li class="dra-card">
+        <li class="dra-card" data-id="<%= b.id %>" data-total="<%= parseFloat(b.total) %>">
           <div class="dra-card-head">
-            <span class="dra-user"><%= b.full_name || b.username || 'Unbekannt' %></span>
-            <span class="dra-date"><%= new Date(b.created_at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
-            <span class="dra-total">€<%= parseFloat(b.total).toFixed(2) %></span>
+            <div class="dra-card-meta">
+              <span class="dra-user"><%= b.full_name || b.username || 'Unbekannt' %></span>
+              <span class="dra-date"><%= new Date(b.created_at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+            </div>
+            <div class="dra-card-actions">
+              <span class="dra-total">€<%= parseFloat(b.total).toFixed(2) %></span>
+              <button type="button" class="dra-delete-btn" aria-label="Löschen" title="Bierdeckel löschen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
+              </button>
+            </div>
           </div>
           <div class="dra-items">
             <% b.items.forEach(function (it) { %>
@@ -125,6 +168,67 @@
           </div>
         </li>
       <% }); %>
-    </ul>
-  <% } %>
+    <% } %>
+  </ul>
 </div>
+
+<script>
+(function () {
+  var listEl = document.getElementById('dra-list');
+  var countEl = document.getElementById('dra-count');
+  var grandTotalEl = document.getElementById('dra-grandtotal');
+  var msgEl = document.getElementById('dra-msg');
+
+  function showMsg(text, ok) {
+    msgEl.textContent = text;
+    msgEl.className = ok ? 'dr-ok' : 'dr-err';
+  }
+
+  function recalcSummary() {
+    var cards = listEl.querySelectorAll('.dra-card');
+    var total = 0;
+    cards.forEach(function (c) { total += parseFloat(c.dataset.total) || 0; });
+    countEl.textContent = cards.length;
+    grandTotalEl.textContent = '€' + total.toFixed(2);
+
+    if (cards.length === 0 && !document.getElementById('dra-empty-item')) {
+      var empty = document.createElement('li');
+      empty.className = 'dra-empty';
+      empty.id = 'dra-empty-item';
+      empty.textContent = 'Noch keine Runden gespeichert.';
+      listEl.appendChild(empty);
+    }
+  }
+
+  listEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dra-delete-btn');
+    if (!btn) return;
+
+    var card = btn.closest('.dra-card');
+    var id = card.dataset.id;
+
+    if (!confirm('Diesen Bierdeckel wirklich unwiderruflich löschen?')) return;
+
+    btn.disabled = true;
+    msgEl.textContent = '';
+    msgEl.className = '';
+
+    fetch('/drinkrounds/archive/' + id, { method: 'DELETE' })
+      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (result) {
+        if (result.ok) {
+          card.remove();
+          recalcSummary();
+          showMsg('Bierdeckel gelöscht.', true);
+        } else {
+          btn.disabled = false;
+          showMsg(result.data.error || 'Fehler beim Löschen.', false);
+        }
+      })
+      .catch(function () {
+        btn.disabled = false;
+        showMsg('Netzwerkfehler beim Löschen.', false);
+      });
+  });
+})();
+</script>
