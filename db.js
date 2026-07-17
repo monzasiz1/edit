@@ -10,4 +10,12 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000       // 10s Timeout beim Verbinden
 });
 
+// Wichtig: Ohne diesen Handler crasht der komplette Node-Prozess,
+// sobald eine idle Connection im Pool von der DB getrennt wird
+// (z.B. bei kurzen Netzwerkausfällen auf Render). Das erklärt die
+// scheinbar zufälligen Abstürze / Timeouts.
+pool.on('error', (err) => {
+  console.error('Unerwarteter Fehler bei einer inaktiven PG-Client-Verbindung:', err);
+});
+
 module.exports = pool;

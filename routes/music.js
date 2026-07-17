@@ -26,6 +26,17 @@ const defaultInstrumentPartsMap = {
   Andere: ['']
 };
 
+// Spalten, die für Listen-/Bearbeitungsansichten benötigt werden.
+// WICHTIG: file_data (die eigentlichen Datei-Bytes) wird hier bewusst
+// NICHT mitgeladen, da sonst bei jeder Listenansicht alle Binärdaten
+// aller Stücke aus der DB gestreamt werden. Das hat bei 50+ Stücken
+// zu Timeouts, überlastetem Connection-Pool und ECONNREFUSED-Fehlern
+// geführt. file_data wird ausschließlich in /music/file/:id geladen.
+const PIECE_LIST_COLUMNS = `
+  mp.id, mp.title, mp.composer, mp.description, mp.instrument, mp.part,
+  mp.filename, mp.original_name, mp.mimetype, mp.uploaded_by
+`;
+
 async function loadInstrumentPartsMap() {
   try {
     const result = await db.query(`SELECT value FROM app_settings WHERE key = 'music_instrument_parts' LIMIT 1`);
@@ -101,11 +112,11 @@ router.get('/debug-session', requireLogin, requireAdmin, (req, res) => {
 });
 
 router.get('/', requireLogin, async (req, res) => {
-  try {
-    const selectedInstrument = (req.query.instrument || '').trim();
-    const selectedPart = (req.query.part || '').trim();
-    const selectedSearch = (req.query.search || '').trim();
+  const selectedInstrument = (req.query.instrument || '').trim();
+  const selectedPart = (req.query.part || '').trim();
+  const selectedSearch = (req.query.search || '').trim();
 
+  try {
     const instrumentPartsMap = await loadInstrumentPartsMap();
 
     const passwordSetting = await db.query(`
@@ -173,7 +184,7 @@ router.get('/', requireLogin, async (req, res) => {
     }
 
     const piecesResult = await db.query(`
-      SELECT mp.*, u.username AS uploaded_by_name
+      SELECT ${PIECE_LIST_COLUMNS}, u.username AS uploaded_by_name
       FROM music_pieces mp
       LEFT JOIN users u ON mp.uploaded_by = u.id
       WHERE ${filters.join(' AND ')}
@@ -197,16 +208,21 @@ router.get('/', requireLogin, async (req, res) => {
     });
   } catch (err) {
     console.error('Fehler beim Laden der Noten:', err);
-    res.render('music', {
+    // Fallback IMMER auf die Instrumentenübersicht rendern, da dieser
+    // Zweig im Template keine der instrument-spezifischen Variablen
+    // (selectedInstrument, availableParts, ...) benötigt. Vorher wurde
+    // hier showInstrumentHome: false gerendert, obwohl diese Variablen
+    // fehlten -> "selectedInstrument is not defined" Crash.
+    return res.render('music', {
       user: req.session.user,
       title: 'Notenverwaltung',
       path: '/music',
-      pieces: [],
-      showInstrumentHome: false,
-      selectedSearch: '',
-      showPartTabs: false,
+      showInstrumentHome: true,
+      instrumentCounts: { all: 0, Flöten: 0, Trommeln: 0, Lyra: 0, Andere: 0 },
+      hasPassword: false,
+      selectedSearch: selectedSearch,
       messageSuccess: null,
-      messageError: 'Fehler beim Laden der Noten.'
+      messageError: 'Fehler beim Laden der Noten. Bitte versuche es erneut.'
     });
   }
 });
@@ -275,7 +291,10 @@ router.get('/view/:id', requireLogin, async (req, res) => {
   const selectedPart = (req.query.part || '').trim();
 
   try {
-    const currentPieceResult = await db.query(`SELECT * FROM music_pieces WHERE id = $1 LIMIT 1`, [pieceId]);
+    const currentPieceResult = await db.query(
+      `SELECT ${PIECE_LIST_COLUMNS} FROM music_pieces mp WHERE mp.id = $1 LIMIT 1`,
+      [pieceId]
+    );
     if (!currentPieceResult.rows.length) {
       return res.status(404).render('404', { title: 'Stück nicht gefunden', path: '/music' });
     }
@@ -338,7 +357,7 @@ router.get('/edit/:id', requireLogin, async (req, res) => {
 
   try {
     const pieceResult = await db.query(`
-      SELECT mp.*, u.username AS uploaded_by_name
+      SELECT ${PIECE_LIST_COLUMNS}, u.username AS uploaded_by_name
       FROM music_pieces mp
       LEFT JOIN users u ON mp.uploaded_by = u.id
       WHERE mp.id = $1
@@ -590,7 +609,7 @@ router.post('/password', requireLogin, async (req, res) => {
 
     req.session.musicAccess = true;
     const redirectTarget = req.query.from === 'admin' ? '/music/admin' : '/music';
-    
+
     return req.session.save((err) => {
       if (err) {
         console.error('Fehler beim Speichern der Musik-Session:', err);
