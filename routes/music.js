@@ -19,6 +19,11 @@ function sanitizeHeaderFilename(filename) {
   return filename.replace(/["\\]/g, '_');
 }
 
+function normalizeInstrumentName(value) {
+  const normalized = (value || '').trim().replace(/\s+/g, ' ');
+  return normalized || '';
+}
+
 const defaultInstrumentPartsMap = {
   Flöten: ['', 'Sopran 1', 'Sopran 2', 'Sopran 3', 'Altflöte'],
   Trommeln: [''],
@@ -141,16 +146,16 @@ router.get('/', requireLogin, async (req, res) => {
         GROUP BY COALESCE(instrument, 'Andere')
       `);
 
-      const instrumentCounts = {
-        all: 0,
-        Flöten: 0,
-        Trommeln: 0,
-        Lyra: 0,
-        Andere: 0
-      };
+      const instrumentList = Object.keys(instrumentPartsMap);
+      const instrumentCounts = { all: 0 };
+      instrumentList.forEach((instrument) => {
+        instrumentCounts[instrument] = 0;
+      });
+
       countsResult.rows.forEach(row => {
+        const instrumentName = normalizeInstrumentName(row.instrument || 'Andere');
         const count = parseInt(row.count, 10);
-        instrumentCounts[row.instrument] = (instrumentCounts[row.instrument] || 0) + count;
+        instrumentCounts[instrumentName] = (instrumentCounts[instrumentName] || 0) + count;
         instrumentCounts.all += count;
       });
 
@@ -159,6 +164,7 @@ router.get('/', requireLogin, async (req, res) => {
         title: 'Notenverwaltung',
         path: '/music',
         showInstrumentHome: true,
+        instrumentList,
         instrumentCounts,
         hasPassword,
         selectedSearch: selectedSearch,
@@ -513,6 +519,15 @@ router.post('/admin/parts', requireLogin, requireAdmin, express.urlencoded({ ext
       const parts = rawValue.split('\n').map((part) => part.trim()).filter((part) => part);
       updatedParts[instrument] = [''].concat(parts);
     });
+
+    const newInstrumentName = normalizeInstrumentName(req.body.newInstrumentName || '');
+    if (newInstrumentName) {
+      const newInstrumentParts = (req.body.newInstrumentParts || '')
+        .split('\n')
+        .map((part) => part.trim())
+        .filter((part) => part);
+      updatedParts[newInstrumentName] = [''].concat(newInstrumentParts);
+    }
 
     await saveInstrumentPartsMap(updatedParts);
     res.redirect('/music/admin?success=' + encodeURIComponent('Stimmen erfolgreich gespeichert.'));

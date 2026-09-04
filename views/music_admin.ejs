@@ -39,6 +39,18 @@
             <textarea name="parts_<%= instrument.replace(/\s+/g, '_') %>" rows="4" placeholder="Eine Stimme pro Zeile"><%= (instrumentPartsMap[instrument] || []).filter(part => part && part.trim()).join('\n') %></textarea>
           </label>
         <% }) %>
+
+        <div class="music-divider"></div>
+
+        <label>
+          <span>Neues Instrument hinzufügen</span>
+          <input type="text" name="newInstrumentName" placeholder="z. B. Klarinetten" />
+        </label>
+        <label>
+          <span>Stimmen für das neue Instrument</span>
+          <textarea name="newInstrumentParts" rows="4" placeholder="Eine Stimme pro Zeile"></textarea>
+        </label>
+
         <button type="submit" class="music-btn music-btn-primary">Stimmen speichern</button>
       </form>
     </article>
@@ -84,7 +96,8 @@
     gap: 0.4rem;
     color: #385147;
   }
-  .music-form input {
+  .music-form input,
+  .music-form textarea {
     width: 100%;
     border: 1px solid #dbe5db;
     border-radius: 14px;
@@ -92,6 +105,15 @@
     font: inherit;
     background: #f6faf6;
     color: #1d342b;
+  }
+  .music-form textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  .music-divider {
+    height: 1px;
+    background: rgba(26, 67, 51, 0.12);
+    margin: 0.25rem 0;
   }
   .music-btn {
     display: inline-flex;

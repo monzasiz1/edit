@@ -23,26 +23,14 @@
         <p>Wähle zuerst ein Instrument, dann kannst du Stimmen filtern und neue Stücke hochladen.</p>
       </div>
       <div class="music-home-grid">
-        <a href="/music?instrument=Flöten" class="music-instrument-card">
-          <span class="music-card-title">Flöten</span>
-          <span class="music-card-subtitle">Für alle Flöten-Stücke</span>
-          <span class="music-card-count"><%= instrumentCounts.Flöten || 0 %> Stücke</span>
-        </a>
-        <a href="/music?instrument=Trommeln" class="music-instrument-card">
-          <span class="music-card-title">Trommeln</span>
-          <span class="music-card-subtitle">Rhythmus und Schlagwerk</span>
-          <span class="music-card-count"><%= instrumentCounts.Trommeln || 0 %> Stücke</span>
-        </a>
-        <a href="/music?instrument=Lyra" class="music-instrument-card">
-          <span class="music-card-title">Lyra</span>
-          <span class="music-card-subtitle">Saiten und Melodie</span>
-          <span class="music-card-count"><%= instrumentCounts.Lyra || 0 %> Stücke</span>
-        </a>
-        <a href="/music?instrument=Andere" class="music-instrument-card">
-          <span class="music-card-title">Andere</span>
-          <span class="music-card-subtitle">Alle weiteren Instrumente</span>
-          <span class="music-card-count"><%= instrumentCounts.Andere || 0 %> Stücke</span>
-        </a>
+        <% const homeInstruments = Array.isArray(instrumentList) && instrumentList.length ? instrumentList : Object.keys(instrumentCounts || {}).filter(key => key !== 'all'); %>
+        <% homeInstruments.forEach((instrumentName) => { %>
+          <a href="/music?instrument=<%= encodeURIComponent(instrumentName) %>" class="music-instrument-card">
+            <span class="music-card-title"><%= instrumentName %></span>
+            <span class="music-card-subtitle">Stimmen und Stücke verwalten</span>
+            <span class="music-card-count"><%= instrumentCounts[instrumentName] || 0 %> Stücke</span>
+          </a>
+        <% }); %>
       </div>
       <div class="music-home-summary">
         <span class="music-badge"><%= instrumentCounts.all || 0 %> Stücke insgesamt</span>
